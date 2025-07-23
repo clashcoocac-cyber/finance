@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Фойдаланувчилар{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold" style="color: #23272c;">Фойдаланувчилар</h3>
+        <a href="{% url 'user_create' %}" class="btn btn-primary btn-sm px-3" style="background-color: #1677ff;">
+            + Yangi foydalanuvchi
+        </a>
+    </div>
+    <div class="table-responsive" style="max-width: 800px;">
+        <table class="table table-bordered border-secondary table-hover align-middle mb-0" style="background-color: #fff;">
+            <thead style="background: #23272c; color: #fff;">
+                <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Roli</th>
+                    <th>Kompaniya</th>
+                    <th style="width:100px;">Amal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>
+                        {% if user.role == 'chief_cashier' %}
+                            <span style="color:#ffb700; font-weight:bold;">Главный кассир</span>
+                        {% elif user.role == 'operator' %}
+                            <span style="color:#1677ff; font-weight:bold;">Оператор</span>
+                        {% elif user.role == 'admin' %}
+                            <span style="color:#fa3b3b; font-weight:bold;">Админ</span>
+                        {% else %}
+                            {{ user.role }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.company %}
+                            {{ user.company.name }}
+                        {% else %}
+                            <span class="text-secondary">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'user_update' user.pk %}" class="btn btn-outline-primary btn-sm py-0 px-1">✏️</a>
+                        <a href="{% url 'user_delete' user.pk %}" class="btn btn-outline-danger btn-sm py-0 px-1"
+                           onclick="return confirm('Rostdan ham o‘chirmoqchimisiz?');">🗑️</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">Foydalanuvchilar yo‘q</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

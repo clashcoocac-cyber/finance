@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Янги фойдаланувчи қўшиш{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow-lg" style="width: 100%; max-width: 600px;">
+        <h3 class="text-center mb-4 mb-5 bg-dark text-white py-4 px-3 rounded-top">
+            Фойдаланувчи қўшиш
+        </h3>
+        <form method="post" novalidate class="row">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger mx-5 py-2 text-center px-2">
+                    Маълумотлар тўғри киритилмаган!
+                </div>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li class="text-danger px-5">{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li class="text-danger px-5">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="mb-3 px-5 col-6 pe-1">
+                <label for="id_username" class="form-label fw-normal">
+                    <span class="text-danger">*</span>Фойдаланувчи номи
+                </label>
+                {{ form.username|add_class:"form-control border-secondary" }}
+            </div>
+            <!-- <div class="mb-3 px-5">
+                <label for="id_first_name" class="form-label fw-normal">Исми</label>
+                {{ form.first_name|add_class:"form-control border-secondary" }}
+            </div>
+            <div class="mb-3 px-5">
+                <label for="id_last_name" class="form-label fw-normal">Фамилияси</label>
+                {{ form.last_name|add_class:"form-control border-secondary" }}
+            </div> -->
+            <div class="mb-3 px-5 col-6">
+                <label for="id_password1" class="form-label fw-normal">Парол</label>
+                {{ form.password1|add_class:"form-control border-secondary" }}
+            </div>
+            <div class="mb-3 px-5 col-6 pe-1">
+                <label for="id_role" class="form-label fw-normal">
+                    <span class="text-danger">*</span>Роли
+                </label>
+                {{ form.role|add_class:"form-select border-secondary" }}
+            </div>
+            <div class="mb-3 px-5 col-6">
+                <label for="id_password2" class="form-label fw-normal">Паролни тасдиқлаш</label>
+                {{ form.password2|add_class:"form-control border-secondary" }}
+                </div>
+            <div class="mb-3 px-5">
+                <label for="id_company" class="form-label fw-normal">Компания</label>
+                {{ form.company_name|add_class:"form-select border-secondary" }}
+            </div>
+            
+            
+            <div class="m-5 mt-4 col-12">
+                <button type="submit" class="btn btn-primary btn new-shadow">ЯРАТИШ</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
