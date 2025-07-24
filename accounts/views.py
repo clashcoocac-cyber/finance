@@ -29,7 +29,7 @@ class BossDashboardView(TemplateView):
         return context
 
 class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, TemplateView):
-    template_name = 'dashboard/chief_cashier.html'
+    template_name = 'cashier_home.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['pending_reports'] = DailyReport.objects.filter(is_closed=False)
@@ -63,19 +63,6 @@ class CustomLogoutView(LogoutView):
     def get(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
-class RegisterView(TemplateView):
-    template_name = 'accounts/register.html'
-    def get(self, request):
-        form = UserRegisterForm()
-        return render(request, self.template_name, {'form': form})
-    def post(self, request):
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            messages.success(request, 'Ro‘yxatdan o‘tish muvaffaqiyatli!')
-            return redirect('login')
-        return render(request, self.template_name, {'form': form})
-
 # --- PROFILE ---
 
 class ProfileView(LoginRequiredMixin, TemplateView):
@@ -94,12 +81,18 @@ class UserListView(LoginRequiredMixin, BossRequiredMixin, ListView):
 
     def get_queryset(self):
         return super().get_queryset().order_by('role')
+    
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['operator_count'] = User.objects.filter(role='operator').count()
+        data['cashier_count'] = User.objects.filter(role='cashier').count()
+        return data
 
 
 class UserCreateView(LoginRequiredMixin, BossRequiredMixin, CreateView):
     model = User
     form_class = UserRegisterForm
-    template_name = 'accounts/user_create.html'
+    template_name = 'accounts/user_list.html'
     success_url = reverse_lazy('user_list')
 
 

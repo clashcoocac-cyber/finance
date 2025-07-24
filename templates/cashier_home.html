@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Фойдаланувчилар{% endblock %}
+{% block content %}    
+    <div id="kassirDashboard" class="min-h-screen">
+        <nav class="bg-white shadow-lg border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <span class="text-2xl">💰</span>
+                        <h1 class="ml-3 text-xl font-bold text-gray-800">Glavniy Kassir Panel</h1>
+                    </div>
+                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        Chiqish
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
+                    <div class="text-2xl mb-2">💳</div>
+                    <p class="text-sm text-gray-600">Click</p>
+                    <p class="text-lg font-bold text-blue-600" id="kassirClick">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
+                    <div class="text-2xl mb-2">💵</div>
+                    <p class="text-sm text-gray-600">Naqd</p>
+                    <p class="text-lg font-bold text-green-600" id="kassirCash">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
+                    <div class="text-2xl mb-2">🏧</div>
+                    <p class="text-sm text-gray-600">Terminal</p>
+                    <p class="text-lg font-bold text-purple-600" id="kassirTerminal">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
+                    <div class="text-2xl mb-2">🏦</div>
+                    <p class="text-sm text-gray-600">Bank</p>
+                    <p class="text-lg font-bold text-indigo-600" id="kassirBank">0</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
+                    <div class="text-2xl mb-2">📋</div>
+                    <p class="text-sm text-gray-600">Qarz</p>
+                    <p class="text-lg font-bold text-yellow-600" id="kassirDebt">0</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Kunlik Hisobotlar</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
+                            <input type="date" id="selectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" onchange="loadKassirReports()">
+                        </div>
+                        <button onclick="setToday()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            📅 Bugun
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kassirReportsTable" class="divide-y divide-gray-200"><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Akmal Toshev</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">6,125,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">click</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button onclick="approveTransaction(1001)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                            Tasdiqlash
+                        </button>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Bobur Aliyev</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">3,675,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">terminal</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button onclick="approveTransaction(1003)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                            Tasdiqlash
+                        </button>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Zarina Yusupova</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">9,800,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">qarz</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button onclick="approveTransaction(1005)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                            Tasdiqlash
+                        </button>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Jasur Mirzayev</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                            chiqim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">1,225,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">click</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button onclick="approveTransaction(1006)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                            Tasdiqlash
+                        </button>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Gulnora Hasanova</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">5,512,500 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">terminal</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button onclick="approveTransaction(1007)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                            Tasdiqlash
+                        </button>
+                    </td>
+                </tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <button onclick="downloadDailyReport()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                    📊 Kunlik Hisobot Yuklab Olish
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

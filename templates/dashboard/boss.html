@@ -2,78 +2,211 @@
 {% block title %}Boshliq Dashboard{% endblock %}
 
 {% block content %}
-<h2 class="mt-3">Boshliq Dashboard</h2>
-<div class="row my-4">
-    <div class="col-md-4">
-        <div class="card text-white bg-success mb-3">
-            <div class="card-header">Umumiy Kirim</div>
-            <div class="card-body">
-                <h3 class="card-title">200 00{{ total_income|default:0 }} so'm</h3>
+<div id="boshliqDashboard" class="min-h-screen">
+        <nav class="bg-white shadow-lg border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <span class="text-2xl">👑</span>
+                        <h1 class="ml-3 text-xl font-bold text-gray-800">Admin Panel</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="{% url 'user_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            👥 Foydalanuvchilar
+                        </a>
+                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            Chiqish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Umumiy Kirim</p>
+                            <p class="text-2xl font-bold text-green-600" id="totalIncome">
+                                25,112,500 so'm
+                            </p>
+                        </div>
+                        <div class="text-green-500 text-3xl">📈</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Umumiy Chiqim</p>
+                            <p class="text-2xl font-bold text-red-600" id="totalExpense">8,575,000 so'm</p>
+                        </div>
+                        <div class="text-red-500 text-3xl">📉</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Foyda</p>
+                            <p class="text-2xl font-bold text-blue-600" id="totalProfit">16,537,500 so'm</p>
+                        </div>
+                        <div class="text-blue-500 text-3xl">💰</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Qarz</p>
+                            <p class="text-2xl font-bold text-yellow-600" id="totalDebt">9,800,000 so'm</p>
+                        </div>
+                        <div class="text-yellow-500 text-3xl">📋</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Barcha Hisobotlar</h2>
+                    <button onclick="downloadReport()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                        📥 Hisobot Yuklab Olish
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov turi</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Holat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allReportsTable" class="divide-y divide-gray-200"><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Akmal Toshev</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">6,125,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">click</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            Tasdiqlangan
+                        </span>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/23/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Sevara Karimova</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                            chiqim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">2,450,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">naqd</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                            Kutilmoqda
+                        </span>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Bobur Aliyev</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">3,675,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">terminal</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            Tasdiqlangan
+                        </span>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/22/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Dilshod Rahimov</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                            chiqim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">1,837,500 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">bank</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            Tasdiqlangan
+                        </span>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Zarina Yusupova</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">9,800,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">qarz</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                            Kutilmoqda
+                        </span>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Jasur Mirzayev</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                            chiqim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">1,225,000 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">click</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            Tasdiqlangan
+                        </span>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Gulnora Hasanova</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            kirim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">5,512,500 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">terminal</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                            Kutilmoqda
+                        </span>
+                    </td>
+                </tr><tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">7/21/2025</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Sherzod Tursunov</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                            chiqim
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">3,062,500 so'm</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">naqd</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                            Tasdiqlangan
+                        </span>
+                    </td>
+                </tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-danger mb-3">
-            <div class="card-header">Umumiy Chiqim</div>
-            <div class="card-body">
-                <h3 class="card-title">{{ total_expense|default:0 }} so'm</h3>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row my-4">
-    <div class="col-md-6">
-        <h4 style="font-weight: 400 !important;">Компаниялар</h4>
-        <ul class="list-group">
-        {% for company in companies %}
-            <li class="list-group-item">{{ company.name }} ({{ company.address }})</li>
-        {% empty %}
-            <li class="list-group-item">Kompaniya yo'q</li>
-        {% endfor %}
-        </ul>
-    </div>
-    <div class="col-md-6">
-        <h4>Фойдаланувчилар</h4>
-        <ul class="list-group">
-        {% for user in users %}
-            <li class="list-group-item">
-                {{ user.get_full_name }} ({{ user.get_role_display }}) - {{ user.username }}
-            </li>
-        {% empty %}
-            <li class="list-group-item">Foydalanuvchi yo'q</li>
-        {% endfor %}
-        </ul>
-    </div>
-</div>
-<div class="row my-4">
-    <div class="col-12">
-        <h4>So'nggi 10 hisobot</h4>
-        <table class="table table-striped">
-            <tr>
-                <th>Sana</th>
-                <th>Operator</th>
-                <th>Kompaniya</th>
-                <th>Holat</th>
-            </tr>
-            {% for report in reports %}
-            <tr>
-                <td>{{ report.date }}</td>
-                <td>{{ report.operator.get_full_name }}</td>
-                <td>{{ report.company.name }}</td>
-                <td>
-                    {% if report.is_closed %}
-                        <span class="badge bg-success">Yopilgan</span>
-                    {% else %}
-                        <span class="badge bg-warning">Ochiq</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4">Hisobot yo'q</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
-</div>
 {% endblock %}

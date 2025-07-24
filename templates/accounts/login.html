@@ -4,30 +4,33 @@
 {% block title %}Тизимга кириш{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
-    <div class="card shadow-lg" style="width: 100%; max-width: 400px;">
-        <h3 class="text-center mb-4 mb-5 bg-dark text-white py-4 px-3 rounded-top">
-            Тизимга кириш
-        </h3>
-        <form method="post" novalidate>
-            {% csrf_token %}
-            {% if form.errors %}
-                <div class="alert alert-danger mx-5 py-1 px-2">
-                    Login yoki parol noto‘g‘ri!
+<div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md fade-in">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-white text-2xl font-bold">💼</span>
                 </div>
-            {% endif %}
-            <div class="mb-3 px-5">
-                <label for="id_username" class="form-label fw-normal">Фойдаланувчи номи</label>
-                {{ form.username|add_class:"form-control border-secondary" }}
+                <h1 class="text-2xl font-bold text-gray-800">Moliyaviy Tizim</h1>
+                <p class="text-gray-600 mt-2">Tizimga kirish</p>
             </div>
-            <div class="mb-3 px-5">
-                <label for="id_password" class="form-label fw-500">Парол</label>
-                {{ form.password|add_class:"form-control border-secondary" }}
-            </div>
-            <div class="d-grid gap-2 m-5 mt-4">
-                <button type="submit" class="btn btn-primary shadow">КИРИШ</button>
-            </div>
-        </form>
+            
+            <form class="space-y-4" method="POST">
+                {% csrf_token %}
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Login</label>
+                    <input type="text" name="username" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Login kiriting">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Parol</label>
+                    <input type="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Parol kiriting">
+                </div>
+                
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 px-6 rounded-xl font-medium transition-all duration-200 transform hover:scale-105">
+                    🔐 Kirish
+                </button>
+            </form>
+            
     </div>
-</div>
 {% endblock %}
