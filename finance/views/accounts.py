@@ -80,7 +80,7 @@ class UserListView(LoginRequiredMixin, BossRequiredMixin, ListView):
     context_object_name = 'users'
 
     def get_queryset(self):
-        return super().get_queryset().order_by('role')
+        return super().get_queryset().exclude(role='boss').order_by('role')
     
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
