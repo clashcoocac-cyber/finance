@@ -19,9 +19,7 @@ INSTALLED_APPS = [
 
     'widget_tweaks',
 
-    'accounts.apps.AccountsConfig',
-    'transactions.apps.TransactionsConfig',
-    'reports.apps.ReportsConfig',
+    'finance.apps.FInanceConfig',
 ]
 
 MIDDLEWARE = [
@@ -89,10 +87,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -100,7 +94,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'finance.User'
 
 # Login and logout settings
 LOGIN_URL = 'login'
