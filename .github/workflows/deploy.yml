@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             cd /var/www/finance
-            git pull origin main
+            git pull origin main --force
             source env/bin/activate
             pip install -r requirements.txt
             python manage.py migrate
