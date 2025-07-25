@@ -74,38 +74,47 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 
 # --- USER MANAGEMENT (Boss uchun) ---
 
-class UserListView(LoginRequiredMixin, BossRequiredMixin, ListView):
-    model = User
+class UserListCreateView(LoginRequiredMixin, BossRequiredMixin, View):
     template_name = 'accounts/user_list.html'
-    context_object_name = 'users'
+    success_url = reverse_lazy('users')
 
-    def get_queryset(self):
-        return super().get_queryset().exclude(role='boss').order_by('role')
+    def get(self, request, *args, **kwargs):
+        form = UserRegisterForm()
+        users = User.objects.exclude(role='boss').order_by('role')
+        context = {
+            'form': form,
+            'users': users,
+            'operator_count': User.objects.filter(role='operator').count(),
+            'cashier_count': User.objects.filter(role='cashier').count(),
+        }
+        return render(request, self.template_name, context)
     
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        data['operator_count'] = User.objects.filter(role='operator').count()
-        data['cashier_count'] = User.objects.filter(role='cashier').count()
-        return data
-
-
-class UserCreateView(LoginRequiredMixin, BossRequiredMixin, CreateView):
-    model = User
-    form_class = UserRegisterForm
-    template_name = 'accounts/user_list.html'
-    success_url = reverse_lazy('user_list')
+    def post(self, request, *args, **kwargs):
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(self.success_url)
+        
+        users = User.objects.exclude(role='boss').order_by('role')
+        context = {
+            'form': form,
+            'users': users,
+            'operator_count': User.objects.filter(role='operator').count(),
+            'cashier_count': User.objects.filter(role='cashier').count(),
+        }
+        return render(request, self.template_name, context)
 
 
 class UserUpdateView(BossRequiredMixin, UpdateView):
     model = User
     form_class = UserRegisterForm
     template_name = "accounts/user_update.html"
-    success_url = reverse_lazy('user_list')
+    success_url = reverse_lazy('users')
 
 
 class UserDeleteView(BossRequiredMixin, DeleteView):
     model = User
-    success_url = reverse_lazy('user_list')
+    success_url = reverse_lazy('users')
 
     def get(self, request, *args, **kwargs):
         return super().delete(request, *args, **kwargs)

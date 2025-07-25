@@ -14,9 +14,9 @@
                         <a href="{% url 'home' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
                             ← Orqaga
                         </a>
-                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
                             Chiqish
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -27,30 +27,51 @@
                 <!-- Create User Form -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-6">Yangi Foydalanuvchi Yaratish</h2>
-                    <form action="{% url 'user_create' %}" method="POST" class="space-y-4">
+                    {% if form.errors %}
+                        <div class="django-errors bg-red-50 border border-red-200 rounded-lg p-4 mb-6 fade-in">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">Quyidagi xatolarni tuzating:</h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <ul class="list-disc pl-5 space-y-1">
+                                            {% if form.errors %}
+                                            <li>Bu username band. Boshqa tanlang</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <form action="{% url 'users' %}" method="POST" class="space-y-4">
                 {% csrf_token %}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
-                            <input type="text" id="newUsername" placeholder="Username kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <input required type="text" name="username" placeholder="Username kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Parol</label>
-                            <input type="password" id="newPassword" placeholder="Parol kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <input required type="password" name="password" placeholder="Parol kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
-                            <select id="newRole" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <select required name="role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="">Rol tanlang</option>
                                 <option value="operator">Operator</option>
-                                <option value="glavniy_kassir">Glavniy Kassir</option>
+                                <option value="cashier">Kassir</option>
                             </select>
                         </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kompaniya</label>
-                            <input type="text" id="newCompany" placeholder="Kompaniya nomi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <input type="text" name="company_name" placeholder="Kompaniya nomi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                         
                         <button onclick="createUser()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
@@ -68,7 +89,7 @@
                                 <span class="text-2xl mr-3">👨‍💻</span>
                                 <span class="font-medium text-gray-700">Operatorlar</span>
                             </div>
-                            <span class="text-2xl font-bold text-blue-600" id="operatorCount">{{ operator_count }}</span>
+                            <span class="text-2xl font-bolder text-blue-600" id="operatorCount">{{ operator_count }}</span>
                         </div>
                         
                         <div class="flex justify-between items-center p-4 bg-green-50 rounded-lg">
@@ -76,7 +97,7 @@
                                 <span class="text-2xl mr-3">💰</span>
                                 <span class="font-medium text-gray-700">Kassirlar</span>
                             </div>
-                            <span class="text-2xl font-bold text-green-600" id="kassirCount">{{ cashier_count }}</span>
+                            <span class="text-2xl font-bolder text-green-600" id="kassirCount">{{ cashier_count }}</span>
                         </div>
                         
                         <div class="flex justify-between items-center p-4 bg-purple-50 rounded-lg">
@@ -84,7 +105,7 @@
                                 <span class="text-2xl mr-3">📊</span>
                                 <span class="font-medium text-gray-700">Jami Tranzaksiyalar</span>
                             </div>
-                            <span class="text-2xl font-bold text-purple-600" id="transactionCount">0</span>
+                            <span class="text-2xl font-bolder text-purple-600" id="transactionCount">0</span>
                         </div>
                     </div>
                 </div>
@@ -116,7 +137,7 @@
                         <td class="px-4 py-3 text-sm text-gray-900">{{ user.company.name | default:"-" }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900">{{ user.created | date:"d/m/Y" }}</td>
                         <td class="px-4 py-3 text-sm">
-                            <a href="{% url 'user_delete' user.pk %}" onclick="confirm('Are you sure?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                            <a href="{% url 'user_delete' user.pk %}" onclick="return confirm('Haqiqatan ham o‘chirmoqchimisiz?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors">
                                 O'chirish
                             </a>
                         </td>

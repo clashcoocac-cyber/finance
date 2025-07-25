@@ -1,33 +1,30 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserChangeForm
 from .models import Company, User
 
 
 
-class UserRegisterForm(UserCreationForm):
+class UserRegisterForm(forms.ModelForm):    
+    password = forms.CharField(widget=forms.PasswordInput)
     company_name = forms.CharField(required=False)
 
     class Meta:
         model = User
-        fields = ['username', 'role', 'company_name', 'password1', 'password2']
-
-    def form_valid(self, form):
-        print("form_valid chaqirildi!")   # Bu chiqadi
-        user = form.save()                # Bu orqali form.save() ichidagi printlar ham chiqadi
-        ...
-        return super().form_valid(form)
+        fields = ['username', 'role', 'company_name', 'password']
 
     def save(self, commit = True):
         company_name = self.cleaned_data.pop('company_name', '')
-        print('----', company_name)
+        password = self.cleaned_data.pop('password')
+
         user = super().save(commit=False)
-        print('----', company_name, user)
+        user.set_password(password)
         
         if company_name:
-            company, created = Company.objects.get_or_create(name=company_name)
+            company, _ = Company.objects.get_or_create(name=company_name)
             user.company = company
         else:
             user.company = None 
+
         if commit:
             user.save()
         return user
