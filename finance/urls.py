@@ -3,8 +3,9 @@ from .views.accounts import (
     HomeView,
     BossDashboardView, ChiefCashierDashboardView, OperatorDashboardView,
     CustomLoginView, CustomLogoutView,
-    ProfileView, UserListCreateView, UserUpdateView, UserDeleteView
+    UserListCreateView, UserUpdateView, UserDeleteView
 )
+from .views.transaction import TransactionCreateView, ConfirmExpenseView
 
 urlpatterns = [
     # Home
@@ -20,10 +21,13 @@ urlpatterns = [
     path("dashboard/operator/", OperatorDashboardView.as_view(), name="operator_dashboard"),
 
     # Profile
-    path("profile/", ProfileView.as_view(), name="profile"),
 
     # User management (boss)
     path("users/", UserListCreateView.as_view(), name="users"),
-    path('users/<int:pk>/edit/', UserUpdateView.as_view(), name='user_update'),
+    path('users/update', UserUpdateView.as_view(), name='user_update'),
     path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user_delete'),
+
+    path('transactions/create/', TransactionCreateView.as_view(), name='transaction_create'),
+
+    path('reports/<int:pk>/confirm/', ConfirmExpenseView.as_view(), name='confirm_expense')
 ]

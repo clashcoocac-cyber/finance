@@ -24,137 +24,158 @@
         </nav>
 
         <div class="max-w-7xl mx-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💳</div>
                     <p class="text-sm text-gray-600">Click</p>
-                    <p class="text-lg font-bold text-blue-600" id="operatorClick">7,350,000</p>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click.eur | default:0 }} €</p>
+                    </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💵</div>
                     <p class="text-sm text-gray-600">Naqd</p>
-                    <p class="text-lg font-bold text-green-600" id="operatorCash">0</p>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-green-600" id="operatorCashUZS">{{ total.cash.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-green-600" id="operatorCashUSD">{{ total.cash.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-green-600" id="operatorCashRUB">{{ total.cash.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-green-600" id="operatorCashEUR">{{ total.cash.eur | default:0 }} €</p>
+                    </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">🏧</div>
                     <p class="text-sm text-gray-600">Terminal</p>
-                    <p class="text-lg font-bold text-purple-600" id="operatorTerminal">9,187,500</p>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-purple-600" id="operatorTerminalUZS">{{ total.terminal.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-purple-600" id="operatorTerminalUSD">{{ total.terminal.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-purple-600" id="operatorTerminalRUB">{{ total.terminal.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-purple-600" id="operatorTerminalEUR">{{ total.terminal.eur | default:0 }} €</p>
+                    </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">🏦</div>
                     <p class="text-sm text-gray-600">Bank</p>
-                    <p class="text-lg font-bold text-indigo-600" id="operatorBank">0</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">📋</div>
-                    <p class="text-sm text-gray-600">Qarz</p>
-                    <p class="text-lg font-bold text-yellow-600" id="operatorDebt">9,800,000</p>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-indigo-600" id="operatorBankUZS">{{ total.bank.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-indigo-600" id="operatorBankUSD">{{ total.bank.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-indigo-600" id="operatorBankRUB">{{ total.bank.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-indigo-600" id="operatorBankEUR">{{ total.bank.eur | default:0 }} €</p>
+                    </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Kiritish</h2>
-                    <div class="space-y-4">
-                        <select id="transactionType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">Tur tanlang</option>
-                            <option value="kirim">Kirim</option>
-                            <option value="chiqim">Chiqim</option>
-                        </select>
-                        
-                        <select id="personSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"><option value="">Shaxsni tanlang</option><option value="Ali Valiyev">Ali Valiyev (mijoz)</option><option value="Sardor Karimov">Sardor Karimov (yetkazib beruvchi)</option><option value="Malika Tosheva">Malika Tosheva (xodim)</option><option value="Oybek Nazarov">Oybek Nazarov (mijoz)</option><option value="Feruza Abdullayeva">Feruza Abdullayeva (yetkazib beruvchi)</option><option value="Nodira Saidova">Nodira Saidova (xodim)</option><option value="Rustam Ergashev">Rustam Ergashev (mijoz)</option><option value="Laylo Qodirova">Laylo Qodirova (yetkazib beruvchi)</option></select>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Qo'shish</h2>
+                    <form action="{% url 'transaction_create' %}" method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kimdan olindi</label>
+                            <input type="text" name="counterparty" id="incomeFromWhom" placeholder="Mijoz yoki tashkilot nomi..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
                         
                         <div class="grid grid-cols-2 gap-4">
-                            <input type="number" id="amountUSD" placeholder="Miqdor ($)" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <input type="number" id="amountUZS" placeholder="Miqdor (so'm)" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">So'm</label>
+                                <input type="number" name="amount_uzs" id="incomeAmountUZS" placeholder="So'm miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Dollar</label>
+                                <input type="number" name="amount_usd" id="incomeAmountUSD" placeholder="Dollar miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
                         </div>
                         
-                        <select id="paymentType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="">To'lov turini tanlang</option>
-                            <option value="click">Click</option>
-                            <option value="naqd">Naqd</option>
-                            <option value="terminal">Terminal</option>
-                            <option value="bank">Bank</option>
-                            <option value="qarz">Qarz</option>
-                            <option value="vozvrat">Vozvrat</option>
-                        </select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rubl</label>
+                                <input type="number" name="amount_rub" id="incomeAmountRUB" placeholder="Rubl miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Yevro</label>
+                                <input type="number" name="amount_uer" id="incomeAmountEUR" placeholder="Yevro miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
                         
-                        <button onclick="addTransaction()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">To'lov turi</label>
+                            <select id="incomePaymentType" name="payment_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">To'lov turini tanlang</option>
+                                <option value="click">Click</option>
+                                <option value="cash">Naqd</option>
+                                <option value="terminal">Terminal</option>
+                                <option value="bank">Bank</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="addIncome()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
                             Ma'lumot Qo'shish
                         </button>
-                    </div>
+                    </form>
                 </div>
 
+                <!-- Today's Summary -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Bugungi Tranzaksiyalar</h2>
-                    <div class="space-y-3 max-h-96 overflow-y-auto" id="todayTransactions"><div class="bg-gray-50 rounded-lg p-4 slide-in">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-medium text-gray-800">Ali Valiyev</p>
-                            <p class="text-sm text-gray-600">kirim - click</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-green-600">
-                                6,125,000 so'm
-                            </p>
-                            <p class="text-xs text-gray-500">2:26:28 PM</p>
-                        </div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Kunlik Hisobotlarim</h2>
+                    <div class="space-y-3 max-h-96 overflow-y-auto" id="operatorDailyReports">
+                    <div class="text-center py-12">
+                        <div class="text-6xl mb-4">📊</div>
+                        <p class="text-gray-500 text-lg mb-2">Hozircha hisobotlar yo'q</p>
+                        <p class="text-gray-400 text-sm">Birinchi tranzaksiyangizni qo'shing va kassani yoping</p>
                     </div>
-                </div><div class="bg-gray-50 rounded-lg p-4 slide-in">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-medium text-gray-800">Malika Tosheva</p>
-                            <p class="text-sm text-gray-600">kirim - terminal</p>
+                </div>
+                </div>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Mening Tranzaksiyalarim</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Vaqt</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kimdan</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="operatorTransactionsTable" class="divide-y divide-gray-200">
+                            {% for transaction in my_transactions %}
+                            <tr>
+        
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.date | time:"H:i:s" }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.counterparty }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1">
+                            {% if transaction.amount_uzs %}
+                                <div class="font-semibold text-green-600">{{ transaction.amount_uzs }} so'm</div>
+                            {% endif %}
+                            {% if transaction.amount_usd %}
+                                <div class="font-semibold text-green-600">{{ transaction.amount_usd }} $</div>
+                            {% endif %}
+                            {% if transaction.amount_rub %}
+                                <div class="font-semibold text-green-600">{{ transaction.amount_rub }} ₽</div>
+                            {% endif %}
+                            {% if transaction.amount_eur %}
+                                <div class="font-semibold text-green-600">{{ transaction.amount_eur }} €</div>
+                            {% endif %}
                         </div>
-                        <div class="text-right">
-                            <p class="font-bold text-green-600">
-                                3,675,000 so'm
-                            </p>
-                            <p class="text-xs text-gray-500">2:26:28 PM</p>
-                        </div>
-                    </div>
-                </div><div class="bg-gray-50 rounded-lg p-4 slide-in">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-medium text-gray-800">Feruza Abdullayeva</p>
-                            <p class="text-sm text-gray-600">kirim - qarz</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-green-600">
-                                9,800,000 so'm
-                            </p>
-                            <p class="text-xs text-gray-500">2:26:28 PM</p>
-                        </div>
-                    </div>
-                </div><div class="bg-gray-50 rounded-lg p-4 slide-in">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-medium text-gray-800">Nodira Saidova</p>
-                            <p class="text-sm text-gray-600">chiqim - click</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-red-600">
-                                1,225,000 so'm
-                            </p>
-                            <p class="text-xs text-gray-500">1:26:28 PM</p>
-                        </div>
-                    </div>
-                </div><div class="bg-gray-50 rounded-lg p-4 slide-in">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-medium text-gray-800">Rustam Ergashev</p>
-                            <p class="text-sm text-gray-600">kirim - terminal</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="font-bold text-green-600">
-                                5,512,500 so'm
-                            </p>
-                            <p class="text-xs text-gray-500">2:26:28 PM</p>
-                        </div>
-                    </div>
-                </div></div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.get_payment_type_display }}</td>
+                    <td class="px-4 py-3 text-sm">
+                        <button onclick="editTransaction(1753450498168)" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                O'zgartirish
+                            </button>
+                    </td>
+                </tr>
+                {% endfor %}
+    </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-    </div>
 {% endblock %}

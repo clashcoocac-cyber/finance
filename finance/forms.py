@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
-from .models import Company, User
+from .models import Company, User, Transaction
 
 
 
@@ -31,7 +31,41 @@ class UserRegisterForm(forms.ModelForm):
 
 
 class UserUpdateForm(UserChangeForm):
-    password = None  # Parolni o'zgartirish formda bo'lmaydi
+    user_id = forms.IntegerField()
+    password = forms.CharField(widget=forms.PasswordInput, required=False)
+    company_name = forms.CharField(required=False)
+
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'role', 'company']
+        fields = ['user_id', 'username', 'password', 'company_name']
+
+    def save(self, commit = True, **kwargs):
+        user = super().save(commit=False)
+
+        password = self.cleaned_data.pop('password', None)
+        company_name = self.cleaned_data.pop('company_name')
+
+        print(password, company_name)
+
+        if password:
+            user.set_password(password)
+
+        company, _ = Company.objects.get_or_create(name=company_name)
+        user.company = company
+        if commit:
+            user.save()
+        return user
+
+
+class TransactionFrom(forms.ModelForm):
+
+    class Meta:
+        model = Transaction
+        fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'counterparty']
+        
+    def save(self, commit = ..., operator=None):
+        transaction = super().save(commit=False)
+        transaction.operator = operator
+        if commit:
+            transaction.save()
+        return transaction

@@ -1,4 +1,5 @@
 {% extends "../base.html" %}
+{% load custom_filters %}
 {% block title %}Boshliq Dashboard{% endblock %}
 
 {% block content %}
@@ -23,14 +24,17 @@
         </nav>
 
         <div class="max-w-7xl mx-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Umumiy Kirim</p>
-                            <p class="text-2xl font-bold text-green-600" id="totalIncome">
-                                25,112,500 so'm
-                            </p>
+                            <div class="space-y-1 mt-2">
+                                <p class="text-lg font-medium text-green-600" id="totalIncomeUZS">{{ stats.uzs.income | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeUSD">{{ stats.usd.income | format_currency }} $</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeRUB">{{ stats.rub.income | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeEUR">{{ stats.uer.income | format_currency }} €</p>
+                            </div>
                         </div>
                         <div class="text-green-500 text-3xl">📈</div>
                     </div>
@@ -39,7 +43,12 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Umumiy Chiqim</p>
-                            <p class="text-2xl font-bold text-red-600" id="totalExpense">8,575,000 so'm</p>
+                            <div class="space-y-1 mt-2">
+                                <p class="text-lg font-bold text-red-600" id="totalExpenseUZS">{{ stats.uzs.expense | format_currency }} so'm</p>
+                                <p class="text-sm font-semibold text-red-600" id="totalExpenseUSD">{{ stats.usd.expense | format_currency }} $</p>
+                                <p class="text-sm font-semibold text-red-600" id="totalExpenseRUB">{{ stats.rub.expense | format_currency }} ₽</p>
+                                <p class="text-sm font-semibold text-red-600" id="totalExpenseEUR">{{ stats.uer.expense | format_currency }} €</p>
+                            </div>
                         </div>
                         <div class="text-red-500 text-3xl">📉</div>
                     </div>
@@ -47,19 +56,15 @@
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">Foyda</p>
-                            <p class="text-2xl font-bold text-blue-600" id="totalProfit">16,537,500 so'm</p>
+                            <p class="text-sm font-medium text-gray-600">Qoldiq</p>
+                            <div class="space-y-1 mt-2">
+                                <p class="text-lg font-bold text-blue-600" id="totalBalanceUZS">{{ stats.uzs.diff | format_currency }} so'm</p>
+                                <p class="text-sm font-semibold text-blue-600" id="totalBalanceUSD">{{ stats.usd.diff | format_currency }} $</p>
+                                <p class="text-sm font-semibold text-blue-600" id="totalBalanceRUB">{{ stats.rub.diff | format_currency }} ₽</p>
+                                <p class="text-sm font-semibold text-blue-600" id="totalBalanceEUR">{{ stats.uer.diff | format_currency }} €</p>
+                            </div>
                         </div>
                         <div class="text-blue-500 text-3xl">💰</div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Qarz</p>
-                            <p class="text-2xl font-bold text-yellow-600" id="totalDebt">9,800,000 so'm</p>
-                        </div>
-                        <div class="text-yellow-500 text-3xl">📋</div>
                     </div>
                 </div>
             </div>
@@ -67,143 +72,79 @@
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-gray-800">Barcha Hisobotlar</h2>
-                    <button onclick="downloadReport()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                        📥 Hisobot Yuklab Olish
-                    </button>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
+                            <input type="date" value="{{ date }}" id="adminSelectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                            onchange="window.location.href = `?date=${this.value}`">
+                        </div>
+                        <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            📅 Bugun
+                        </a>
+                        <button onclick="downloadDailyReportAdmin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
+                            📥 Yuklab Olish
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov turi</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Holat</th>
                             </tr>
                         </thead>
-                        <tbody id="allReportsTable" class="divide-y divide-gray-200"><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Akmal Toshev</td>
+                        <tbody id="allReportsTable" class="divide-y divide-gray-200">
+                            {% for report in reports %}
+                            <tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.date | date:"d/m/Y" }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.company.name }}</td>
                     <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 text-xs rounded-full {% if report.type == 'income' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}">
+                            {{ report.get_type_display | lower }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1 font-medium {% if report.type == 'income' %} text-green-600 {% else %} text-red-600 {% endif %}">
+                            {% if report.total_uzs %}
+                            <div class="">{{ report.total_uzs | format_currency }} so'm</div>
+                            {% endif %}
+                            {% if report.total_usd %}
+                            <div class="">{{ report.total_usd | format_currency }} $</div>
+                            {% endif %}
+                            {% if report.total_rub %}
+                            <div class="">{{ report.total_rub | format_currency }} ₽</div>
+                            {% endif %}
+                            {% if report.total_eur %}
+                            <div class="">{{ report.total_eur | format_currency }} €</div>
+                            {% endif %}
+
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        {% if report.is_closed %}
                         <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            kirim
+                                Tasdiqlangan
                         </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">6,125,000 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">click</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            Tasdiqlangan
-                        </span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/23/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Sevara Karimova</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
-                            chiqim
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">2,450,000 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">naqd</td>
-                    <td class="px-4 py-3 text-sm">
+                        {% elif report.type == 'income' %}
                         <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
                             Kutilmoqda
                         </span>
+                        {% else %}
+                        <form action = "{% url 'confirm_expense' report.pk %}" method="POST">
+                            {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Rostan ham tasdiqlamoqchimisiz?')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                Tasdiqlash
+                        </a>
+                        </form>
+                        {% endif %}
                     </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Bobur Aliyev</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            kirim
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">3,675,000 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">terminal</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            Tasdiqlangan
-                        </span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/22/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Dilshod Rahimov</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
-                            chiqim
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">1,837,500 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">bank</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            Tasdiqlangan
-                        </span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Zarina Yusupova</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            kirim
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">9,800,000 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">qarz</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                            Kutilmoqda
-                        </span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Jasur Mirzayev</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
-                            chiqim
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">1,225,000 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">click</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            Tasdiqlangan
-                        </span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/24/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Gulnora Hasanova</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            kirim
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">5,512,500 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">terminal</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                            Kutilmoqda
-                        </span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/21/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Sherzod Tursunov</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">
-                            chiqim
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">3,062,500 so'm</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">naqd</td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                            Tasdiqlangan
-                        </span>
-                    </td>
-                </tr></tbody>
+                </tr>
+                {% endfor %}
+ </tbody>
                     </table>
                 </div>
             </div>

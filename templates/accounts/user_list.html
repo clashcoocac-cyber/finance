@@ -40,7 +40,11 @@
                                     <div class="mt-2 text-sm text-red-700">
                                         <ul class="list-disc pl-5 space-y-1">
                                             {% if form.errors %}
-                                            <li>Bu username band. Boshqa tanlang</li>
+                                            {% for field, errors in form.errors.items %}
+                                                <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
+                                            {% endfor %}
+                                            {% else %}
+                                                <li>Ma'lumotlarni to'ldiring</li>
                                             {% endif %}
                                         </ul>
                                     </div>
@@ -130,16 +134,21 @@
                             <tr>
                                 <td class="px-4 py-3 text-sm text-gray-900">{{ user.username }}</td>
                         <td class="px-4 py-3 text-sm">
-                            <span class="px-2 py-1 text-xs rounded-full {% if user.role == 'operator' %} bg-blue-100 text-blue-800 {% elif user.role == 'cachier' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}">
+                            <span class="px-2 py-1 text-xs rounded-full {% if user.role == 'operator' %} bg-blue-100 text-blue-800 {% elif user.role == 'cashier' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}">
                                 {% if user.role == 'operator' %} Operator {% elif user.role == 'cashier' %} Kassir {% else %} Admin {% endif %}
                             </span>
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-900">{{ user.company.name | default:"-" }}</td>
                         <td class="px-4 py-3 text-sm text-gray-900">{{ user.created | date:"d/m/Y" }}</td>
                         <td class="px-4 py-3 text-sm">
-                            <a href="{% url 'user_delete' user.pk %}" onclick="return confirm('Haqiqatan ham o‘chirmoqchimisiz?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                O'chirish
-                            </a>
+                            <div class="flex space-x-2">
+                                <button onclick="editUser('{{user.username}}', '{{user.company.name| default:""}}', '{{ user.id }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                    Tahrirlash
+                                </button>
+                                <a href="{% url 'user_delete' user.pk %}" onclick='return confirm("Rostan ochirmoqchimisiz?")' class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                    O'chirish
+                                </a>
+                            </div>
                         </td>
                             </tr>
                             {% endfor %}
@@ -149,5 +158,66 @@
             </div>
         </div>
     </div>
+
+
+<!-- Edit User Modal -->
+    <div id="editUserModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <form action="{% url 'user_update' %}" method="POST" class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            {% csrf_token %}
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Foydalanuvchini Tahrirlash</h2>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+            
+            <div class="space-y-4">
+                <input type="number" name="user_id" id="userID" class="w-full px-4 py-3 border border-gray-300 rounded-lg hidden" required>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" name="username" id="editUsername" class="w-full px-4 py-3 border border-gray-300 rounded-lg" required>
+                </div>
+                
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Yangi Parol</label>
+                    <input type="password" name="password" id="editPassword" placeholder="Yangi parol (bo'sh qoldirish mumkin)" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">Bo'sh qoldirsangiz, eski parol saqlanadi</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Kompaniya</label>
+                    <input type="text" id="editCompany" name="company_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
+                </div>
+                
+                <div class="flex space-x-4 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                        💾 Saqlash
+                    </button>
+                    <button onclick="closeEditModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                        ❌ Bekor qilish
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function editUser(username, company_name, user_id) {
+            // Fill modal with user data
+            document.getElementById('editUsername').value = username;
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editCompany').value = company_name;
+            document.getElementById('userID').value = user_id;
+            
+            // Show modal
+            document.getElementById('editUserModal').classList.remove('hidden');
+        }
+        
+        // Close edit modal
+        function closeEditModal() {
+            document.getElementById('editUserModal').classList.add('hidden');
+            clearErrorMessages();
+        }
+    </script>
 
 {% endblock %}
