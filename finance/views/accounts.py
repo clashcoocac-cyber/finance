@@ -26,7 +26,7 @@ class BossDashboardView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['users'] = User.objects.all()
         context['date'] = self.request.GET.get('date', None) or datetime.today().strftime('%Y-%m-%d')
-        context['reports'] = DailyReport.objects.filter(date=context['date'])
+        context['reports'] = DailyReport.objects.filter(date=context['date']).order_by('type')
         
         qs = DailyReport.objects.filter(is_closed=True)
 
