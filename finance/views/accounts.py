@@ -126,7 +126,7 @@ class UserListCreateView(LoginRequiredMixin, BossRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         form = UserRegisterForm()
-        users = User.objects.exclude(role='boss').order_by('role')
+        users = User.objects.order_by('role') # .exclude(role='boss')
         context = {
             'form': form,
             'users': users,
