@@ -86,7 +86,11 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Naqd</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Click</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Terminal</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Bank</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Umumiy</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amal</th>
                             </tr>
                         </thead>
@@ -98,6 +102,70 @@
                     <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.company.name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="space-y-1 text-green-600 font-medium">
+                            {% if report.uzs_detail.cash > 0 %}
+                            <div class="">{{ report.uzs_detail.cash | format_currency }} so'm</div>
+                            {% endif %}
+                            {% if report.usd_detail.cash > 0 %}
+                            <div class="">{{ report.usd_detail.cash | format_currency }} $</div>
+                            {% endif %}
+                            {% if report.rub_detail.cash > 0 %}
+                            <div class="">{{ report.rub_detail.cash | format_currency }} ₽</div>
+                            {% endif %}
+                            {% if report.eur_detail.cash > 0 %}
+                            <div class="">{{ report.eur_detail.cash | format_currency }} €</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1 text-green-600 font-medium">
+                            {% if report.uzs_detail.click > 0 %}
+                            <div class="">{{ report.uzs_detail.click | format_currency }} so'm</div>
+                            {% endif %}
+                            {% if report.usd_detail.click > 0 %}
+                            <div class="">{{ report.usd_detail.click | format_currency }} $</div>
+                            {% endif %}
+                            {% if report.rub_detail.click > 0 %}
+                            <div class="">{{ report.rub_detail.click | format_currency }} ₽</div>
+                            {% endif %}
+                            {% if report.eur_detail.click > 0 %}
+                            <div class="">{{ report.eur_detail.click | format_currency }} €</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1 text-green-600 font-medium">
+                            {% if report.uzs_detail.terminal > 0 %}
+                            <div class="">{{ report.uzs_detail.terminal | format_currency }} so'm</div>
+                            {% endif %}
+                            {% if report.usd_detail.terminal > 0 %}
+                            <div class="">{{ report.usd_detail.terminal | format_currency }} $</div>
+                            {% endif %}
+                            {% if report.rub_detail.terminal > 0 %}
+                            <div class="">{{ report.rub_detail.terminal | format_currency }} ₽</div>
+                            {% endif %}
+                            {% if report.eur_detail.terminal > 0 %}
+                            <div class="">{{ report.eur_detail.terminal | format_currency }} €</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1 text-green-600 font-medium">
+                            {% if report.uzs_detail.bank > 0 %}
+                            <div class="">{{ report.uzs_detail.bank | format_currency }} so'm</div>
+                            {% endif %}
+                            {% if report.usd_detail.bank > 0 %}
+                            <div class="">{{ report.usd_detail.bank | format_currency }} $</div>
+                            {% endif %}
+                            {% if report.rub_detail.bank > 0 %}
+                            <div class="">{{ report.rub_detail.bank | format_currency }} ₽</div>
+                            {% endif %}
+                            {% if report.eur_detail.bank > 0 %}
+                            <div class="">{{ report.eur_detail.bank | format_currency }} €</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1 text-green-600 font-semibold">
                             {% if report.total_uzs %}
                             <div class="">{{ report.total_uzs | format_currency }} so'm</div>
                             {% endif %}

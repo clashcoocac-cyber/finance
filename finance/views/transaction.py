@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, date
 from django.shortcuts import render, redirect
 from django.views import View
@@ -61,10 +62,29 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         )
 
         transactions.update(report=report)
-        report.total_uzs = transactions.aggregate(Sum('amount_uzs'))['amount_uzs__sum'] or 0
-        report.total_usd = transactions.aggregate(Sum('amount_usd'))['amount_usd__sum'] or 0
-        report.total_rub = transactions.aggregate(Sum('amount_rub'))['amount_rub__sum'] or 0
-        report.total_uer = transactions.aggregate(Sum('amount_eur'))['amount_eur__sum'] or 0
+
+        result = {
+        'usd': defaultdict(lambda: 0),
+        'uzs': defaultdict(lambda: 0),
+        'rub': defaultdict(lambda: 0),
+        'eur': defaultdict(lambda: 0),
+    }
+
+        for tx in transactions:
+            result['usd'][tx.payment_type] += tx.amount_usd or 0
+            result['uzs'][tx.payment_type] += tx.amount_uzs or 0
+            result['rub'][tx.payment_type] += tx.amount_rub or 0
+            result['eur'][tx.payment_type] += tx.amount_eur or 0
+
+        report.total_usd = sum(result['usd'].values())
+        report.total_uzs = sum(result['uzs'].values())
+        report.total_rub = sum(result['rub'].values())
+        report.total_uer = sum(result['eur'].values()) 
+
+        report.usd_detail = {k: int(v) for k, v in result['usd'].items()}
+        report.uzs_detail = {k: int(v) for k, v in result['uzs'].items()}
+        report.rub_detail = {k: int(v) for k, v in result['rub'].items()}
+        report.eur_detail = {k: int(v) for k, v in result['eur'].items()}
         report.is_closed = False
         report.save()
 

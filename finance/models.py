@@ -56,6 +56,11 @@ class DailyReport(models.Model):
     total_usd = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     total_rub = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     total_uer = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
+
+    uzs_detail = models.JSONField(null=True, blank=True)
+    usd_detail = models.JSONField(null=True, blank=True)
+    rub_detail = models.JSONField(null=True, blank=True)
+    eur_detail = models.JSONField(null=True, blank=True)
     
     is_closed = models.BooleanField(default=False)
    
