@@ -39,7 +39,8 @@ class Transaction(models.Model):
     description = models.TextField()
     operator = models.ForeignKey(User, on_delete=models.CASCADE)
     counterparty = models.CharField(max_length=255)
-    is_approved = models.BooleanField(default=False)
+    report = models.ForeignKey('DailyReport', on_delete=models.CASCADE, null=True, blank=True)
+
 
 
 class DailyReport(models.Model):

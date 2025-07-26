@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime , date
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, ListView, DeleteView, CreateView, UpdateView
@@ -69,11 +69,27 @@ class BossDashboardView(TemplateView):
 
 class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, TemplateView):
     template_name = 'cashier_home.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['pending_reports'] = DailyReport.objects.filter(is_closed=False)
-        context['approved_reports'] = DailyReport.objects.filter(is_closed=True)
-        context['today_transactions'] = Transaction.objects.filter(date__date=self.request.user.last_login.date())
+        context['date'] = self.request.GET.get('date', None) or datetime.today().strftime('%Y-%m-%d')
+        context['reports'] = DailyReport.objects.filter(type='income', date=context['date']).order_by('-date')
+        
+        queryset = Transaction.objects.filter(
+            report__type='income', date__date=context['date'], report__is_closed=True
+        )
+
+
+        result = {}
+        for payment in ['click', 'cash', 'terminal', 'bank']:
+            subquery = queryset.filter(payment_type=payment).aggregate(
+                usd=Sum('amount_usd'),
+                uzs=Sum('amount_uzs'),
+                rub=Sum('amount_rub'),
+                eur=Sum('amount_eur'),
+            )
+            result[payment] = subquery
+        context['total'] = result
         return context
 
 class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateView):
@@ -81,12 +97,13 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['date'] = self.request.GET.get('date', None) or datetime.today().strftime('%Y-%m-%d')
         user = self.request.user
-        context['my_transactions'] = Transaction.objects.filter(operator=user).order_by('-date')[:10]
-        context['my_reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:5]
+        context['my_transactions'] = Transaction.objects.filter(operator=user, date__date=context['date']).order_by('-date')
+        context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:3]
 
         queryset = Transaction.objects.filter(
-            operator=self.request.user,
+            operator=self.request.user, date__date=context['date']
         )
 
         result = {}

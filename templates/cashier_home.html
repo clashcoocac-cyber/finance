@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 {% block title %}Фойдаланувчилар{% endblock %}
 {% block content %}    
     <div id="kassirDashboard" class="min-h-screen">
@@ -12,9 +13,9 @@
                     <button onclick="showExpensesPage()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
                         💸 Chiqimlar
                     </button>
-                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
                         Chiqish
-                    </button>
+                    </a>
                 </div>
             </div>
         </nav>
@@ -25,40 +26,40 @@
                     <div class="text-2xl mb-2">💳</div>
                     <p class="text-sm text-gray-600">Click</p>
                     <div class="space-y-1">
-                        <p class="text-sm font-bold text-blue-600" id="kassirClickUZS">12,250,000 so'm</p>
-                        <p class="text-xs font-semibold text-blue-600" id="kassirClickUSD">$500</p>
-                        <p class="text-xs font-semibold text-blue-600" id="kassirClickRUB">₽0</p>
-                        <p class="text-xs font-semibold text-blue-600" id="kassirClickEUR">€0</p>
+                        <p class="text-sm font-bold text-blue-600" id="kassirClickUZS">{{ total.click.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-blue-600" id="kassirClickUSD">{{ total.click.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-blue-600" id="kassirClickRUB">{{ total.click.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-blue-600" id="kassirClickEUR">{{ total.click.eur | default:0 }} €</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💵</div>
                     <p class="text-sm text-gray-600">Naqd</p>
                     <div class="space-y-1">
-                        <p class="text-sm font-bold text-green-600" id="kassirCashUZS">-1,837,500 so'm</p>
-                        <p class="text-xs font-semibold text-green-600" id="kassirCashUSD">$-225</p>
-                        <p class="text-xs font-semibold text-green-600" id="kassirCashRUB">₽0</p>
-                        <p class="text-xs font-semibold text-green-600" id="kassirCashEUR">€0</p>
+                        <p class="text-sm font-bold text-green-600" id="kassirClickUZS">{{ total.cash.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-green-600" id="kassirClickUSD">{{ total.cash.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-green-600" id="kassirClickRUB">{{ total.cash.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-green-600" id="kassirClickEUR">{{ total.cash.eur | default:0 }} €</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">🏧</div>
                     <p class="text-sm text-gray-600">Terminal</p>
                     <div class="space-y-1">
-                        <p class="text-sm font-bold text-purple-600" id="kassirTerminalUZS">3,675,000 so'm</p>
-                        <p class="text-xs font-semibold text-purple-600" id="kassirTerminalUSD">$450</p>
-                        <p class="text-xs font-semibold text-purple-600" id="kassirTerminalRUB">₽0</p>
-                        <p class="text-xs font-semibold text-purple-600" id="kassirTerminalEUR">€0</p>
+                        <p class="text-sm font-bold text-purple-600" id="kassirClickUZS">{{ total.terminal.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-purple-600" id="kassirClickUSD">{{ total.terminal.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-purple-600" id="kassirClickRUB">{{ total.terminal.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-purple-600" id="kassirClickEUR">{{ total.terminal.eur | default:0 }} €</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">🏦</div>
                     <p class="text-sm text-gray-600">Bank</p>
                     <div class="space-y-1">
-                        <p class="text-sm font-bold text-indigo-600" id="kassirBankUZS">10,412,500 so'm</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="kassirBankUSD">$800</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="kassirBankRUB">₽0</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="kassirBankEUR">€0</p>
+                        <p class="text-sm font-bold text-indigo-600" id="kassirClickUZS">{{ total.bank.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-indigo-600" id="kassirClickUSD">{{ total.bank.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-indigo-600" id="kassirClickRUB">{{ total.bank.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-indigo-600" id="kassirClickEUR">{{ total.bank.eur | default:0 }} €</p>
                     </div>
                 </div>
             </div>
@@ -71,11 +72,11 @@
                     <div class="flex items-center space-x-4">
                         <div class="flex items-center space-x-2">
                             <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
-                            <input type="date" id="selectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" onchange="loadKassirReports()">
+                            <input value="{{ date }}" type="date" id="selectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" onchange="window.location.href = `?date=${this.value}`">
                         </div>
-                        <button onclick="setToday()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                             📅 Bugun
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
@@ -88,77 +89,41 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amal</th>
                             </tr>
                         </thead>
-                        <tbody id="kassirReportsTable" class="divide-y divide-gray-200"><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/25/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Akmal Toshev</td>
+                        <tbody id="kassirReportsTable" class="divide-y divide-gray-200">
+                            {% for report in reports %}
+                            <tr>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.date | date:"d/m/Y" }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.company.name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div class="font-semibold text-green-600">6,125,000 so'm</div><div class="font-semibold text-green-600">$500</div>
+                        <div class="space-y-1 text-green-600 font-medium">
+                            {% if report.total_uzs %}
+                            <div class="">{{ report.total_uzs | format_currency }} so'm</div>
+                            {% endif %}
+                            {% if report.total_usd %}
+                            <div class="">{{ report.total_usd | format_currency }} $</div>
+                            {% endif %}
+                            {% if report.total_rub %}
+                            <div class="">{{ report.total_rub | format_currency }} ₽</div>
+                            {% endif %}
+                            {% if report.total_uer %}
+                            <div class="">{{ report.total_uer | format_currency }} €</div>
+                            {% endif %}
                         </div>
                     </td>
                     <td class="px-4 py-3 text-sm">
+                        {% if report.is_closed %}
                         <span class="text-green-600 text-xs">✓ Tasdiqlangan</span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/25/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Bobur Aliyev</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div class="font-semibold text-green-600">3,675,000 so'm</div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="text-green-600 text-xs">✓ Tasdiqlangan</span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/25/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Jasur Mirzayev</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div class="font-semibold text-green-600">9,800,000 so'm</div><div class="font-semibold text-green-600">$800</div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        <button onclick="approveTransaction(1004)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                        {% else %}
+                        <form action="{% url 'confirm_income' report.pk %}" method="POST" >
+                            {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Rostan ham tasdiqlamoqchimisiz?')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
                                 Tasdiqlash
                             </button>
+                        {% endif %}
                     </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/25/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Sevara Karimova</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div class="font-semibold text-green-600">3,062,500 so'm</div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="text-green-600 text-xs">✓ Tasdiqlangan</span>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/25/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Sherzod Tursunov</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div class="font-semibold text-green-600">$450</div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        <button onclick="approveTransaction(1007)" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                Tasdiqlash
-                            </button>
-                    </td>
-                </tr><tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">7/25/2025</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">Bobur Aliyev</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div class="font-semibold text-green-600">7,350,000 so'm</div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="text-green-600 text-xs">✓ Tasdiqlangan</span>
-                    </td>
-                </tr></tbody>
+                </tr>
+                {% endfor %}
+</tbody>
                     </table>
                 </div>
             </div>

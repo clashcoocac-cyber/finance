@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load custom_filters %}
+
 {% block title %}Operator Dashboard{% endblock %}
 
 {% block content %}
@@ -12,9 +14,12 @@
                         <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="operatorCompanyName">{{ request.user.company.name }}</span>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button onclick="closeCashRegister()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <form method="POST", action="{% url 'close_cash_register' %}">
+                            {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
                             🔒 Kassani Yopish
                         </button>
+                        </form>
                         <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
                             Chiqish
                         </a>
@@ -70,6 +75,31 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Qo'shish</h2>
+                    {% if form.errors %}
+                        <div class="django-errors bg-red-50 border border-red-200 rounded-lg p-4 mb-6 fade-in">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">Quyidagi xatolarni tuzating:</h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        <ul class="list-disc pl-5 space-y-1">
+                                            {% if form.errors %}
+                                            {% for field, errors in form.errors.items %}
+                                                <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
+                                            {% endfor %}
+                                            {% else %}
+                                                <li>Ma'lumotlarni to'ldiring</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                     <form action="{% url 'transaction_create' %}" method="POST" class="space-y-4">
                         {% csrf_token %}
                         <div>
@@ -118,12 +148,47 @@
 
                 <!-- Today's Summary -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Kunlik Hisobotlarim</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Kunlik Hisobotlarim</h2>
+                    </div>
                     <div class="space-y-3 max-h-96 overflow-y-auto" id="operatorDailyReports">
-                    <div class="text-center py-12">
-                        <div class="text-6xl mb-4">📊</div>
-                        <p class="text-gray-500 text-lg mb-2">Hozircha hisobotlar yo'q</p>
-                        <p class="text-gray-400 text-sm">Birinchi tranzaksiyangizni qo'shing va kassani yoping</p>
+                    <div class="space-y-4">
+
+                        {% for report in reports %}
+                        <div class="bg-white rounded-xl shadow-sm border p-6 pb-1 border-l-4 {% if report.is_closed %}border-green-500 bg-green-50 {% else %}border-yellow-500 bg-red-50 {% endif %}">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center">
+                                    <div class="text-2xl mr-3">📅</div>
+                                    <div>
+                                        <h3 class="font-bold text-lg text-gray-800">{{ report.date }}</h3>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="flex items-center justify-end mb-1">
+                                        <span class="text-sm {% if report.is_closed %} text-green-600 bg-green-50 {% else %} text-yellow-600 bg-yellow-50 {% endif %} px-2 py-1 rounded-full font-medium">
+                                            {% if report.is_closed %}Tasdiqlangan{% else %}Kutilmoqda{% endif %}
+                                        </span>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Currency Status Breakdown -->
+                            <div class="bg-gradient-to-r from-gray-50 {% if report.is_closed %}to-green-50{% else %}to-yellow-50{% endif %} rounded-lg p-4 mb-4">
+                                
+                                <!-- Approved -->
+                                <div class="{% if report.is_closed %} bg-green-50 border-green-200 {% else %} bg-yellow-50 border-yellow-200 {% endif %} border  rounded-lg p-3 mb-3">
+                                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 font-medium">
+                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">So'm</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_uzs | default:0 | format_currency }}</div></div>
+                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Dollar</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_usd | default:0 | format_currency }} $</div></div>
+                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Rubl</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_rub | default:0 | format_currency }} ₽</div></div>
+                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Yevro</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_uer | default:0 | format_currency }} €</div></div>
+                                    </div>
+                                </div>
+                         </div>
+                         </div>
+                         {% endfor %}       
+
                     </div>
                 </div>
                 </div>

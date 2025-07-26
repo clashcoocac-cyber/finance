@@ -5,7 +5,7 @@ from .views.accounts import (
     CustomLoginView, CustomLogoutView,
     UserListCreateView, UserUpdateView, UserDeleteView
 )
-from .views.transaction import TransactionCreateView, ConfirmExpenseView
+from .views.transaction import TransactionCreateView, ConfirmExpenseView, CloseCashRegister, ConfirmIncomeView
 
 urlpatterns = [
     # Home
@@ -29,5 +29,7 @@ urlpatterns = [
 
     path('transactions/create/', TransactionCreateView.as_view(), name='transaction_create'),
 
-    path('reports/<int:pk>/confirm/', ConfirmExpenseView.as_view(), name='confirm_expense')
+    path('reports/<int:pk>/confirm/', ConfirmExpenseView.as_view(), name='confirm_expense'),
+    path('cash-register/close/', CloseCashRegister.as_view(), name='close_cash_register'),
+    path('confirm-income/<int:pk>/', ConfirmIncomeView.as_view(), name='confirm_income'),
 ]
