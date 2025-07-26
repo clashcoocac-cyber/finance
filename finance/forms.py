@@ -10,7 +10,7 @@ class UserRegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'role', 'company_name', 'password']
+        fields = ['username', 'shift', 'role', 'company_name', 'password']
 
     def save(self, commit = True):
         company_name = self.cleaned_data.pop('company_name', '')
@@ -37,7 +37,7 @@ class UserUpdateForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ['user_id', 'username', 'password', 'company_name']
+        fields = ['user_id', 'shift', 'username', 'password', 'company_name']
 
     def save(self, commit = True, **kwargs):
         user = super().save(commit=False)

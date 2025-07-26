@@ -10,6 +10,7 @@ class User(AbstractUser):
     ]
     role = models.CharField(max_length=20, choices=ROLES)
     company = models.ForeignKey('Company', on_delete=models.CASCADE, null=True)
+    shift = models.SmallIntegerField(null=True, blank=True)
     created = models.DateField(auto_now_add=True)
 
 

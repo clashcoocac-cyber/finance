@@ -103,7 +103,14 @@
                             <div class="">{{ report.date | date:"Y" }}</div>
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.username }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1">
+                            <div>{{ report.operator.username }}</div>
+                            {% if report.operator.shift %}
+                            <div class="text-xs text-gray-500">{{ report.operator.shift }}-smena</div>
+                            {% endif %}
+                        </div>
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.company.name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="space-y-1 text-green-600 font-medium">
