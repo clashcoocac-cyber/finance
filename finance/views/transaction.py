@@ -56,7 +56,8 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         report, _ = DailyReport.objects.get_or_create(
             operator=user,
             date=today,
-            defaults={'is_closed': False}
+            defaults={'is_closed': False},
+            type='income'
         )
 
         transactions.update(report=report)
