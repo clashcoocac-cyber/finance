@@ -40,13 +40,11 @@ class UserUpdateForm(UserChangeForm):
         fields = ['user_id', 'shift', 'username', 'password', 'company_name']
 
     def save(self, commit = True, **kwargs):
-        user = super().save(commit=False)
-
         password = self.cleaned_data.pop('password', None)
         company_name = self.cleaned_data.pop('company_name')
 
-        print(password, company_name)
-
+        user = super().save(commit=False)
+        
         if password:
             user.set_password(password)
 
