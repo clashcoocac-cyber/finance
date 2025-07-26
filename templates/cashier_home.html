@@ -97,7 +97,12 @@
                         <tbody id="kassirReportsTable" class="divide-y divide-gray-200">
                             {% for report in reports %}
                             <tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.date | date:"d/m/Y" }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1">
+                            <div class="">{{ report.date | date:"d/m" }}</div>
+                            <div class="">{{ report.date | date:"Y" }}</div>
+                        </div>
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.username }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.company.name }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
