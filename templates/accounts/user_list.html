@@ -223,7 +223,7 @@
             document.getElementById('editPassword').value = '';
             document.getElementById('editCompany').value = company_name;
             document.getElementById('userID').value = user_id;
-            document.getElementById('editShift').value = shift;
+            document.getElementById('editShift').value = shift ? shift : '';
             
             // Show modal
             document.getElementById('editUserModal').classList.remove('hidden');
