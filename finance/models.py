@@ -10,7 +10,6 @@ class User(AbstractUser):
     ]
     role = models.CharField(max_length=20, choices=ROLES)
     company = models.ForeignKey('Company', on_delete=models.CASCADE, null=True)
-    shift = models.SmallIntegerField(null=True, blank=True)
     created = models.DateField(auto_now_add=True)
 
 
@@ -52,6 +51,7 @@ class DailyReport(models.Model):
     type = models.CharField(max_length=10, choices=TYPES)
     date = models.DateField(auto_now_add=True)
     operator = models.ForeignKey(User, on_delete=models.CASCADE)
+    operator_shift = models.IntegerField(null=True, blank=True)
     category = models.CharField(max_length=100)
     
     total_uzs = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)

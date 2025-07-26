@@ -125,9 +125,11 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
 
-    def form_invalid(self, form):
-        messages.error(self.request, "Login yoki parol noto‘g‘ri!")
-        return super().form_invalid(form)
+    def post(self, request, *args, **kwargs):
+        shift = request.POST.get('shift', None)
+        if shift:
+            request.session['shift'] = shift
+        return super().post(request, *args, **kwargs)
 
 
 class CustomLogoutView(LogoutView):

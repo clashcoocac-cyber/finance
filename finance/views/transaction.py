@@ -53,9 +53,11 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         user = request.user
         today = date.today()
         transactions = Transaction.objects.filter(operator=user, date__date=today)
+        shift = request.session.get('shift', None)
 
         report, _ = DailyReport.objects.get_or_create(
             operator=user,
+            operator_shift=shift,
             date=today,
             defaults={'is_closed': False},
             type='income'
