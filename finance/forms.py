@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
-from .models import Company, User, Transaction
+from django.shortcuts import redirect
+from .models import Company, User, Transaction, DailyReport
 
 
 
@@ -71,3 +72,50 @@ class TransactionFrom(forms.ModelForm):
         if commit:
             transaction.save()
         return transaction
+    
+CATEGORIES = {
+    'salary': 'Maosh',
+    'rent': 'Ijaraga olish',
+    'utilities': 'Kommunal to\'lovlar',
+    'transport': 'Transport xarajatlari',
+    'office': 'Ofis xarajatlari',
+    'marketing': 'Marketing xarajatlari',
+    'supplies': 'Tayyorlov xarajatlari',
+    'maintenance': 'Texnik xizmat ko\'rsatish',
+}
+
+class ExpenseForm(forms.Form):
+    category = forms.CharField(max_length=100)
+    amount_usd = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
+    amount_uzs = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
+    amount_rub = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
+    amount_eur = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
+    payment_type = forms.ChoiceField(choices=Transaction.PAYMENT_TYPES)
+    description = forms.CharField(widget=forms.Textarea, required=False)
+
+    class Meta:
+        fields = ['category', 'amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'description']
+        
+    def save(self, commit=True, operator=None):
+        if self.cleaned_data['category'] in CATEGORIES:
+            category = CATEGORIES.get(self.cleaned_data['category'], 'Boshqa xarajatlar')
+        else:
+            category = self.cleaned_data['description']
+        report = DailyReport.objects.create(
+            operator=operator,
+            type='expense',
+            is_closed=False,
+            category=category
+        )
+        report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
+        report.total_usd = self.cleaned_data.get('amount_usd', 0)
+        report.total_rub = self.cleaned_data.get('amount_rub', 0)
+        report.total_eur = self.cleaned_data.get('amount_eur', 0)
+
+        report.uzs_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_uzs') or 0)}
+        report.usd_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_usd') or 0)}
+        report.rub_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_rub') or 0)}
+        report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
+        report.save()
+
+        return redirect('expenses_list')

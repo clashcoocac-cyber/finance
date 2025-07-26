@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}Фойдаланувчилар{% endblock %}
+{% block content %}  
+<div id="expensesPage" class="min-h-screen">
+        <nav class="bg-white shadow-lg border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <span class="text-2xl">💸</span>
+                        <h1 class="ml-3 text-xl font-bold text-gray-800">Chiqimlar Boshqaruvi</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="{% url 'home' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            ← Orqaga
+                        </a>
+                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            Chiqish
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto p-6">
+            <!-- Add Expense Form -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Chiqim Qo'shish</h2>
+                    <form action="{% url 'expenses_list' %}" method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kategoriya</label>
+                            <select name="category" id="expenseCategory" onchange="toggleCustomDescription()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Kategoriya tanlang</option>
+                                <option value="salary">Oylik maosh</option>
+                                <option value="rent">Ijara to'lovi</option>
+                                <option value="utilities">Kommunal to'lovlar</option>
+                                <option value="transport">Transport xarajatlari</option>
+                                <option value="office">Ofis jihozlari</option>
+                                <option value="marketing">Marketing va reklama</option>
+                                <option value="maintenance">Ta'mirlash xizmati</option>
+                                <option value="other">Boshqa</option>
+                            </select>
+                        </div>
+                        
+                        <div id="customDescriptionDiv" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tavsif</label>
+                            <input type="text" name="description" id="customDescription" placeholder="Chiqim tavsifini kiriting..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">So'm</label>
+                                <input type="number" name="amount_uzs" id="expenseAmountUZS" placeholder="So'm miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Dollar</label>
+                                <input type="number" name="amount_usd" id="expenseAmountUSD" placeholder="Dollar miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rubl</label>
+                                <input type="number" name="amount_rub" id="expenseAmountRUB" placeholder="Rubl miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Yevro</label>
+                                <input type="number" name="amount_eur" id="expenseAmountEUR" placeholder="Yevro miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">To'lov turi</label>
+                            <select name="payment_type" id="expensePaymentType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            onchange="toggleCustomDescription()">
+                                <option value="">To'lov turini tanlang</option>
+                                <option value="click">Click</option>
+                                <option value="cash">Naqd</option>
+                                <option value="terminal">Terminal</option>
+                                <option value="bank">Bank</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="addExpense()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                            💸 Chiqim Qo'shish
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Today's Expenses Summary -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-800">Kunlik Chiqimlar</h2>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
+<input value="{{ date }}" type="date" id="selectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" onchange="window.location.href = `?date=${this.value}`">                            </div>
+                            <a href="{% url 'expenses_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
+                                📅 Bugun
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 max-h-96 overflow-y-auto" id="todayExpenses">
+                        {% for report in reports %}
+                        <div class="bg-gray-50 rounded-lg p-4 slide-in">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium text-gray-800">{{ report.category }}</p>
+                            <p class="text-sm text-gray-600">{{ report.date | date:"d/m/Y" }}</p>
+                            {% if not report.is_closed %}
+                            <p class="text-sm text-yellow-600">
+                                Kutilmoqda
+                            </p>
+                            {% else %}
+                            <p class="text-sm text-green-600">
+                                Tasdiqlangan
+                            </p>
+                            {% endif %}
+                        </div>
+                        <div class="text-right">
+                            {% if report.total_uzs %}
+                            <div class="space-y-1">
+                                <p class="font-medium text-red-600">{{ report.total_uzs | format_currency }} so'm</p>
+                            </div>
+                            {% endif %}
+                            {% if report.total_usd %}
+                            <div class="space-y-1">
+                                <p class="font-medium text-red-600">{{ report.total_usd | format_currency }} $</p>
+                            </div>
+                            {% endif %}
+                            {% if report.total_rub %}
+                            <div class="space-y-1">
+                                <p class="font-medium text-red-600">{{ report.total_rub | format_currency }} ₽</p>
+                            </div>
+                            {% endif %}
+                            {% if report.total_eur %}
+                            <div class="space-y-1">
+                                <p class="font-medium text-red-600">{{ report.total_eur | format_currency }} €</p>
+                            </div>
+                            {% endif %}
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+            </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleCustomDescription() {
+            const categorySelect = document.getElementById('expenseCategory');
+            const customDescriptionDiv = document.getElementById('customDescriptionDiv');
+            if (categorySelect.value === 'other') {
+                customDescriptionDiv.classList.remove('hidden');
+            } else {
+                customDescriptionDiv.classList.add('hidden');
+            }
+        }
+    </script>
+{% endblock %}

@@ -91,7 +91,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya / Kategoriya</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Holat</th>
@@ -101,7 +101,13 @@
                             {% for report in reports %}
                             <tr>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ report.date | date:"d/m/Y" }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.operator.company.name }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        {% if report.type == 'income' %}
+                            {{ report.operator.company.name }}
+                        {% else %}
+                            {{ report.category }}
+                        {% endif %}
+                    </td>
                     <td class="px-4 py-3 text-sm">
                         <span class="px-2 py-1 text-xs rounded-full {% if report.type == 'income' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}">
                             {{ report.get_type_display | lower }}

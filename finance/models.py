@@ -52,6 +52,7 @@ class DailyReport(models.Model):
     type = models.CharField(max_length=10, choices=TYPES)
     date = models.DateField(auto_now_add=True)
     operator = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.CharField(max_length=100)
     
     total_uzs = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     total_usd = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)

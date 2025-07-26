@@ -8,7 +8,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Sum
-from finance.forms import TransactionFrom
+from finance.forms import ExpenseForm, TransactionFrom
 from finance.models import User, Company
 from finance.models import DailyReport
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
@@ -103,3 +103,27 @@ class ConfirmIncomeView(LoginRequiredMixin, CashierRequiredMixin, View):
         else:
             messages.error(request, "Kirim topilmadi.")
         return redirect(self.success_url)
+
+
+class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
+    template_name = 'expenses_page.html'
+    success_url = reverse_lazy('expenses_list')
+
+    def get(self, request, *args, **kwargs):
+        context = {}
+        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
+        reposts = DailyReport.objects.filter(type='expense', date=report_date).order_by('-date')
+        context['reports'] = reposts
+        context['date'] = report_date
+        return render(request, self.template_name, context)
+    
+    def post(self, request, *args, **kwargs):
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            form.save(operator=request.user)
+            messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
+            return redirect(self.success_url)
+        else:
+            messages.error(request, "Chiqim qo'shishda xatolik yuz berdi.")
+        return render(request, self.template_name, {'form': form})
+    
