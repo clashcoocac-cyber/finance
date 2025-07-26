@@ -32,26 +32,30 @@ class UserRegisterForm(forms.ModelForm):
 
 class UserUpdateForm(UserChangeForm):
     user_id = forms.IntegerField()
-    password = forms.CharField(widget=forms.PasswordInput, required=False)
+    new_password = forms.CharField(widget=forms.PasswordInput, required=False)
     company_name = forms.CharField(required=False)
 
     class Meta:
         model = User
-        fields = ['user_id', 'shift', 'username', 'password', 'company_name']
+        fields = ['user_id', 'shift', 'username', 'new_password', 'company_name']
 
     def save(self, commit = True, **kwargs):
-        password = self.cleaned_data.pop('password', None)
-        company_name = self.cleaned_data.pop('company_name')
-
         user = super().save(commit=False)
-        
-        if password:
-            user.set_password(password)
+
+        print(self.cleaned_data)
+
+        new_password = self.cleaned_data.get('new_password')
+        if new_password:
+            user.set_password(new_password)
+
+        company_name = self.cleaned_data.get('company_name')
 
         company, _ = Company.objects.get_or_create(name=company_name)
         user.company = company
+
         if commit:
             user.save()
+
         return user
 
 
