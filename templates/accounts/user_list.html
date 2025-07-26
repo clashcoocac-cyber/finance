@@ -150,7 +150,7 @@
                         <td class="px-4 py-3 text-sm text-gray-900">{{ user.created | date:"d/m/Y" }}</td>
                         <td class="px-4 py-3 text-sm">
                             <div class="flex space-x-2">
-                                <button onclick="editUser('{{user.username}}', '{{user.company.name| default:""}}', '{{ user.id }}', {{ user.shift }})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                <button onclick="editUser('{{user.username}}', '{{user.company.name| default:""}}', '{{ user.id }}'{% if user.shift %}, {{ user.shift }}{% endif %})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
                                     Tahrirlash
                                 </button>
                                 {% if user.role != 'boss' %}
@@ -217,7 +217,7 @@
     </div>
 
     <script>
-        function editUser(username, company_name, user_id, shift) {
+        function editUser(username, company_name, user_id, shift='') {
             // Fill modal with user data
             document.getElementById('editUsername').value = username;
             document.getElementById('editPassword').value = '';
