@@ -4,21 +4,26 @@
 {% block content %}    
     <div id="kassirDashboard" class="min-h-screen">
         <nav class="bg-white shadow-lg border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <span class="text-2xl">💰</span>
-                        <h1 class="ml-3 text-xl font-bold text-gray-800">Glavniy Kassir Panel</h1>
-                    </div>
-                    <a href="{% url 'expenses_list' %}" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
-                        💸 Chiqimlar
-                    </a>
-                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                        Chiqish
-                    </a>
-                </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap justify-between items-center gap-2 py-3">
+            <div class="flex items-center">
+                <span class="text-2xl">💰</span>
+                <h1 class="ml-3 text-xl font-bold text-gray-800">Glavniy Kassir Panel</h1>
             </div>
-        </nav>
+            <div class="flex gap-2 w-full sm:w-auto justify-end">
+                <a href="{% url 'expenses_list' %}"
+                   class="bg-orange-400 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors w-full sm:w-auto text-sm text-center">
+                    💸 Chiqimlar
+                </a>
+                <a href="{% url 'logout' %}"
+                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors w-full text-sm sm:w-auto text-center">
+                    Chiqish
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
 
         <div class="max-w-7xl mx-auto p-6" id="invoice">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -69,7 +74,7 @@
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-bold text-gray-800">Kunlik Hisobotlar</h2>
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4">
                         <div class="flex items-center space-x-2">
                             <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
                             <input value="{{ date }}" type="date" id="selectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" onchange="window.location.href = `?date=${this.value}`">

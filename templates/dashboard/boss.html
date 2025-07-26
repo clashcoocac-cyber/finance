@@ -15,10 +15,10 @@
                         <h1 class="ml-3 text-xl font-bold text-gray-800">Admin Panel</h1>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <a href="{% url 'users' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <a href="{% url 'users' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
                             👥 Foydalanuvchilar
                         </a>
-                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
                             Chiqish
                         </a>
                     </div>
@@ -75,7 +75,7 @@
             <div class="bg-white rounded-xl shadow-lg p-6" >
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-gray-800">Barcha Hisobotlar</h2>
-                    <div class="flex items-center space-x-4">
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-4">
                         <div class="flex items-center space-x-2">
                             <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
                             <input type="date" value="{{ date }}" id="adminSelectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"

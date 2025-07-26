@@ -6,30 +6,41 @@
 {% block content %}
 <div id="operatorDashboard" class="min-h-screen">
         <nav class="bg-white shadow-lg border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <span class="text-2xl">👨&zwj;💻</span>
-                        <h1 class="ml-3 text-xl font-bold text-gray-800">Operator Panel</h1>
-                        <span class="ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="operatorCompanyName">{{ request.user.company.name }}</span>
-                        {% if request.session.shift %}
-                            <span class="ml-4 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm" id="operatorCompanyName">{{ request.session.shift }}-smena</span>
-                        {% endif %}
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <form method="POST", action="{% url 'close_cash_register' %}">
-                            {% csrf_token %}
-                        <button type="submit" onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            🔒 Kassani Yopish
-                        </button>
-                        </form>
-                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            Chiqish
-                        </a>
-                    </div>
-                </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap justify-between items-center gap-2 py-3">
+            <!-- Chap tomon: Icon, Title, Company, Smena -->
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-2xl">👨‍💻</span>
+                <h1 class="text-xl font-bold text-gray-800">Operator Panel</h1>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="operatorCompanyName">
+                    {{ request.user.company.name }}
+                </span>
+                {% if request.session.shift %}
+                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                        {{ request.session.shift }}-smena
+                    </span>
+                {% endif %}
             </div>
-        </nav>
+
+            <!-- O'ng tomon: Tugmalar -->
+            <div class="flex flex-wrap gap-2 justify-end w-full sm:w-auto">
+                <form method="POST" action="{% url 'close_cash_register' %}">
+                    {% csrf_token %}
+                    <button type="submit"
+                        onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')"
+                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm">
+                        🔒 Kassani Yopish
+                    </button>
+                </form>
+                <a href="{% url 'logout' %}"
+                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm">
+                    Chiqish
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
 
         <div class="max-w-7xl mx-auto p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="div1">
