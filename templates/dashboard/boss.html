@@ -3,6 +3,9 @@
 {% block title %}Boshliq Dashboard{% endblock %}
 
 {% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <div id="boshliqDashboard" class="min-h-screen">
         <nav class="bg-white shadow-lg border-b border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,7 +26,7 @@
             </div>
         </nav>
 
-        <div class="max-w-7xl mx-auto p-6">
+        <div class="max-w-7xl mx-auto p-6" id="invoice">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
                     <div class="flex items-center justify-between">
@@ -69,7 +72,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white rounded-xl shadow-lg p-6" >
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-gray-800">Barcha Hisobotlar</h2>
                     <div class="flex items-center space-x-4">
@@ -81,7 +84,7 @@
                         <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
                             📅 Bugun
                         </a>
-                        <button onclick="downloadDailyReportAdmin()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
+                        <button onclick="generatePDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
                             📥 Yuklab Olish
                         </button>
                     </div>
@@ -156,4 +159,33 @@
             </div>
         </div>
     </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    function generatePDF() {
+    const element = document.getElementById("invoice");
+
+    const opt = {
+        margin:       0,
+        filename:     'document.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  {
+            scale: 2,
+            useCORS: true, // agar rasm bo'lsa
+            logging: true,
+            scrollY: 0, // skrollni hisobga olmasin
+            windowWidth: document.body.scrollWidth,
+            windowHeight: document.body.scrollHeight,
+        },
+        jsPDF:        {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'landscape' // <-- bu albom ko‘rinish uchun
+        }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+</script>
+
 {% endblock %}

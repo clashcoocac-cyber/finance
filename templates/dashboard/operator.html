@@ -32,7 +32,7 @@
         </nav>
 
         <div class="max-w-7xl mx-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="div1">
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💳</div>
                     <p class="text-sm text-gray-600">Click</p>
@@ -198,7 +198,7 @@
             </div>
 
             <!-- Transactions Table -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white rounded-xl shadow-lg p-6" id="div2">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Mening Tranzaksiyalarim</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
@@ -245,5 +245,48 @@
                     </table>
                 </div>
             </div>
+
+            <div class="flex justify-center my-6">
+                <button onclick="generatePDF()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                    📊 Kunlik Hisobot Yuklab Olish
+                </button>
+            </div>
         </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    function generatePDF() {
+    const container = document.createElement("div");
+    container.classList.add('max-w-7xl', 'mx-auto', 'p-6')
+
+    const div1 = document.getElementById("div1").cloneNode(true);
+    const div2 = document.getElementById("div2").cloneNode(true);
+
+    container.appendChild(div1);
+    container.appendChild(div2);
+
+    const opt = {
+        margin:       0,
+        filename:     'document.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  {
+            scale: 2,
+            useCORS: true, // agar rasm bo'lsa
+            logging: true,
+            scrollY: 0, // skrollni hisobga olmasin
+            windowWidth: document.body.scrollWidth,
+            windowHeight: document.body.scrollHeight,
+        },
+        jsPDF:        {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'landscape' // <-- bu albom ko‘rinish uchun
+        }
+    };
+
+    html2pdf().set(opt).from(container).save();
+}
+</script>
+
 {% endblock %}

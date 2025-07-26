@@ -20,7 +20,7 @@
             </div>
         </nav>
 
-        <div class="max-w-7xl mx-auto p-6">
+        <div class="max-w-7xl mx-auto p-6" id="invoice">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💳</div>
@@ -211,10 +211,39 @@
             </div>
 
             <div class="flex justify-center">
-                <button onclick="downloadDailyReport()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                <button onclick="generatePDF()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
                     📊 Kunlik Hisobot Yuklab Olish
                 </button>
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+    function generatePDF() {
+    const element = document.getElementById("invoice");
+
+    const opt = {
+        margin:       0,
+        filename:     'document.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  {
+            scale: 2,
+            useCORS: true, // agar rasm bo'lsa
+            logging: true,
+            scrollY: 0, // skrollni hisobga olmasin
+            windowWidth: document.body.scrollWidth,
+            windowHeight: document.body.scrollHeight,
+        },
+        jsPDF:        {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'landscape' // <-- bu albom ko‘rinish uchun
+        }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+</script>
 {% endblock %}
