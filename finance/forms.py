@@ -74,14 +74,17 @@ class TransactionFrom(forms.ModelForm):
         return transaction
     
 CATEGORIES = {
-    'salary': 'Maosh',
-    'rent': 'Ijaraga olish',
-    'utilities': 'Kommunal to\'lovlar',
-    'transport': 'Transport xarajatlari',
-    'office': 'Ofis xarajatlari',
-    'marketing': 'Marketing xarajatlari',
-    'supplies': 'Tayyorlov xarajatlari',
-    'maintenance': 'Texnik xizmat ko\'rsatish',
+    "expense_day": "Kunlik xarajatlar",
+    "chicago_factory": "Chikako zavodi",
+    "kvass_wholesale": "Jasur un",
+    "emir_tashkent": "Elyor Toshkent",
+    "salary_opt": "Oylik OPT",
+    "salary_sfb": "Oylik SFB",
+    "salary_msb": "Oylik MSB",
+    "equipment_purchase_sfb": "Texnika xaridi SFB",
+    "equipment_purchase_opt": "Texnika xaridi OPT",
+    "exchange_rate_changed": "Valyuta almashtirish",
+    "sfb_suppliers": "SFB yetkazib beruvchilar",
 }
 
 class ExpenseForm(forms.Form):
