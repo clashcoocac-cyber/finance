@@ -7,8 +7,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-wrap justify-between items-center gap-2 py-3">
             <div class="flex items-center">
-                <span class="text-2xl">💰</span>
-                <h1 class="ml-3 text-xl font-bold text-gray-800">Glavniy Kassir Panel</h1>
+                <h1 class="ml-3 text-xl font-bold text-gray-800">SFBMSSB</h1>
+                        <span class="ms-4 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm" id="operatorCompanyName">
+                    {{ request.user.username }}
+                </span>
             </div>
             <div class="flex gap-2 w-full sm:w-auto justify-end">
                 <a href="{% url 'expenses_list' %}"
@@ -26,48 +28,84 @@
 
 
         <div class="max-w-7xl mx-auto p-6" id="invoice">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Umumiy Kirim</p>
+                            <div class="space-y-1 mt-2">
+                                <p class="text-lg font-medium text-green-600" id="totalIncomeUZS">{{ stats.income.total_uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeUSD">{{ stats.income.total_usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeRUB">{{ stats.income.total_rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeEUR">{{ stats.income.total_eur | default:0 | format_currency }} €</p>
+                            </div>
+                        </div>
+                        <div class="text-green-500 text-3xl">📈</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Umumiy Chiqim</p>
+                            <div class="space-y-1 mt-2">
+                                <p class="text-lg font-medium text-red-600" id="totalExpenseUZS">{{ stats.expense.total_uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-red-600" id="totalExpenseUSD">{{ stats.expense.total_usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-red-600" id="totalExpenseRUB">{{ stats.expense.total_rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-red-600" id="totalExpenseEUR">{{ stats.expense.total_uer | default:0 | format_currency }} €</p>
+                            </div>
+                        </div>
+                        <div class="text-red-500 text-3xl">📉</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Qoldiq</p>
+                            <div class="space-y-1 mt-2">
+                                <p class="text-lg font-medium text-blue-600" id="totalBalanceUZS">{{ stats.diff.uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-blue-600" id="totalBalanceUSD">{{ stats.diff.usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-blue-600" id="totalBalanceRUB">{{ stats.diff.rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-blue-600" id="totalBalanceEUR">{{ stats.diff.eur | default:0 | format_currency }} €</p>
+                            </div>
+                        </div>
+                        <div class="text-blue-500 text-3xl">💰</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" id="div1">
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click</p>
+                    <p class="text-sm text-gray-600">Click ({{ clicks.0.1 }})</p>
                     <div class="space-y-1">
-                        <p class="text-sm font-bold text-blue-600" id="kassirClickUZS">{{ total.click.uzs | default:0 }} so'm</p>
-                        <p class="text-xs font-semibold text-blue-600" id="kassirClickUSD">{{ total.click.usd | default:0 }} $</p>
-                        <p class="text-xs font-semibold text-blue-600" id="kassirClickRUB">{{ total.click.rub | default:0 }} ₽</p>
-                        <p class="text-xs font-semibold text-blue-600" id="kassirClickEUR">{{ total.click.eur | default:0 }} €</p>
+                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click1.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click1.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click1.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click1.eur | default:0 }} €</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
+                    <div class="text-2xl mb-2">💳</div>
+                    <p class="text-sm text-gray-600">Click ({{ clicks.1.1 }})</p>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click2.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click2.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click2.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click2.eur | default:0 }} €</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💵</div>
                     <p class="text-sm text-gray-600">Naqd</p>
                     <div class="space-y-1">
-                        <p class="text-sm font-bold text-green-600" id="kassirClickUZS">{{ total.cash.uzs | default:0 }} so'm</p>
-                        <p class="text-xs font-semibold text-green-600" id="kassirClickUSD">{{ total.cash.usd | default:0 }} $</p>
-                        <p class="text-xs font-semibold text-green-600" id="kassirClickRUB">{{ total.cash.rub | default:0 }} ₽</p>
-                        <p class="text-xs font-semibold text-green-600" id="kassirClickEUR">{{ total.cash.eur | default:0 }} €</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">🏧</div>
-                    <p class="text-sm text-gray-600">Terminal</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-purple-600" id="kassirClickUZS">{{ total.terminal.uzs | default:0 }} so'm</p>
-                        <p class="text-xs font-semibold text-purple-600" id="kassirClickUSD">{{ total.terminal.usd | default:0 }} $</p>
-                        <p class="text-xs font-semibold text-purple-600" id="kassirClickRUB">{{ total.terminal.rub | default:0 }} ₽</p>
-                        <p class="text-xs font-semibold text-purple-600" id="kassirClickEUR">{{ total.terminal.eur | default:0 }} €</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">🏦</div>
-                    <p class="text-sm text-gray-600">Bank</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-indigo-600" id="kassirClickUZS">{{ total.bank.uzs | default:0 }} so'm</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="kassirClickUSD">{{ total.bank.usd | default:0 }} $</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="kassirClickRUB">{{ total.bank.rub | default:0 }} ₽</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="kassirClickEUR">{{ total.bank.eur | default:0 }} €</p>
+                        <p class="text-sm font-bold text-green-600" id="operatorCashUZS">{{ total.cash.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-green-600" id="operatorCashUSD">{{ total.cash.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-green-600" id="operatorCashRUB">{{ total.cash.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-green-600" id="operatorCashEUR">{{ total.cash.eur | default:0 }} €</p>
                     </div>
                 </div>
             </div>
+            
 
 
 
@@ -92,7 +130,8 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Naqd</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Click</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Click ({{ clicks.0.1 }})</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Click ({{ clicks.1.1 }})</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Terminal</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Bank</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Umumiy</th>
@@ -131,21 +170,41 @@
                             {% if report.eur_detail.cash > 0 %}
                             <div class="">{{ report.eur_detail.cash | format_currency }} €</div>
                             {% endif %}
+                            <div class="text-xs text-gray-500">
+                                {% if report.comment %}
+                                <span class="italic">{{ report.comment }}</span>
+                                {% endif %}
+                            </div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="space-y-1 text-green-600 font-medium">
+                            {% if report.uzs_detail.click1 > 0 %}
+                            <div class="">{{ report.uzs_detail.click1 | format_currency }} so'm</div>
+                            {% endif %}
+                            {% if report.usd_detail.click1 > 0 %}
+                            <div class="">{{ report.usd_detail.click1 | format_currency }} $</div>
+                            {% endif %}
+                            {% if report.rub_detail.click1 > 0 %}
+                            <div class="">{{ report.rub_detail.click1 | format_currency }} ₽</div>
+                            {% endif %}
+                            {% if report.eur_detail.click1 > 0 %}
+                            <div class="">{{ report.eur_detail.click1 | format_currency }} €</div>
+                            {% endif %}
                         </div>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="space-y-1 text-green-600 font-medium">
-                            {% if report.uzs_detail.click > 0 %}
-                            <div class="">{{ report.uzs_detail.click | format_currency }} so'm</div>
+                            {% if report.uzs_detail.click2 > 0 %}
+                            <div class="">{{ report.uzs_detail.click2 | format_currency }} so'm</div>
                             {% endif %}
-                            {% if report.usd_detail.click > 0 %}
-                            <div class="">{{ report.usd_detail.click | format_currency }} $</div>
+                            {% if report.usd_detail.click2 > 0 %}
+                            <div class="">{{ report.usd_detail.click2 | format_currency }} $</div>
                             {% endif %}
-                            {% if report.rub_detail.click > 0 %}
-                            <div class="">{{ report.rub_detail.click | format_currency }} ₽</div>
+                            {% if report.rub_detail.click2 > 0 %}
+                            <div class="">{{ report.rub_detail.click2 | format_currency }} ₽</div>
                             {% endif %}
-                            {% if report.eur_detail.click > 0 %}
-                            <div class="">{{ report.eur_detail.click | format_currency }} €</div>
+                            {% if report.eur_detail.click2 > 0 %}
+                            <div class="">{{ report.eur_detail.click2 | format_currency }} €</div>
                             {% endif %}
                         </div>
                     </td>

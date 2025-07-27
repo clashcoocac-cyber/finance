@@ -11,8 +11,10 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
-                        <span class="text-2xl">👑</span>
-                        <h1 class="ml-3 text-xl font-bold text-gray-800">Admin Panel</h1>
+                        <h1 class="ml-3 text-xl font-bold text-gray-800">SFBMSSB</h1>
+                        <span class="ms-4 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm" id="operatorCompanyName">
+                    {{ request.user.username }}
+                </span>
                     </div>
                     <div class="flex items-center space-x-4">
                         <a href="{% url 'users' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
@@ -33,10 +35,10 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600">Umumiy Kirim</p>
                             <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-green-600" id="totalIncomeUZS">{{ stats.uzs.income | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-green-600" id="totalIncomeUSD">{{ stats.usd.income | format_currency }} $</p>
-                                <p class="text-sm font-medium text-green-600" id="totalIncomeRUB">{{ stats.rub.income | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-green-600" id="totalIncomeEUR">{{ stats.uer.income | format_currency }} €</p>
+                                <p class="text-lg font-medium text-green-600" id="totalIncomeUZS">{{ stats.income.total_uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeUSD">{{ stats.income.total_usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeRUB">{{ stats.income.total_rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-green-600" id="totalIncomeEUR">{{ stats.income.total_eur | default:0 | format_currency }} €</p>
                             </div>
                         </div>
                         <div class="text-green-500 text-3xl">📈</div>
@@ -47,10 +49,10 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600">Umumiy Chiqim</p>
                             <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-red-600" id="totalExpenseUZS">{{ stats.uzs.expense | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-red-600" id="totalExpenseUSD">{{ stats.usd.expense | format_currency }} $</p>
-                                <p class="text-sm font-medium text-red-600" id="totalExpenseRUB">{{ stats.rub.expense | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-red-600" id="totalExpenseEUR">{{ stats.uer.expense | format_currency }} €</p>
+                                <p class="text-lg font-medium text-red-600" id="totalExpenseUZS">{{ stats.expense.total_uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-red-600" id="totalExpenseUSD">{{ stats.expense.total_usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-red-600" id="totalExpenseRUB">{{ stats.expense.total_rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-red-600" id="totalExpenseEUR">{{ stats.expense.total_uer | default:0 | format_currency }} €</p>
                             </div>
                         </div>
                         <div class="text-red-500 text-3xl">📉</div>
@@ -61,10 +63,10 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600">Qoldiq</p>
                             <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-blue-600" id="totalBalanceUZS">{{ stats.uzs.diff | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-blue-600" id="totalBalanceUSD">{{ stats.usd.diff | format_currency }} $</p>
-                                <p class="text-sm font-medium text-blue-600" id="totalBalanceRUB">{{ stats.rub.diff | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-blue-600" id="totalBalanceEUR">{{ stats.uer.diff | format_currency }} €</p>
+                                <p class="text-lg font-medium text-blue-600" id="totalBalanceUZS">{{ stats.diff.uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-blue-600" id="totalBalanceUSD">{{ stats.diff.usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-blue-600" id="totalBalanceRUB">{{ stats.diff.rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-blue-600" id="totalBalanceEUR">{{ stats.diff.eur | default:0 | format_currency }} €</p>
                             </div>
                         </div>
                         <div class="text-blue-500 text-3xl">💰</div>
@@ -94,6 +96,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya / Kategoriya</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
@@ -104,6 +107,16 @@
                             {% for report in reports %}
                             <tr>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ report.date | date:"d/m/Y" }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        {% if report.type == 'income' %}
+                            <div class="space-y-1">
+                                <div>{{ report.operator.username }}</div>
+                                {% if report.operator_shift %}
+                                <div class="text-xs text-gray-500">{{ report.operator_shift }}-smena</div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         {% if report.type == 'income' %}
                             {{ report.operator.company.name }}

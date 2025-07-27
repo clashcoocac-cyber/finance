@@ -10,10 +10,9 @@
         <div class="flex flex-wrap justify-between items-center gap-2 py-3">
             <!-- Chap tomon: Icon, Title, Company, Smena -->
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-2xl">👨‍💻</span>
-                <h1 class="text-xl font-bold text-gray-800">Operator Panel</h1>
-                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="operatorCompanyName">
-                    {{ request.user.company.name }}
+                <h1 class="text-xl font-bold text-gray-800">SFBMSSB</h1>
+                <span class="ms-3 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="operatorCompanyName">
+                    {{ request.user.username }}
                 </span>
                 {% if request.session.shift %}
                     <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
@@ -43,15 +42,25 @@
 
 
         <div class="max-w-7xl mx-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="div1">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" id="div1">
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click</p>
+                    <p class="text-sm text-gray-600">Click ({{ clicks.0.1 }})</p>
                     <div class="space-y-1">
-                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click.uzs | default:0 }} so'm</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click.usd | default:0 }} $</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click.rub | default:0 }} ₽</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click.eur | default:0 }} €</p>
+                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click1.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click1.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click1.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click1.eur | default:0 }} €</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
+                    <div class="text-2xl mb-2">💳</div>
+                    <p class="text-sm text-gray-600">Click ({{ clicks.1.1 }})</p>
+                    <div class="space-y-1">
+                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click2.uzs | default:0 }} so'm</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click2.usd | default:0 }} $</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click2.rub | default:0 }} ₽</p>
+                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click2.eur | default:0 }} €</p>
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
@@ -64,31 +73,11 @@
                         <p class="text-xs font-semibold text-green-600" id="operatorCashEUR">{{ total.cash.eur | default:0 }} €</p>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">🏧</div>
-                    <p class="text-sm text-gray-600">Terminal</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-purple-600" id="operatorTerminalUZS">{{ total.terminal.uzs | default:0 }} so'm</p>
-                        <p class="text-xs font-semibold text-purple-600" id="operatorTerminalUSD">{{ total.terminal.usd | default:0 }} $</p>
-                        <p class="text-xs font-semibold text-purple-600" id="operatorTerminalRUB">{{ total.terminal.rub | default:0 }} ₽</p>
-                        <p class="text-xs font-semibold text-purple-600" id="operatorTerminalEUR">{{ total.terminal.eur | default:0 }} €</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">🏦</div>
-                    <p class="text-sm text-gray-600">Bank</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-indigo-600" id="operatorBankUZS">{{ total.bank.uzs | default:0 }} so'm</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="operatorBankUSD">{{ total.bank.usd | default:0 }} $</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="operatorBankRUB">{{ total.bank.rub | default:0 }} ₽</p>
-                        <p class="text-xs font-semibold text-indigo-600" id="operatorBankEUR">{{ total.bank.eur | default:0 }} €</p>
-                    </div>
-                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Qo'shish</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Qo'shis {{ form.counterparty.option }}</h2>
                     {% if form.errors %}
                         <div class="django-errors bg-red-50 border border-red-200 rounded-lg p-4 mb-6 fade-in">
                             <div class="flex items-start">
@@ -118,7 +107,12 @@
                         {% csrf_token %}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kimdan olindi</label>
-                            <input type="text" name="counterparty" id="incomeFromWhom" placeholder="Mijoz yoki tashkilot nomi..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <select id="counterparty" required name="counterparty" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Shaxsni tanlang</option>
+                                {% for person in persons %}
+                                    <option value="{{ person.0 }}">{{ person.1 }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
@@ -142,15 +136,31 @@
                                 <input type="number" name="amount_eur" id="incomeAmountEUR" placeholder="Yevro miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             </div>
                         </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kurs haqida izoh (ixtiyoriy)</label>
+                            <textarea id="incomeExchangeComment" name="comment" placeholder="Masalan: Dollar kursi 12,250 so'm, Yevro kursi 13,500 so'm..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="2"></textarea>
+                            <p class="text-xs text-gray-500 mt-1">Valyuta kursi yoki boshqa muhim ma'lumotlarni kiriting</p>
+                        </div>
                         
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">To'lov turi</label>
-                            <select id="incomePaymentType" name="payment_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <select required onchange="changePaymentType()" id="incomePaymentType" name="payment_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="">To'lov turini tanlang</option>
                                 <option value="click">Click</option>
                                 <option value="cash">Naqd</option>
                                 <option value="terminal">Terminal</option>
                                 <option value="bank">Bank</option>
+                            </select>
+                        </div>
+
+                        <div id="click" class="hidden">
+                            <label class="block text-sm font-medium text-green-500 mb-2">Click kartani tanlang</label>
+                            <select name="click" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">---</option>
+                                {% for click in clicks %}
+                                    <option value="{{ click.0 }}">{{ click.1 }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         
@@ -218,8 +228,8 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Vaqt</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kimdan</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amallar</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kommentariya</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov turi</th>
                             </tr>
                         </thead>
                         <tbody id="operatorTransactionsTable" class="divide-y divide-gray-200">
@@ -227,7 +237,7 @@
                             <tr>
         
                     <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.date | time:"H:i:s" }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.counterparty }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.get_counterparty_display }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="space-y-1">
                             {% if transaction.amount_uzs %}
@@ -244,11 +254,12 @@
                             {% endif %}
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.get_payment_type_display }}</td>
-                    <td class="px-4 py-3 text-sm">
-                        <button onclick="editTransaction(1753450498168)" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                O'zgartirish
-                            </button>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.comment | default:"" }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        {{ transaction.get_payment_type_display }}
+                        {% if transaction.payment_type == 'click' %}
+                            <span class="text-gray-600"> ({{ transaction.get_click_display }})</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -298,6 +309,20 @@
 
     html2pdf().set(opt).from(container).save();
 }
+
+        function changePaymentType() {
+            const paymentType = document.getElementById('incomePaymentType');
+            const customDescriptionDiv = document.getElementById('click');
+            const firstSelect = customDescriptionDiv.querySelector('select');
+
+            if (paymentType.value === 'click') {
+                customDescriptionDiv.classList.remove('hidden');
+                firstSelect.setAttribute('required', true);
+            } else {
+                customDescriptionDiv.classList.add('hidden');
+                firstSelect.removeAttribute('required');
+            }
+        }
 </script>
 
 {% endblock %}

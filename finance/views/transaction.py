@@ -52,7 +52,7 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         user = request.user
         today = date.today()
-        transactions = Transaction.objects.filter(operator=user, date__date=today)
+        transactions = Transaction.objects.filter(operator=user, date__date=today).order_by('-date')
         shift = request.session.get('shift', None)
 
         report, _ = DailyReport.objects.get_or_create(
@@ -64,6 +64,9 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         )
 
         transactions.update(report=report)
+        comment_tran = transactions.filter(comment__isnull=False).first()
+        if comment_tran:
+            report.comment = comment_tran.comment
 
         result = {
         'usd': defaultdict(lambda: 0),
@@ -73,10 +76,16 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
     }
 
         for tx in transactions:
-            result['usd'][tx.payment_type] += tx.amount_usd or 0
-            result['uzs'][tx.payment_type] += tx.amount_uzs or 0
-            result['rub'][tx.payment_type] += tx.amount_rub or 0
-            result['eur'][tx.payment_type] += tx.amount_eur or 0
+            if tx.payment_type == 'click':
+                result['usd'][tx.click] += tx.amount_usd or 0
+                result['uzs'][tx.click] += tx.amount_uzs or 0
+                result['rub'][tx.click] += tx.amount_rub or 0
+                result['eur'][tx.click] += tx.amount_eur or 0
+            else:
+                result['usd'][tx.payment_type] += tx.amount_usd or 0
+                result['uzs'][tx.payment_type] += tx.amount_uzs or 0
+                result['rub'][tx.payment_type] += tx.amount_rub or 0
+                result['eur'][tx.payment_type] += tx.amount_eur or 0
 
         report.total_usd = sum(result['usd'].values())
         report.total_uzs = sum(result['uzs'].values())

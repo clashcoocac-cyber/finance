@@ -17,6 +17,22 @@ class Company(models.Model):
     name = models.CharField(max_length=255)
 
 
+PERSONS = [
+    ('kenjayev_jasur', 'Kenjayev Jasur'),
+    ('abdullayev_vohid', 'Abdullayev Vohid'),
+    ('murodov_zubaydullo', 'Murodov Zubaydullo'),
+    ('yarashev_kamol', 'Yarashev Kamol'),
+    ('umarov_maxsud', 'Umarov Maxsud'),
+    ('toxtayev_farrux', "To'xtayev Farrux"),
+    ('amonova_rushana', 'Amonova Rushana'),
+    ('hamidova_umida', 'Hamidova Umida'),
+]
+
+CLICKS = [
+    ('click1', 'Nurmuxammedova'),
+    ('click2', 'Umarov J')
+]
+
 class Transaction(models.Model):
     TYPES = [
         ('income', 'Kirim'),
@@ -31,6 +47,7 @@ class Transaction(models.Model):
     
     date = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=10, choices=TYPES)
+    click = models.CharField(max_length=255, choices=CLICKS, null=True, blank=True)
     amount_usd = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     amount_uzs = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     amount_rub = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
@@ -38,8 +55,9 @@ class Transaction(models.Model):
     payment_type = models.CharField(max_length=10, choices=PAYMENT_TYPES)
     description = models.TextField()
     operator = models.ForeignKey(User, on_delete=models.CASCADE)
-    counterparty = models.CharField(max_length=255)
+    counterparty = models.CharField(max_length=255, choices=PERSONS)
     report = models.ForeignKey('DailyReport', on_delete=models.CASCADE, null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
 
 
 
@@ -65,4 +83,4 @@ class DailyReport(models.Model):
     eur_detail = models.JSONField(null=True, blank=True)
     
     is_closed = models.BooleanField(default=False)
-   
+    comment = models.TextField(null=True, blank=True)

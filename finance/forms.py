@@ -64,7 +64,7 @@ class TransactionFrom(forms.ModelForm):
 
     class Meta:
         model = Transaction
-        fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'counterparty']
+        fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty']
         
     def save(self, commit = ..., operator=None):
         transaction = super().save(commit=False)

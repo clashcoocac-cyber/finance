@@ -5,13 +5,12 @@ from django.views.generic import TemplateView, ListView, DeleteView, CreateView,
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
-from django.contrib import messages
 from django.db.models import Sum
-from finance.forms import UserRegisterForm, UserUpdateForm
-from finance.models import User, Company
+from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
+from finance.models import PERSONS, User, Company
 from finance.models import DailyReport
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
-from finance.models import Transaction
+from finance.models import Transaction, CLICKS
 from django.db.models import Sum, Case, When, DecimalField, F, Value
 
 
@@ -28,44 +27,40 @@ class BossDashboardView(TemplateView):
         context['date'] = self.request.GET.get('date', None) or datetime.today().strftime('%Y-%m-%d')
         context['reports'] = DailyReport.objects.filter(date=context['date']).order_by('type')
         
-        qs = DailyReport.objects.filter(is_closed=True)
+        income_qs = Transaction.objects.filter(
+            report__is_closed=True,
+            payment_type__in=['cash', 'click']
+        )
+        income_stats = income_qs.aggregate(
+            total_usd=Sum('amount_usd'),
+            total_uzs=Sum('amount_uzs'),
+            total_rub=Sum('amount_rub'),
+            total_eur=Sum('amount_eur')
+        )
 
-        result = {}
+        expense_qs = DailyReport.objects.filter(type='expense', is_closed=True)
+        expense_stats = expense_qs.aggregate(
+            total_usd=Sum('total_usd'),
+            total_uzs=Sum('total_uzs'),
+            total_rub=Sum('total_rub'),
+            total_eur=Sum('total_uer')  # e'tibor bering: bu yerda `total_uer` yozilgan
+        )
 
-        for currency in ['uzs', 'usd', 'rub', 'uer']:
-            income_key = f'total_{currency}_income'
-            expense_key = f'total_{currency}_expense'
+        diff_stats = {
+            'usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
+            'uzs': (income_stats['total_uzs'] or 0) - (expense_stats['total_uzs'] or 0),
+            'rub': (income_stats['total_rub'] or 0) - (expense_stats['total_rub'] or 0),
+            'eur': (income_stats['total_eur'] or 0) - (expense_stats['total_eur'] or 0),
+        }
 
-            aggregated = qs.aggregate(
-                **{
-                    income_key: Sum(
-                        Case(
-                            When(type='income', then=F(f'total_{currency}')),
-                            default=Value(0),
-                            output_field=DecimalField()
-                        )
-                    ),
-                    expense_key: Sum(
-                        Case(
-                            When(type='expense', then=F(f'total_{currency}')),
-                            default=Value(0),
-                            output_field=DecimalField()
-                        )
-                    )
-                }
-            )
-
-            income = aggregated[income_key] or 0
-            expense = aggregated[expense_key] or 0
-
-            result[currency] = {
-                'income': income,
-                'expense': expense,
-                'diff': income - expense
-            }
+        context['stats'] = {
+            'income': income_stats,
+            'expense': expense_stats,
+            'diff': diff_stats
+        }
         
-        context['stats'] = result
         return context
+
 
 class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, TemplateView):
     template_name = 'cashier_home.html'
@@ -76,20 +71,63 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         context['reports'] = DailyReport.objects.filter(type='income', date=context['date']).order_by('-date')
         
         queryset = Transaction.objects.filter(
-            report__type='income', date__date=context['date'], report__is_closed=True
+            report__is_closed=True, date__date=context['date']
         )
 
-
         result = {}
-        for payment in ['click', 'cash', 'terminal', 'bank']:
-            subquery = queryset.filter(payment_type=payment).aggregate(
-                usd=Sum('amount_usd'),
-                uzs=Sum('amount_uzs'),
-                rub=Sum('amount_rub'),
-                eur=Sum('amount_eur'),
-            )
-            result[payment] = subquery
+        for payment in ['click', 'cash']:
+            if payment is not 'click':
+                subquery = queryset.filter(payment_type=payment).aggregate(
+                    usd=Sum('amount_usd'),
+                    uzs=Sum('amount_uzs'),
+                    rub=Sum('amount_rub'),
+                    eur=Sum('amount_eur'),
+                )
+                result[payment] = subquery
+            else:
+                for click in CLICKS:
+                    subquery = queryset.filter(payment_type=payment, click=click[0]).aggregate(
+                        usd=Sum('amount_usd'),
+                        uzs=Sum('amount_uzs'),
+                        rub=Sum('amount_rub'),
+                        eur=Sum('amount_eur'),
+                    )
+                    result[click[0]] = subquery
+            
         context['total'] = result
+
+        income_qs = Transaction.objects.filter(
+            report__is_closed=True,
+            payment_type__in=['cash', 'click']
+        )
+        income_stats = income_qs.aggregate(
+            total_usd=Sum('amount_usd'),
+            total_uzs=Sum('amount_uzs'),
+            total_rub=Sum('amount_rub'),
+            total_eur=Sum('amount_eur')
+        )
+
+        expense_qs = DailyReport.objects.filter(type='expense', is_closed=True)
+        expense_stats = expense_qs.aggregate(
+            total_usd=Sum('total_usd'),
+            total_uzs=Sum('total_uzs'),
+            total_rub=Sum('total_rub'),
+            total_eur=Sum('total_uer')  # e'tibor bering: bu yerda `total_uer` yozilgan
+        )
+
+        diff_stats = {
+            'usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
+            'uzs': (income_stats['total_uzs'] or 0) - (expense_stats['total_uzs'] or 0),
+            'rub': (income_stats['total_rub'] or 0) - (expense_stats['total_rub'] or 0),
+            'eur': (income_stats['total_eur'] or 0) - (expense_stats['total_eur'] or 0),
+        }
+
+        context['stats'] = {
+            'income': income_stats,
+            'expense': expense_stats,
+            'diff': diff_stats
+        }
+        context['clicks'] = CLICKS
         return context
 
 class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateView):
@@ -101,23 +139,34 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
         user = self.request.user
         context['my_transactions'] = Transaction.objects.filter(operator=user, date__date=context['date']).order_by('-date')
         context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:3]
+        context['persons'] = PERSONS
 
         queryset = Transaction.objects.filter(
             operator=self.request.user, date__date=context['date']
         )
 
         result = {}
-        for payment in ['click', 'cash', 'terminal', 'bank']:
-            subquery = queryset.filter(payment_type=payment).aggregate(
-                usd=Sum('amount_usd'),
-                uzs=Sum('amount_uzs'),
-                rub=Sum('amount_rub'),
-                eur=Sum('amount_eur'),
-            )
-            result[payment] = subquery
+        for payment in ['click', 'cash']:
+            if payment is not 'click':
+                subquery = queryset.filter(payment_type=payment).aggregate(
+                    usd=Sum('amount_usd'),
+                    uzs=Sum('amount_uzs'),
+                    rub=Sum('amount_rub'),
+                    eur=Sum('amount_eur'),
+                )
+                result[payment] = subquery
+            else:
+                for click in CLICKS:
+                    subquery = queryset.filter(payment_type=payment, click=click[0]).aggregate(
+                        usd=Sum('amount_usd'),
+                        uzs=Sum('amount_uzs'),
+                        rub=Sum('amount_rub'),
+                        eur=Sum('amount_eur'),
+                    )
+                    result[click[0]] = subquery
+            
         context['total'] = result
-        
-        
+        context['clicks'] = CLICKS
         return context
 
 # --- AUTH (LOGIN / LOGOUT / REGISTER) ---
