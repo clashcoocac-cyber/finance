@@ -130,6 +130,8 @@ class IncomeForm(forms.ModelForm):
         report.rub_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_rub') or 0)}
         report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
         report.category = transaction.counterparty
+        transaction.report = report
+        transaction.save()
         report.save()
         return transaction
 
