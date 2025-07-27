@@ -289,16 +289,16 @@
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="space-y-1">
                             {% if transaction.amount_uzs %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_uzs }} so'm</div>
+                                <div class="font-semibold text-green-600">{{ transaction.amount_uzs | format_currency }} so'm</div>
                             {% endif %}
                             {% if transaction.amount_usd %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_usd }} $</div>
+                                <div class="font-semibold text-green-600">{{ transaction.amount_usd | format_currency }} $</div>
                             {% endif %}
                             {% if transaction.amount_rub %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_rub }} ₽</div>
+                                <div class="font-semibold text-green-600">{{ transaction.amount_rub | format_currency }} ₽</div>
                             {% endif %}
                             {% if transaction.amount_eur %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_eur }} €</div>
+                                <div class="font-semibold text-green-600">{{ transaction.amount_eur | format_currency }} €</div>
                             {% endif %}
                         </div>
                     </td>

@@ -322,3 +322,38 @@ class HomeView(View):
             elif request.user.role == 'operator':
                 return redirect('operator_dashboard')
         return redirect('login')
+    
+
+class TransactionView(LoginRequiredMixin, BossRequiredMixin, View):
+    template_name = 'edit_tran.html'
+
+    def get(self, request, pk, *args, **kwargs):
+        transaction = Transaction.objects.filter(pk=pk).first()
+        if not transaction:
+            return redirect('transaction_list')
+
+        form = TransactionFrom(instance=transaction)
+        context = {
+            'form': form,
+            'transaction': transaction,
+            'persons': PERSONS,
+            'clicks': CLICKS,
+            'choices': Transaction.PAYMENT_TYPES,
+        }
+        return render(request, self.template_name, context)
+    
+    def post(self, request, pk, *args, **kwargs):
+        transaction = Transaction.objects.filter(pk=pk).first()
+        if not transaction:
+            return redirect('transaction_list')
+
+        data = request.POST.copy()
+        transaction = Transaction.objects.filter(pk=pk).first()
+        transaction.payment_type = data.get('payment_type')
+        transaction.click = data.get('click') or None
+        transaction.amount_usd = int(data.get('amount_usd', 0) or 0) or None
+        transaction.amount_uzs = int(data.get('amount_uzs', 0) or 0) or None
+        transaction.amount_rub = int(data.get('amount_rub', 0) or 0) or None
+        transaction.amount_eur = int(data.get('amount_eur', 0) or 0) or None
+        transaction.save()
+        return redirect('transaction_list')
