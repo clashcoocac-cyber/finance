@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from finance.models import User, Transaction, DailyReport
+from finance.models import User, Transaction, DailyReport, Stat
 
 
 @admin.register(User)
@@ -16,4 +16,9 @@ class TransactionAdmin(admin.ModelAdmin):
 
 @admin.register(DailyReport)
 class DailyReportAdmin(admin.ModelAdmin):
+    ...
+
+
+@admin.register(Stat)
+class StatAdmin(admin.ModelAdmin):
     ...

@@ -17,8 +17,11 @@
                 </span>
                     </div>
                     <div class="flex items-center space-x-4">
+                        <a href="{% url 'transaction_list' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                            Tranzaksiyalar
+                        </a>
                         <a href="{% url 'users' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            👥 Foydalanuvchilar
+                            Foydalanuvchilar
                         </a>
                         <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
                             Chiqish
@@ -31,8 +34,12 @@
         <div class="max-w-7xl mx-auto p-6" id="invoice">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
-                    <div class="flex items-center justify-between">
-                        <div>
+
+                    <div class="flex items-center justify-between relative group">
+                        <div class="">
+                            <button onclick="editDailyStats('income')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-gray-200 hover:bg-gray-300 text-white p-1 rounded text-xs transition-all">
+                            ✏️
+                        </button>
                             <p class="text-sm font-medium text-gray-600">Umumiy Kirim</p>
                             <div class="space-y-1 mt-2">
                                 <p class="text-lg font-medium text-green-600" id="totalIncomeUZS">{{ stats.income.total_uzs | default:0 | format_currency }} so'm</p>
@@ -45,8 +52,11 @@
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between relative group">
                         <div>
+                            <button onclick="editDailyStats('expense')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-gray-200 hover:bg-gray-300 text-white p-1 rounded text-xs transition-all">
+                            ✏️
+                        </button>
                             <p class="text-sm font-medium text-gray-600">Umumiy Chiqim</p>
                             <div class="space-y-1 mt-2">
                                 <p class="text-lg font-medium text-red-600" id="totalExpenseUZS">{{ stats.expense.total_uzs | default:0 | format_currency }} so'm</p>
@@ -59,14 +69,17 @@
                     </div>
                 </div>
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between relative group">
                         <div>
+                            <button onclick="editDailyStats('diff')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-gray-200 hover:bg-gray-300 text-white p-1 rounded text-xs transition-all">
+                            ✏️
+                        </button>
                             <p class="text-sm font-medium text-gray-600">Qoldiq</p>
                             <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-yellow-600" id="totalBalanceUZS">{{ stats.diff.uzs | default:0 | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceUSD">{{ stats.diff.usd | default:0 | format_currency }} $</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceRUB">{{ stats.diff.rub | default:0 | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceEUR">{{ stats.diff.eur | default:0 | format_currency }} €</p>
+                                <p class="text-lg font-medium text-yellow-600" id="totalBalanceUZS">{{ stats.diff.total_uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceUSD">{{ stats.diff.total_usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceRUB">{{ stats.diff.total_rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceEUR">{{ stats.diff.total_uer | default:0 | format_currency }} €</p>
                             </div>
                         </div>
                         <div class="text-blue-500 text-3xl">💰</div>
@@ -112,7 +125,7 @@
             <input 
                 type="text" 
                 id="filterSearch" 
-                value="{{ request.GET.q }}" 
+                value="{{ q | default:"" }}" 
                 placeholder="Tavsif yoki operator..." 
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
             >
@@ -207,6 +220,64 @@
 
         </div>
     </div>
+
+
+ <!-- Edit Daily Stats Modal -->
+    <div id="editStatsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <form method="POST" action="{% url 'change_stat' %}" class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+            {% csrf_token %}
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800" id="editStatsTitle">Statistikani Tahrirlash</h2>
+                <button onclick="closeEditStatsModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="hidden">
+                    <input type="hidden" name="stat_type" id="StatType">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">So'm miqdori</label>
+                    <input type="number" name="total_uzs" id="editStatsUZS" placeholder="So'm miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dollar miqdori</label>
+                    <input type="number" name="total_usd" id="editStatsUSD" placeholder="Dollar miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rubl miqdori</label>
+                    <input type="number" name="total_rub" id="editStatsRUB" placeholder="Rubl miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Yevro miqdori</label>
+                    <input type="number" name="total_eur" id="editStatsEUR" placeholder="Yevro miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div class="flex items-start">
+                        <span class="text-yellow-600 mr-2">⚠️</span>
+                        <div class="text-sm text-yellow-800">
+                            <p class="font-medium mb-1">Diqqat!</p>
+                            <p>Bu o'zgarishlar kunlik hisobotga ta'sir qiladi. Faqat zarur hollarda o'zgartiring.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-4 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                        Saqlash
+                    </button>
+                    <button onclick="closeEditStatsModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                        Bekor qilish
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
@@ -249,6 +320,50 @@ function applyTransactionFilters() {
 
     window.location.search = urlParams.toString();
 }
+
+function editDailyStats(type) {
+            
+            // Set modal title and date
+            const titles = {
+                'income': 'Umumiy Kirimni Tahrirlash',
+                'expense': 'Umumiy Chiqimni Tahrirlash',
+                'diff': 'Umumiy Qoldiqni Tahrirlash'
+            };
+            
+            document.getElementById('editStatsTitle').textContent = titles[type];
+            document.getElementById('StatType').value = type;
+            
+            // Calculate current values
+            const currencies = ['uzs', 'usd', 'rub', 'eur'];
+            currencies.forEach(currency => {
+                let currentValue = 0;
+                
+                if (type === 'income') {
+                    document.getElementById('editStatsUZS').value = {{ stats.income.total_uzs | default:0 }};
+                    document.getElementById('editStatsUSD').value = {{ stats.income.total_usd | default:0 }};
+                    document.getElementById('editStatsRUB').value = {{ stats.income.total_rub | default:0 }};
+                    document.getElementById('editStatsEUR').value = {{ stats.income.total_eur | default:0 }};
+                } 
+                else if (type === 'expense') {
+                    document.getElementById('editStatsUZS').value = {{ stats.expense.total_uzs | default:0 }};
+                    document.getElementById('editStatsUSD').value = {{ stats.expense.total_usd | default:0 }};
+                    document.getElementById('editStatsRUB').value = {{ stats.expense.total_rub | default:0 }};
+                    document.getElementById('editStatsEUR').value = {{ stats.expense.total_eur | default:0 }};
+                } 
+                else if (type === 'diff') {
+                    document.getElementById('editStatsUZS').value = {{ stats.diff.total_uzs | default:0 }};
+                    document.getElementById('editStatsUSD').value = {{ stats.diff.total_usd | default:0 }};
+                    document.getElementById('editStatsRUB').value = {{ stats.diff.total_rub | default:0 }};
+                    document.getElementById('editStatsEUR').value = {{ stats.diff.total_eur | default:0 }};
+                } 
+            });
+            
+            document.getElementById('editStatsModal').classList.remove('hidden');
+        }
+
+        function closeEditStatsModal() {
+            document.getElementById('editStatsModal').classList.add('hidden');
+        }
 </script>
 
 {% endblock %}

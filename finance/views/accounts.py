@@ -7,7 +7,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
-from finance.models import PERSONS, User, Company
+from finance.models import PERSONS, Stat, StatTypes, User, Company
 from finance.models import DailyReport
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, CLICKS
@@ -39,8 +39,10 @@ class BossDashboardView(TemplateView):
         if context['q']:
             reports = reports.filter(
                 Q(operator__username__icontains=context['q']) |
-                Q(operator__company__name__icontains=context['q'])
+                Q(operator__company__name__icontains=context['q']) |
+                Q(category__icontains=context['q'])
             )
+
         context['reports'] = reports.order_by('-date')
         
         income_qs = Transaction.objects.filter(
@@ -53,6 +55,12 @@ class BossDashboardView(TemplateView):
             total_rub=Sum('amount_rub'),
             total_eur=Sum('amount_eur')
         )
+        inc_stat, _ = Stat.objects.get_or_create(type=StatTypes.INCOME)
+        inc_stat.total_uzs = (income_stats['total_uzs'] or 0) - inc_stat.default_uzs
+        inc_stat.total_usd = (income_stats['total_usd'] or 0) - inc_stat.default_usd
+        inc_stat.total_rub = (income_stats['total_rub'] or 0) - inc_stat.default_rub
+        inc_stat.total_eur = (income_stats['total_eur'] or 0) - inc_stat.default_eur
+        inc_stat.save()
 
         expense_qs = DailyReport.objects.filter(type='expense', is_closed=True)
         expense_stats = expense_qs.aggregate(
@@ -61,6 +69,12 @@ class BossDashboardView(TemplateView):
             total_rub=Sum('total_rub'),
             total_eur=Sum('total_uer')  # e'tibor bering: bu yerda `total_uer` yozilgan
         )
+        expense_stat, _ = Stat.objects.get_or_create(type=StatTypes.EXPENSE)
+        expense_stat.total_uzs = (expense_stats['total_uzs'] or 0) - expense_stat.default_uzs
+        expense_stat.total_usd = (expense_stats['total_usd'] or 0) - expense_stat.default_usd
+        expense_stat.total_rub = (expense_stats['total_rub'] or 0) - expense_stat.default_rub
+        expense_stat.total_eur = (expense_stats['total_eur'] or 0) - expense_stat.default_eur
+        expense_stat.save()
 
         diff_stats = {
             'usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
@@ -68,11 +82,17 @@ class BossDashboardView(TemplateView):
             'rub': (income_stats['total_rub'] or 0) - (expense_stats['total_rub'] or 0),
             'eur': (income_stats['total_eur'] or 0) - (expense_stats['total_eur'] or 0),
         }
+        diff_stat, _ = Stat.objects.get_or_create(type=StatTypes.BALANCE)
+        diff_stat.total_uzs = int(diff_stats['uzs']) - diff_stat.default_uzs
+        diff_stat.total_usd = int(diff_stats['usd']) - diff_stat.default_usd
+        diff_stat.total_rub = int(diff_stats['rub']) - diff_stat.default_rub
+        diff_stat.total_eur = int(diff_stats['eur']) - diff_stat.default_eur
+        diff_stat.save()
 
         context['stats'] = {
-            'income': income_stats,
-            'expense': expense_stats,
-            'diff': diff_stats
+            'income': inc_stat,
+            'expense': expense_stat,
+            'diff': diff_stat
         }
         
         return context
@@ -86,6 +106,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
         context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
         context['q'] = self.request.GET.get('q', None)
+
         reports = DailyReport.objects.filter(type='income')
         if context['from']:
             date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
@@ -96,7 +117,8 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         if context['q']:
             reports = reports.filter(
                 Q(operator__username__icontains=context['q']) |
-                Q(operator__company__name__icontains=context['q'])
+                Q(operator__company__name__icontains=context['q']) |
+                Q(category__icontains=context['q'])
             )
         context['reports'] = reports.order_by('-date')
         
@@ -168,6 +190,7 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
         context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
         context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
         context['q'] = self.request.GET.get('q', None)
+
         user = self.request.user
         my_transactions = Transaction.objects.filter(operator=user)
         if context['from']:
@@ -244,6 +267,7 @@ class UserListCreateView(LoginRequiredMixin, BossRequiredMixin, View):
             'users': users,
             'operator_count': User.objects.filter(role='operator').count(),
             'cashier_count': User.objects.filter(role='cashier').count(),
+            'transaction_count': Transaction.objects.count(),
         }
         return render(request, self.template_name, context)
     

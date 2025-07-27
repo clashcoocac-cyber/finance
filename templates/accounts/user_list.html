@@ -109,7 +109,7 @@
                                 <span class="text-2xl mr-3">📊</span>
                                 <span class="font-medium text-gray-700">Jami Tranzaksiyalar</span>
                             </div>
-                            <span class="text-2xl font-bolder text-purple-600" id="transactionCount">0</span>
+                            <span class="text-2xl font-bolder text-purple-600" id="transactionCount"> {{ transaction_count }}</span>
                         </div>
                     </div>
                 </div>
@@ -123,7 +123,6 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Smena</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Rol</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Yaratilgan</th>
@@ -134,7 +133,6 @@
                             {% for user in users %}
                             <tr>
                                 <td class="px-4 py-3 text-sm text-gray-900">{{ user.username }}</td>
-                                <td class="px-4 py-3 text-sm text-gray-900">{{ user.shift | default:"-" }}</td>
                         <td class="px-4 py-3 text-sm">
                             <span class="px-2 py-1 text-xs rounded-full {% if user.role == 'operator' %} bg-blue-100 text-blue-800 {% elif user.role == 'cashier' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}">
                                 {% if user.role == 'operator' %} Operator {% elif user.role == 'cashier' %} Kassir {% else %} Admin {% endif %}

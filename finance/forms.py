@@ -74,6 +74,7 @@ class TransactionFrom(forms.ModelForm):
         else:
             transaction.counterparty = self.cleaned_data['counterparty']
         transaction.operator = operator
+        transaction.type = 'income'
         if commit:
             transaction.save()
         return transaction
@@ -131,6 +132,7 @@ class IncomeForm(forms.ModelForm):
         report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
         report.category = transaction.counterparty
         transaction.report = report
+        transaction.type = 'income'
         transaction.save()
         report.save()
         return transaction
@@ -168,5 +170,19 @@ class ExpenseForm(forms.Form):
         report.rub_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_rub') or 0)}
         report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
         report.save()
+
+        transaction = Transaction.objects.create(
+            type='expense',
+            amount_usd=self.cleaned_data.get('amount_usd'),
+            amount_uzs=self.cleaned_data.get('amount_uzs'),
+            amount_rub=self.cleaned_data.get('amount_rub'),
+            amount_eur=self.cleaned_data.get('amount_eur'),
+            payment_type=self.cleaned_data['payment_type'],
+            description=self.cleaned_data['description'],
+            operator=operator,
+            report=report,
+            counterparty=category
+        )
+        transaction.save()
 
         return redirect('expenses_list')

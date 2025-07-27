@@ -7,7 +7,7 @@ from .views.accounts import (
 )
 from .views.transaction import (
     TransactionCreateView, ConfirmExpenseView, CloseCashRegister, ConfirmIncomeView,
-    ExpensesPageView, IncomesPageView
+    ExpensesPageView, IncomesPageView, TransactionList, ChangeStatView
 )
 
 urlpatterns = [
@@ -30,6 +30,7 @@ urlpatterns = [
     path('users/update', UserUpdateView.as_view(), name='user_update'),
     path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user_delete'),
 
+    path('transactions/', TransactionList.as_view(), name='transaction_list'),
     path('transactions/create/', TransactionCreateView.as_view(), name='transaction_create'),
 
     path('reports/<int:pk>/confirm/', ConfirmExpenseView.as_view(), name='confirm_expense'),
@@ -38,4 +39,6 @@ urlpatterns = [
 
     path('expenses/', ExpensesPageView.as_view(), name='expenses_list'),
     path('incomes/', IncomesPageView.as_view(), name='incomes_list'),
+
+    path('stats/', ChangeStatView.as_view(), name='change_stat'),
 ]

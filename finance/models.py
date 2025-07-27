@@ -85,3 +85,21 @@ class DailyReport(models.Model):
     
     is_closed = models.BooleanField(default=False)
     comment = models.TextField(null=True, blank=True)
+
+class StatTypes(models.TextChoices):
+    INCOME = 'income', 'Kirim'
+    EXPENSE = 'expense', 'Chiqim'
+    BALANCE = 'diff', 'Qoldiq'
+
+class Stat(models.Model):
+    type = models.CharField(max_length=10, choices=StatTypes.choices)
+
+    total_uzs = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_usd = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_rub = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    total_eur = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+
+    default_uzs = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    default_usd = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    default_rub = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    default_eur = models.DecimalField(max_digits=15, decimal_places=2, default=0)
