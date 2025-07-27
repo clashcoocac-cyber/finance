@@ -111,7 +111,7 @@ class IncomeForm(forms.ModelForm):
         if self.cleaned_data['countryparty'] == 'other':
             transaction.counterparty = self.cleaned_data['other_counterparty']
         else:
-            transaction.countryparty = self.cleaned_data['countryparty']
+            transaction.counterparty = self.cleaned_data['countryparty']
         transaction.operator = operator
         if commit:
             transaction.save()
@@ -129,7 +129,7 @@ class IncomeForm(forms.ModelForm):
         report.usd_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_usd') or 0)}
         report.rub_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_rub') or 0)}
         report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
-        report.category = transaction.countryparty
+        report.category = transaction.counterparty
         report.save()
         return transaction
 
