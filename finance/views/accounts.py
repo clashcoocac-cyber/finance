@@ -1,4 +1,4 @@
-from datetime import datetime , date
+from datetime import datetime , date,timedelta
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, ListView, DeleteView, CreateView, UpdateView
@@ -11,7 +11,7 @@ from finance.models import PERSONS, User, Company
 from finance.models import DailyReport
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, CLICKS
-from django.db.models import Sum, Case, When, DecimalField, F, Value
+from django.db.models import Sum, Q
 
 
 
@@ -23,13 +23,29 @@ class BossDashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = User.objects.all()
-        context['date'] = self.request.GET.get('date', None) or datetime.today().strftime('%Y-%m-%d')
-        context['reports'] = DailyReport.objects.filter(date=context['date']).order_by('type')
+        context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
+        context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
+        context['type'] = self.request.GET.get('type', None)
+        context['q'] = self.request.GET.get('q', None)
+        reports = DailyReport.objects.all()
+        if context['from']:
+            date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
+            reports = reports.filter(date__gte=date_from)
+        if context['to']:
+            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
+            reports = reports.filter(date__lte=date_to)
+        if context['type']:
+            reports = reports.filter(type=context['type'])
+        if context['q']:
+            reports = reports.filter(
+                Q(operator__username__icontains=context['q']) |
+                Q(operator__company__name__icontains=context['q'])
+            )
+        context['reports'] = reports.order_by('-date')
         
         income_qs = Transaction.objects.filter(
             report__is_closed=True,
-            payment_type__in=['cash', 'click']
+            payment_type__in=['cash', 'click'],
         )
         income_stats = income_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -67,11 +83,25 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['date'] = self.request.GET.get('date', None) or datetime.today().strftime('%Y-%m-%d')
-        context['reports'] = DailyReport.objects.filter(type='income', date=context['date']).order_by('-date')
+        context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
+        context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
+        context['q'] = self.request.GET.get('q', None)
+        reports = DailyReport.objects.filter(type='income')
+        if context['from']:
+            date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
+            reports = reports.filter(date__gte=date_from)
+        if context['to']:
+            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date() + timedelta(days=1)
+            reports = reports.filter(date__lte=date_to)
+        if context['q']:
+            reports = reports.filter(
+                Q(operator__username__icontains=context['q']) |
+                Q(operator__company__name__icontains=context['q'])
+            )
+        context['reports'] = reports.order_by('-date')
         
         queryset = Transaction.objects.filter(
-            report__is_closed=True, date__date=context['date']
+            report__is_closed=True, date__date__range=(context['from'], context['to'])
         )
 
         result = {}
@@ -135,14 +165,28 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['date'] = self.request.GET.get('date', None) or datetime.today().strftime('%Y-%m-%d')
+        context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
+        context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
+        context['q'] = self.request.GET.get('q', None)
         user = self.request.user
-        context['my_transactions'] = Transaction.objects.filter(operator=user, date__date=context['date']).order_by('-date')
+        my_transactions = Transaction.objects.filter(operator=user)
+        if context['from']:
+            date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
+            my_transactions = my_transactions.filter(date__gte=date_from)
+        if context['to']:
+            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date() + timedelta(days=1)
+            my_transactions = my_transactions.filter(date__lte=date_to)
+        if context['q']:
+            my_transactions = my_transactions.filter(
+                Q(counterparty__icontains=context['q']) |
+                Q(description__icontains=context['q'])
+            )
+        context['my_transactions'] = my_transactions.order_by('-date')
         context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:3]
         context['persons'] = PERSONS
 
         queryset = Transaction.objects.filter(
-            operator=self.request.user, date__date=context['date']
+            operator=self.request.user, date__date__range=(context['from'], context['to'])
         )
 
         result = {}

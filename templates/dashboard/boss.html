@@ -58,15 +58,15 @@
                         <div class="text-red-500 text-3xl">📉</div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Qoldiq</p>
                             <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-blue-600" id="totalBalanceUZS">{{ stats.diff.uzs | default:0 | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-blue-600" id="totalBalanceUSD">{{ stats.diff.usd | default:0 | format_currency }} $</p>
-                                <p class="text-sm font-medium text-blue-600" id="totalBalanceRUB">{{ stats.diff.rub | default:0 | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-blue-600" id="totalBalanceEUR">{{ stats.diff.eur | default:0 | format_currency }} €</p>
+                                <p class="text-lg font-medium text-yellow-600" id="totalBalanceUZS">{{ stats.diff.uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceUSD">{{ stats.diff.usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceRUB">{{ stats.diff.rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceEUR">{{ stats.diff.eur | default:0 | format_currency }} €</p>
                             </div>
                         </div>
                         <div class="text-blue-500 text-3xl">💰</div>
@@ -74,38 +74,77 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-xl shadow-lg p-6" >
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold text-gray-800">Barcha Hisobotlar</h2>
-                    <div class="flex flex-wrap items-center gap-2 sm:gap-4">
-                        <div class="flex items-center space-x-2">
-                            <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
-                            <input type="date" value="{{ date }}" id="adminSelectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                            onchange="window.location.href = `?date=${this.value}`">
-                        </div>
-                        <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            📅 Bugun
-                        </a>
-                        <button onclick="generatePDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
-                            📥 Yuklab Olish
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya / Kategoriya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Holat</th>
-                            </tr>
-                        </thead>
-                        <tbody id="allReportsTable" class="divide-y divide-gray-200">
-                            {% for report in reports %}
-                            <tr>
+            <div class="bg-white rounded-xl shadow-lg p-6 space-y-6">
+    <!-- Sarlavha -->
+    <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold text-gray-800">Barcha Hisobotlar</h2>
+        <button onclick="generatePDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
+            📥 Yuklab Olish
+        </button>
+    </div>
+
+    <!-- Qidiruv va filterlar -->
+    <div class="space-y-4">
+        <!-- Qidiruv input -->
+        
+
+        <!-- Filterlar -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Boshlanish sanasi</label>
+                <input type="date" value="{{from}}" id="filterStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tugash sanasi</label>
+                <input type="date" value="{{to}}"  id="filterEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tranzaksiya turi</label>
+                <select value="{{request.GET.type}}"  id="filterTransactionType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
+                    <option value="">Barchasi</option>
+                    <option value="income" {% if request.GET.type == 'income' %}selected{% endif %}>📈 Kirimlar</option>
+                    <option value="expense" {% if request.GET.type == 'expense' %}selected{% endif %}>📉 Chiqimlar</option>
+                </select>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="md:col-span-3">
+            <input 
+                type="text" 
+                id="filterSearch" 
+                value="{{ request.GET.q }}" 
+                placeholder="Tavsif yoki operator..." 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+            >
+        </div>
+        <div>
+            <button
+                id="applyFiltersButton" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                onclick="applyTransactionFilters()"
+            > 
+                Filtrlarni qo'llash
+        </button>
+        </div>
+        </div>
+    </div>
+
+    <!-- Jadval -->
+    <div class="overflow-x-auto">
+        <table class="w-full table-auto">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya / Kategoriya</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
+                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Holat</th>
+                </tr>
+            </thead>
+            <tbody id="allReportsTable" class="divide-y divide-gray-200">
+                {% for report in reports %}
+                <tr>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ report.date | date:"d/m/Y" }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         {% if report.type == 'income' %}
@@ -132,44 +171,40 @@
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="space-y-1 font-medium {% if report.type == 'income' %} text-green-600 {% else %} text-red-600 {% endif %}">
                             {% if report.total_uzs %}
-                            <div class="">{{ report.total_uzs | format_currency }} so'm</div>
+                                <div>{{ report.total_uzs | format_currency }} so'm</div>
                             {% endif %}
                             {% if report.total_usd %}
-                            <div class="">{{ report.total_usd | format_currency }} $</div>
+                                <div>{{ report.total_usd | format_currency }} $</div>
                             {% endif %}
                             {% if report.total_rub %}
-                            <div class="">{{ report.total_rub | format_currency }} ₽</div>
+                                <div>{{ report.total_rub | format_currency }} ₽</div>
                             {% endif %}
                             {% if report.total_uer %}
-                            <div class="">{{ report.total_uer | format_currency }} €</div>
+                                <div>{{ report.total_uer | format_currency }} €</div>
                             {% endif %}
-
                         </div>
                     </td>
                     <td class="px-4 py-3 text-sm">
                         {% if report.is_closed %}
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                                Tasdiqlangan
-                        </span>
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Tasdiqlangan</span>
                         {% elif report.type == 'income' %}
-                        <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
-                            Kutilmoqda
-                        </span>
+                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Kutilmoqda</span>
                         {% else %}
-                        <form action = "{% url 'confirm_expense' report.pk %}" method="POST">
-                            {% csrf_token %}
-                        <button type="submit" onclick="return confirm('Rostan ham tasdiqlamoqchimisiz?')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                Tasdiqlash
-                        </a>
-                        </form>
+                            <form action="{% url 'confirm_expense' report.pk %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('Rostan ham tasdiqlamoqchimisiz?')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                    Tasdiqlash
+                                </button>
+                            </form>
                         {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
- </tbody>
-                    </table>
-                </div>
-            </div>
+            </tbody>
+        </table>
+    </div>
+</div>
+
         </div>
     </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -198,6 +233,21 @@
     };
 
     html2pdf().set(opt).from(element).save();
+}
+
+function applyTransactionFilters() {
+    const from = document.getElementById('filterStartDate').value;
+    const to = document.getElementById('filterEndDate').value;
+    const type = document.getElementById('filterTransactionType').value;
+    const q = document.getElementById('filterSearch').value;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('from', from);
+    urlParams.set('to', to);
+    urlParams.set('type', type);
+    urlParams.set('q', q);
+
+    window.location.search = urlParams.toString();
 }
 </script>
 

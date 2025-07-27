@@ -42,10 +42,11 @@
 
 
         <div class="max-w-7xl mx-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" id="div1">
+            <div class="grid grid-cols-1 md:grid-cols-2 {% if 'OPT' in request.user.username %}lg:grid-cols-2{%else%}lg:grid-cols-3{% endif %} gap-4 mb-8" id="div1">
+                {% if not 'OPT' in request.user.username %}
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click ({{ clicks.0.1 }})</p>
+                    <p class="text-sm text-gray-600">Click {{ clicks.0.1 }}</p>
                     <div class="space-y-1">
                         <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click1.uzs | default:0 }} so'm</p>
                         <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click1.usd | default:0 }} $</p>
@@ -53,9 +54,10 @@
                         <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click1.eur | default:0 }} €</p>
                     </div>
                 </div>
+                {% endif %}
                 <div class="bg-white rounded-xl shadow-lg p-4 text-center">
                     <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click ({{ clicks.1.1 }})</p>
+                    <p class="text-sm text-gray-600">Click {{ clicks.1.1 }}</p>
                     <div class="space-y-1">
                         <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click2.uzs | default:0 }} so'm</p>
                         <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click2.usd | default:0 }} $</p>
@@ -77,7 +79,7 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Qo'shis {{ form.counterparty.option }}</h2>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Qo'shish {{ form.counterparty.option }}</h2>
                     {% if form.errors %}
                         <div class="django-errors bg-red-50 border border-red-200 rounded-lg p-4 mb-6 fade-in">
                             <div class="flex items-start">
@@ -107,12 +109,17 @@
                         {% csrf_token %}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kimdan olindi</label>
-                            <select id="counterparty" required name="counterparty" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <select onchange="seeWho()" id="counterparty" required name="counterparty" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="">Shaxsni tanlang</option>
                                 {% for person in persons %}
                                     <option value="{{ person.0 }}">{{ person.1 }}</option>
                                 {% endfor %}
                             </select>
+                        </div>
+
+                        <div id="otherCounterparty" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Boshqa shaxs</label>
+                            <input type="text" name="other_counterparty" placeholder="Boshqa shaxs nomi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
@@ -221,6 +228,47 @@
             <!-- Transactions Table -->
             <div class="bg-white rounded-xl shadow-lg p-6" id="div2">
                 <h2 class="text-xl font-bold text-gray-800 mb-4">Mening Tranzaksiyalarim</h2>
+                
+                <!-- Qidiruv va filterlar -->
+    <div class="space-y-4">
+        <!-- Qidiruv input -->
+        
+
+        <!-- Filterlar -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 my-6 mt-5 justify-">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Boshlanish sanasi</label>
+                <input type="date" value="{{from}}" id="filterStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tugash sanasi</label>
+                <input type="date" value="{{to}}"  id="filterEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
+            </div>
+        <div class="md:col-span-2 justify-end">
+                            <label class="block text-sm font-medium text-gray-700 mb-1"> Qidiruv</label>
+
+            <input 
+                type="text" 
+                id="filterSearch" 
+                value="{{ request.GET.q }}" 
+                placeholder="Tavsif yoki operator..." 
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+            >
+        </div>
+        <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">.</label>
+
+            <button
+                id="applyFiltersButton" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                onclick="applyTransactionFilters()"
+            > 
+                Filtrlarni qo'llash
+        </button>
+        </div>
+        </div>
+    </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full table-auto">
                         <thead class="bg-gray-50">
@@ -236,7 +284,7 @@
                             {% for transaction in my_transactions %}
                             <tr>
         
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.date | time:"H:i:s" }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.date | date:"d.m.Y" }}<br> {{ transaction.date | time:"H:i" }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.get_counterparty_display }}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="space-y-1">
@@ -258,7 +306,7 @@
                     <td class="px-4 py-3 text-sm text-gray-900">
                         {{ transaction.get_payment_type_display }}
                         {% if transaction.payment_type == 'click' %}
-                            <span class="text-gray-600"> ({{ transaction.get_click_display }})</span>
+                            <span class="font-medium"> {{ transaction.get_click_display }}</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -323,6 +371,33 @@
                 firstSelect.removeAttribute('required');
             }
         }
+
+        function seeWho() {
+            const counterpartySelect = document.getElementById('counterparty');
+            const otherCounterpartyDiv = document.getElementById('otherCounterparty');
+            const firstInput = otherCounterpartyDiv.querySelector('input');
+
+            if (counterpartySelect.value === 'other') {
+                otherCounterpartyDiv.classList.remove('hidden');
+                firstInput.setAttribute('required', true);
+            } else {
+                otherCounterpartyDiv.classList.add('hidden');
+                firstInput.removeAttribute('required');
+            }
+        }
+
+        function applyTransactionFilters() {
+    const from = document.getElementById('filterStartDate').value;
+    const to = document.getElementById('filterEndDate').value;
+    const q = document.getElementById('filterSearch').value;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('from', from);
+    urlParams.set('to', to);
+    urlParams.set('q', q);
+
+    window.location.search = urlParams.toString();
+}
 </script>
 
 {% endblock %}

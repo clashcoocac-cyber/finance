@@ -61,6 +61,7 @@ class UserUpdateForm(UserChangeForm):
 
 
 class TransactionFrom(forms.ModelForm):
+    other_counterparty = forms.CharField(required=False, max_length=255, label="Boshqa shaxs nomi")
 
     class Meta:
         model = Transaction
@@ -68,6 +69,10 @@ class TransactionFrom(forms.ModelForm):
         
     def save(self, commit = ..., operator=None):
         transaction = super().save(commit=False)
+        if self.cleaned_data['counterparty'] == 'other':
+            transaction.counterparty = self.cleaned_data['other_counterparty']
+        else:
+            transaction.counterparty = self.cleaned_data['counterparty']
         transaction.operator = operator
         if commit:
             transaction.save()
@@ -83,9 +88,50 @@ CATEGORIES = {
     "salary_msb": "Oylik MSB",
     "equipment_purchase_sfb": "Texnika xaridi SFB",
     "equipment_purchase_opt": "Texnika xaridi OPT",
-    "exchange_rate_changed": "Valyuta almashtirish",
+    "exchange_rate_changed": "Almashdi",
     "sfb_suppliers": "SFB yetkazib beruvchilar",
 }
+
+IncomeCHoices = [
+    ('almashdi', 'Almashdi'),
+    ('vozvrat', 'Vozvrat rasx den'),
+    ('other', 'Boshqa'),
+]
+
+class IncomeForm(forms.ModelForm):
+    countryparty = forms.ChoiceField(choices=IncomeCHoices)
+    other_counterparty = forms.CharField(required=False, max_length=255, label="Boshqa shaxs nomi")
+
+    class Meta:
+        model = Transaction
+        fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'countryparty', 'other_counterparty']
+        
+    def save(self, commit = True, operator=None):
+        transaction = super().save(commit=False)
+        if self.cleaned_data['countryparty'] == 'other':
+            transaction.counterparty = self.cleaned_data['other_counterparty']
+        else:
+            transaction.countryparty = self.cleaned_data['countryparty']
+        transaction.operator = operator
+        if commit:
+            transaction.save()
+
+        report = DailyReport.objects.create(
+            operator=operator,
+            type='income',
+            is_closed=True
+        )
+        report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
+        report.total_usd = self.cleaned_data.get('amount_usd', 0)
+        report.total_rub = self.cleaned_data.get('amount_rub', 0)
+        report.total_uer = self.cleaned_data.get('amount_eur', 0)
+        report.uzs_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_uzs') or 0)}
+        report.usd_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_usd') or 0)}
+        report.rub_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_rub') or 0)}
+        report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
+        report.category = transaction.countryparty
+        report.save()
+        return transaction
 
 class ExpenseForm(forms.Form):
     category = forms.CharField(max_length=100)
@@ -113,7 +159,7 @@ class ExpenseForm(forms.Form):
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
         report.total_usd = self.cleaned_data.get('amount_usd', 0)
         report.total_rub = self.cleaned_data.get('amount_rub', 0)
-        report.total_eur = self.cleaned_data.get('amount_eur', 0)
+        report.total_uer = self.cleaned_data.get('amount_eur', 0)
 
         report.uzs_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_uzs') or 0)}
         report.usd_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_usd') or 0)}

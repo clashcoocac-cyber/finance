@@ -26,11 +26,12 @@ PERSONS = [
     ('toxtayev_farrux', "To'xtayev Farrux"),
     ('amonova_rushana', 'Amonova Rushana'),
     ('hamidova_umida', 'Hamidova Umida'),
+    ('other', 'Boshqa')
 ]
 
 CLICKS = [
-    ('click1', 'Nurmuxammedova'),
-    ('click2', 'Umarov J')
+    ('click1', 'SFB'),
+    ('click2', 'OPT')
 ]
 
 class Transaction(models.Model):

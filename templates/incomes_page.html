@@ -7,14 +7,13 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <div class="flex items-center">
-                        <span class="text-2xl">💸</span>
-                        <h1 class="ml-3 text-xl font-bold text-gray-800">Chiqimlar Boshqaruvi</h1>
+                        <h1 class="ml-3 text-xl font-bold text-gray-800">Kirimlar Bo'limi</h1>
                     </div>
                     <div class="flex items-center space-x-4">
                         <a href="{% url 'home' %}" class="text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
                             ← Orqaga
                         </a>
-                        <a href="{% url 'logout' %}" class="text-sm bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                        <a href="{% url 'logout' %}" class=" text-sm bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
                             Chiqish
                         </a>
                     </div>
@@ -26,31 +25,22 @@
             <!-- Add Expense Form -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Chiqim Qo'shish</h2>
-                    <form action="{% url 'expenses_list' %}" method="POST" class="space-y-4">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Kirim Qo'shish</h2>
+                    <form action="{% url 'incomes_list' %}" method="POST" class="space-y-4">
                         {% csrf_token %}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kategoriya</label>
-                            <select name="category" id="expenseCategory" onchange="toggleCustomDescription()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <select name="countryparty" required id="expenseCategory" onchange="toggleCustomDescription()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="">Kategoriya tanlang</option>
-                                <option value="expense_day">Kunlik xarajatlar</option>
-                                <option value="chicago_factory">Chikako zavodi</option>
-                                <option value="kvass_wholesale">Jasur un</option>
-                                <option value="emir_tashkent">Elyor Toshkent</option>
-                                <option value="salary_opt">Oylik OPT</option>
-                                <option value="salary_sfb">Oylik SFB</option>
-                                <option value="salary_msb">Oylik MSB</option>
-                                <option value="equipment_purchase_sfb">Texnika xaridi SFB</option>
-                                <option value="equipment_purchase_opt">Texnika xaridi OPT</option>
-                                <option value="exchange_rate_changed">Valyuta almashtirish</option>
-                                <option value="sfb_suppliers">SFB yetkazib beruvchilar</option>
-                                <option value="other">Boshqa</option>
+                                {% for choice in choices %}
+                                    <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                         
                         <div id="customDescriptionDiv" class="hidden">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Tavsif</label>
-                            <input type="text" name="description" id="customDescription" placeholder="Chiqim tavsifini kiriting..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <input type="text" name="other_counterparty" id="customDescription" placeholder="Kirim tavsifini kiriting..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
@@ -87,8 +77,8 @@
                             </select>
                         </div>
                         
-                        <button onclick="addExpense()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                            💸 Chiqim Qo'shish
+                        <button onclick="addExpense()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                            Qo'shish
                         </button>
                     </form>
                 </div>
@@ -96,7 +86,7 @@
                 <!-- Today's Expenses Summary -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800">Kunlik Chiqimlar</h2>
+                        <h2 class="text-xl font-bold text-gray-800">Kunlik Kirimlar</h2>
                         <div class="flex items-center space-x-3">
                             <div class="flex items-center space-x-2">
                                 <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
@@ -127,22 +117,22 @@
                         <div class="text-right">
                             {% if report.total_uzs %}
                             <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_uzs | format_currency }} so'm</p>
+                                <p class="font-medium text-green-600">{{ report.total_uzs | format_currency }} so'm</p>
                             </div>
                             {% endif %}
                             {% if report.total_usd %}
                             <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_usd | format_currency }} $</p>
+                                <p class="font-medium text-green-600">{{ report.total_usd | format_currency }} $</p>
                             </div>
                             {% endif %}
                             {% if report.total_rub %}
                             <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_rub | format_currency }} ₽</p>
+                                <p class="font-medium text-green-600">{{ report.total_rub | format_currency }} ₽</p>
                             </div>
                             {% endif %}
                             {% if report.total_uer %}
                             <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_uer | format_currency }} €</p>
+                                <p class="font-medium text-green-600">{{ report.total_uer | format_currency }} €</p>
                             </div>
                             {% endif %}
                             

@@ -7,7 +7,7 @@ from .views.accounts import (
 )
 from .views.transaction import (
     TransactionCreateView, ConfirmExpenseView, CloseCashRegister, ConfirmIncomeView,
-    ExpensesPageView
+    ExpensesPageView, IncomesPageView
 )
 
 urlpatterns = [
@@ -37,4 +37,5 @@ urlpatterns = [
     path('confirm-income/<int:pk>/', ConfirmIncomeView.as_view(), name='confirm_income'),
 
     path('expenses/', ExpensesPageView.as_view(), name='expenses_list'),
+    path('incomes/', IncomesPageView.as_view(), name='incomes_list'),
 ]
