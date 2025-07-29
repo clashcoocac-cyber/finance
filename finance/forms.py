@@ -150,13 +150,15 @@ class ExpenseForm(forms.Form):
         exp_type = self.cleaned_data.get('exp_type', None)
         if self.cleaned_data['category'] in CATEGORIES:
             category = CATEGORIES.get(self.cleaned_data['category'], 'Boshqa xarajatlar')
+            desc = self.cleaned_data.get('description', '')
         else:
             category = self.cleaned_data['description']
         report = DailyReport.objects.create(
             operator=operator,
             type=exp_type,
             is_closed=False,
-            category=category
+            category=category,
+            desc=desc
         )
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
         report.total_usd = self.cleaned_data.get('amount_usd', 0)

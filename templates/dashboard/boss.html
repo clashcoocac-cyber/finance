@@ -175,6 +175,7 @@
                             {{ report.operator.company.name }}
                         {% else %}
                             {{ report.category }}
+                            <div class="text-gray-500">{{ report.desc | default:""}}</div>
                         {% endif %}
                     </td>
                     <td class="px-4 py-3 text-sm">
