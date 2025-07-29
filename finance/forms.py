@@ -86,7 +86,8 @@ CATEGORIES = {
     'almashdi': 'Almashdi',
     'msbb_xarajat': 'MSSB xarajat',
     'opt_xarajat': 'OPT xarajat',
-    'sfb_xarajat': 'SFB xarajat'
+    'sfb_xarajat': 'SFB xarajat',
+    'rasxod_den': 'Rasxod den'
 }
 
 IncomeCHoices = [
