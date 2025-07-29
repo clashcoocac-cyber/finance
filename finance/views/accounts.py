@@ -154,6 +154,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         context['total'] = result
 
         income_qs = Transaction.objects.filter(
+            type='income',
             report__is_closed=True,
             payment_type__in=['cash', 'click'],
         )
@@ -187,7 +188,6 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         expense_stat.total_rub = (expense_stats['total_rub'] or 0) - expense_stat.default_rub
         expense_stat.total_eur = (expense_stats['total_eur'] or 0) - expense_stat.default_eur
         expense_stat.save()
-
 
         diff_stats = {
             'usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
