@@ -210,5 +210,15 @@
                 
             }
         }
+
+document.querySelectorAll('input[type="number"]').forEach(function(input) {
+    input.addEventListener('input', function(e) {
+        const value = e.target.value;
+        if (value.includes('.')) {
+            alert("Iltimos, nuqta ishlatmang, faqat butun son kiriting.");
+            e.target.value = value.replace('.', '');
+        }
+    });
+});
     </script>
 {% endblock %}
