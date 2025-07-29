@@ -8,6 +8,6 @@ def format_currency(value):
         return ''
     try:
         value = float(value)
-        return '{:,.0f}'.format(value).replace(',', '.')
+        return '{:,.0f}'.format(value).replace(',', ' ')
     except (ValueError, TypeError):
         return value
