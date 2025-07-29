@@ -153,6 +153,7 @@ class ExpenseForm(forms.Form):
             desc = self.cleaned_data.get('description', '')
         else:
             category = self.cleaned_data['description']
+            desc=None
         report = DailyReport.objects.create(
             operator=operator,
             type=exp_type,
