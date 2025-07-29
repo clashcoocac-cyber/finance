@@ -123,7 +123,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         context['reports'] = reports.order_by('-date')
         
         queryset = Transaction.objects.filter(
-            report__is_closed=True, date__date__range=(context['from'], context['to'])
+            report__is_closed=True, date__date__range=(context['from'], context['to']), type='income'
         )
 
         result = {}
