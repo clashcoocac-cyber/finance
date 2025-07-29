@@ -65,7 +65,8 @@ class Transaction(models.Model):
 class DailyReport(models.Model):
     TYPES = [
         ('income', 'Kirim'),
-        ('expense', 'Chiqim')
+        ('expense', 'Chiqim'),
+        ('xarajat', 'Xarajat'),
     ]
     type = models.CharField(max_length=10, choices=TYPES)
     date = models.DateField(auto_now_add=True)

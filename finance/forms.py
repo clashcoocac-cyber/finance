@@ -80,17 +80,13 @@ class TransactionFrom(forms.ModelForm):
         return transaction
     
 CATEGORIES = {
-    "expense_day": "Kunlik xarajatlar",
-    "chicago_factory": "Chikako zavodi",
-    "kvass_wholesale": "Jasur un",
-    "emir_tashkent": "Elyor Toshkent",
-    "salary_opt": "Oylik OPT",
-    "salary_sfb": "Oylik SFB",
-    "salary_msb": "Oylik MSB",
-    "equipment_purchase_sfb": "Texnika xaridi SFB",
-    "equipment_purchase_opt": "Texnika xaridi OPT",
-    "exchange_rate_changed": "Almashdi",
-    "sfb_suppliers": "SFB yetkazib beruvchilar",
+    'chikako': 'Chikako zavod',
+    'jasur': 'Jasur un',
+    'ravshan': 'Ravshan $',
+    'almashdi': 'Almashdi',
+    'msbb_xarajat': 'MSSB xarajat',
+    'opt_xarajat': 'OPT xarajat',
+    'sfb_xarajat': 'SFB xarajat'
 }
 
 IncomeCHoices = [
@@ -145,18 +141,20 @@ class ExpenseForm(forms.Form):
     amount_eur = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
     payment_type = forms.ChoiceField(choices=Transaction.PAYMENT_TYPES)
     description = forms.CharField(widget=forms.Textarea, required=False)
+    exp_type = forms.CharField()
 
     class Meta:
-        fields = ['category', 'amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'description']
+        fields = ['exp_type', 'category', 'amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'description']
         
     def save(self, commit=True, operator=None):
+        exp_type = self.cleaned_data.get('exp_type', None)
         if self.cleaned_data['category'] in CATEGORIES:
             category = CATEGORIES.get(self.cleaned_data['category'], 'Boshqa xarajatlar')
         else:
             category = self.cleaned_data['description']
         report = DailyReport.objects.create(
             operator=operator,
-            type='expense',
+            type=exp_type,
             is_closed=False,
             category=category
         )

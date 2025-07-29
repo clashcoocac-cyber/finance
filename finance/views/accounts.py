@@ -46,6 +46,7 @@ class BossDashboardView(TemplateView):
         context['reports'] = reports.order_by('-date')
         
         income_qs = Transaction.objects.filter(
+            type='income',
             report__is_closed=True,
             payment_type__in=['cash', 'click'],
         )
@@ -62,12 +63,17 @@ class BossDashboardView(TemplateView):
         inc_stat.total_eur = (income_stats['total_eur'] or 0) - inc_stat.default_eur
         inc_stat.save()
 
-        expense_qs = DailyReport.objects.filter(type='expense', is_closed=True)
+        expense_qs = Transaction.objects.filter(
+            type='expense',
+            report__is_closed=True,
+            payment_type__in=['cash', 'click'],
+        )
+        print(expense_qs)
         expense_stats = expense_qs.aggregate(
-            total_usd=Sum('total_usd'),
-            total_uzs=Sum('total_uzs'),
-            total_rub=Sum('total_rub'),
-            total_eur=Sum('total_uer')  # e'tibor bering: bu yerda `total_uer` yozilgan
+            total_usd=Sum('amount_usd'),
+            total_uzs=Sum('amount_uzs'),
+            total_rub=Sum('amount_rub'),
+            total_eur=Sum('amount_eur')
         )
         expense_stat, _ = Stat.objects.get_or_create(type=StatTypes.EXPENSE)
         expense_stat.total_uzs = (expense_stats['total_uzs'] or 0) - expense_stat.default_uzs

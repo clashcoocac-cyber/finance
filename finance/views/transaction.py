@@ -123,7 +123,7 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         context = {}
         report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
-        reposts = DailyReport.objects.filter(type='expense', date=report_date).order_by('-date')
+        reposts = DailyReport.objects.filter(type__in=['expense', 'xarajat'], date=report_date).order_by('-date')
         context['reports'] = reposts
         context['date'] = report_date
         return render(request, self.template_name, context)
@@ -135,7 +135,7 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
             messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
             return redirect(self.success_url)
         else:
-            messages.error(request, "Chiqim qo'shishda xatolik yuz berdi.")
+            print(form.errors)
         return render(request, self.template_name, {'form': form})
     
 
@@ -157,8 +157,6 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
         if form.is_valid():
             form.save(operator=request.user)
             return redirect(self.success_url)
-        else:
-            print(form.errors)
         return redirect(self.success_url)
 
 
@@ -210,6 +208,7 @@ class ChangeStatView(LoginRequiredMixin, BossRequiredMixin, View):
         stat, _ = Stat.objects.get_or_create(type=stat_type)
 
         income_qs = Transaction.objects.filter(
+            type='income',
             report__is_closed=True,
             payment_type__in=['cash', 'click'],
         )
@@ -220,12 +219,16 @@ class ChangeStatView(LoginRequiredMixin, BossRequiredMixin, View):
             total_eur=Sum('amount_eur')
         )
 
-        expense_qs = DailyReport.objects.filter(type='expense', is_closed=True)
+        expense_qs = Transaction.objects.filter(
+            type='expense',
+            report__is_closed=True,
+            payment_type__in=['cash', 'click'],
+        )
         expense_stats = expense_qs.aggregate(
-            total_usd=Sum('total_usd'),
-            total_uzs=Sum('total_uzs'),
-            total_rub=Sum('total_rub'),
-            total_eur=Sum('total_uer')  # e'tibor bering: bu yerda `total_uer` yozilgan
+            total_usd=Sum('amount_usd'),
+            total_uzs=Sum('amount_uzs'),
+            total_rub=Sum('amount_rub'),
+            total_eur=Sum('amount_eur')
         )
 
         diff_stats = {

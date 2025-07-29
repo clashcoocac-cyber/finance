@@ -30,21 +30,17 @@
                     <form action="{% url 'expenses_list' %}" method="POST" class="space-y-4">
                         {% csrf_token %}
                         <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">To'lov maqsadi</label>
+                            <select required id="reason" onchange="changeCategories()" name="exp_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Maqsadni tanlang</option>
+                                <option value="expense">Chiqim</option>
+                                <option value="xarajat">Xarajat</option>
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kategoriya</label>
                             <select name="category" id="expenseCategory" onchange="toggleCustomDescription()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <option value="">Kategoriya tanlang</option>
-                                <option value="expense_day">Kunlik xarajatlar</option>
-                                <option value="chicago_factory">Chikako zavodi</option>
-                                <option value="kvass_wholesale">Jasur un</option>
-                                <option value="emir_tashkent">Elyor Toshkent</option>
-                                <option value="salary_opt">Oylik OPT</option>
-                                <option value="salary_sfb">Oylik SFB</option>
-                                <option value="salary_msb">Oylik MSB</option>
-                                <option value="equipment_purchase_sfb">Texnika xaridi SFB</option>
-                                <option value="equipment_purchase_opt">Texnika xaridi OPT</option>
-                                <option value="exchange_rate_changed">Valyuta almashtirish</option>
-                                <option value="sfb_suppliers">SFB yetkazib beruvchilar</option>
-                                <option value="other">Boshqa</option>
                             </select>
                         </div>
                         
@@ -166,6 +162,49 @@
                 customDescriptionDiv.classList.remove('hidden');
             } else {
                 customDescriptionDiv.classList.add('hidden');
+            }
+        }
+
+         const exp_options = [
+            { value: '', text: 'Kategoriya tanlang' },
+            { value: 'chikako', text: 'Chikako zavod' },
+            { value: 'jasur', text: 'Jasur un' },
+            { value: 'ravshan', text: 'Ravshan $' },
+            { value: 'almashdi', text: 'Almashdi' },
+            { value: 'other', text: 'Boshqa' }
+        ];
+
+         const xar_options = [
+            { value: '', text: 'Kategoriya tanlang' },
+            { value: 'msbb_xarajat', text: 'MSSB xarajat' },
+            { value: 'opt_xarajat', text: 'OPT xarajat' },
+            { value: 'sfb_xarajat', text: 'SFB xarajat' },
+            { value: 'other', text: 'Boshqa' }
+        ];
+
+        function changeCategories() {
+            const categorySelect = document.getElementById('expenseCategory');
+            const reason = document.getElementById('reason');
+            if (reason.value === 'expense') {
+                categorySelect.innerHTML = '';
+                exp_options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.textContent = option.text;
+                    categorySelect.appendChild(opt);
+                });
+                toggleCustomDescription();
+            } else if (reason.value === 'xarajat') {
+                categorySelect.innerHTML = '';
+                xar_options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.textContent = option.text;
+                    categorySelect.appendChild(opt);
+                });
+                toggleCustomDescription();
+            } else {
+                
             }
         }
     </script>

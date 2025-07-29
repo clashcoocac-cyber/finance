@@ -117,7 +117,8 @@
                     <option value="">Barchasi</option>
                     <option value="income" {% if request.GET.type == 'income' %}selected{% endif %}>📈 Kirimlar</option>
                     <option value="expense" {% if request.GET.type == 'expense' %}selected{% endif %}>📉 Chiqimlar</option>
-                </select>
+                    <option value="xarajat" {% if request.GET.type == 'xarajat' %}selected{% endif %}>📉 Xarajatlar</option>
+                    </select>
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -177,7 +178,7 @@
                         {% endif %}
                     </td>
                     <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full {% if report.type == 'income' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}">
+                        <span class="px-2 py-1 text-xs rounded-full {% if report.type == 'income' %} bg-green-100 text-green-800 {% elif report.type == 'xarajat' %} bg-yellow-100 text-yellow-800 {% else %} bg-red-100 text-red-800 {% endif %}">
                             {{ report.get_type_display | lower }}
                         </span>
                     </td>
