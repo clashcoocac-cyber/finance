@@ -1,13 +1,13 @@
-from datetime import datetime , date,timedelta
+from datetime import datetime, timedelta
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import TemplateView, ListView, DeleteView, CreateView, UpdateView
+from django.views.generic import TemplateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
-from finance.models import PERSONS, Stat, StatTypes, User, Company
+from finance.models import PERSONS, Stat, StatTypes, User
 from finance.models import DailyReport
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, CLICKS
@@ -150,7 +150,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
 
         income_qs = Transaction.objects.filter(
             report__is_closed=True,
-            payment_type__in=['cash', 'click']
+            payment_type__in=['cash', 'click'],
         )
         income_stats = income_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -158,6 +158,12 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             total_rub=Sum('amount_rub'),
             total_eur=Sum('amount_eur')
         )
+        inc_stat, _ = Stat.objects.get_or_create(type=StatTypes.INCOME)
+        inc_stat.total_uzs = (income_stats['total_uzs'] or 0) - inc_stat.default_uzs
+        inc_stat.total_usd = (income_stats['total_usd'] or 0) - inc_stat.default_usd
+        inc_stat.total_rub = (income_stats['total_rub'] or 0) - inc_stat.default_rub
+        inc_stat.total_eur = (income_stats['total_eur'] or 0) - inc_stat.default_eur
+        inc_stat.save()
 
         expense_qs = DailyReport.objects.filter(type='expense', is_closed=True)
         expense_stats = expense_qs.aggregate(
@@ -166,6 +172,12 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             total_rub=Sum('total_rub'),
             total_eur=Sum('total_uer')  # e'tibor bering: bu yerda `total_uer` yozilgan
         )
+        expense_stat, _ = Stat.objects.get_or_create(type=StatTypes.EXPENSE)
+        expense_stat.total_uzs = (expense_stats['total_uzs'] or 0) - expense_stat.default_uzs
+        expense_stat.total_usd = (expense_stats['total_usd'] or 0) - expense_stat.default_usd
+        expense_stat.total_rub = (expense_stats['total_rub'] or 0) - expense_stat.default_rub
+        expense_stat.total_eur = (expense_stats['total_eur'] or 0) - expense_stat.default_eur
+        expense_stat.save()
 
         diff_stats = {
             'usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
@@ -173,11 +185,17 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             'rub': (income_stats['total_rub'] or 0) - (expense_stats['total_rub'] or 0),
             'eur': (income_stats['total_eur'] or 0) - (expense_stats['total_eur'] or 0),
         }
+        diff_stat, _ = Stat.objects.get_or_create(type=StatTypes.BALANCE)
+        diff_stat.total_uzs = int(diff_stats['uzs']) - diff_stat.default_uzs
+        diff_stat.total_usd = int(diff_stats['usd']) - diff_stat.default_usd
+        diff_stat.total_rub = int(diff_stats['rub']) - diff_stat.default_rub
+        diff_stat.total_eur = int(diff_stats['eur']) - diff_stat.default_eur
+        diff_stat.save()
 
         context['stats'] = {
-            'income': income_stats,
-            'expense': expense_stats,
-            'diff': diff_stats
+            'income': inc_stat,
+            'expense': expense_stat,
+            'diff': diff_stat
         }
         context['clicks'] = CLICKS
         return context

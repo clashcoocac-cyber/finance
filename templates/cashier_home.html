@@ -38,10 +38,10 @@
                         <div>
                             <p class="text-sm font-medium text-gray-600">Qoldiq</p>
                             <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-yellow-600" id="totalBalanceUZS">{{ stats.diff.uzs | default:0 | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceUSD">{{ stats.diff.usd | default:0 | format_currency }} $</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceRUB">{{ stats.diff.rub | default:0 | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceEUR">{{ stats.diff.eur | default:0 | format_currency }} €</p>
+                                <p class="text-lg font-medium text-yellow-600" id="totalBalanceUZS">{{ stats.diff.total_uzs | default:0 | format_currency }} so'm</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceUSD">{{ stats.diff.total_usd | default:0 | format_currency }} $</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceRUB">{{ stats.diff.total_rub | default:0 | format_currency }} ₽</p>
+                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceEUR">{{ stats.diff.total_eur | default:0 | format_currency }} €</p>
                             </div>
                         </div>
                         <div class="text-blue-500 text-3xl">💰</div>
