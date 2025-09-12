@@ -23,13 +23,19 @@
 
             <!-- O'ng tomon: Tugmalar -->
             <div class="flex flex-wrap gap-2 justify-end w-full sm:w-auto">
-                <form method="POST" action="{% url 'close_cash_register' %}">
+                <form method="POST" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
                     {% csrf_token %}
+                    {% if is_expired %}
+                    <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm">
+                        🔒 Kassani Yopish
+                    </button>
+                    {% else %}
                     <button type="submit"
                         onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')"
                         class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm">
                         🔒 Kassani Yopish
                     </button>
+                    {% endif %}
                 </form>
                 <a href="{% url 'logout' %}"
                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm">
@@ -105,7 +111,7 @@
                             </div>
                         </div>
                     {% endif %}
-                    <form action="{% url 'transaction_create' %}" method="POST" class="space-y-4">
+                    <form action="{% url 'transaction_create' %}?report_date={{ report_date }}" method="POST" class="space-y-4">
                         {% csrf_token %}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kimdan olindi</label>
@@ -179,7 +185,21 @@
 
                 <!-- Today's Summary -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-5 mb-4">
+                        <label for="reportDate" class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                            📅 Kun tanlash:
+                        </label>
+                        <input 
+                            type="date" 
+                            id="reportDate" 
+                            name="report_date" 
+                            value="{{ report_date }}" 
+                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+                            onchange="window.location.href = `?report_date=${this.value}`"
+                        >
+                    </div>
+<hr>                    
+                    <div class="flex justify-between items-center mb-4 mt-4">   
                         <h2 class="text-xl font-bold text-gray-800">Kunlik Hisobotlarim</h2>
                     </div>
                     <div class="space-y-3 max-h-96 overflow-y-auto" id="operatorDailyReports">

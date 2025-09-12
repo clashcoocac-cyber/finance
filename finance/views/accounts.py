@@ -214,10 +214,13 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
     template_name = 'dashboard/operator.html'
 
     def get_context_data(self, **kwargs):
+        report_date = self.request.GET.get('report_date', None) or datetime.today().strftime('%Y-%m-%d')
         context = super().get_context_data(**kwargs)
-        context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
-        context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
+        context['from'] = self.request.GET.get('from', None) or report_date
+        context['to'] = self.request.GET.get('to', None) or report_date
         context['q'] = self.request.GET.get('q', None)
+        context['report_date'] = report_date
+        context['is_expired'] = datetime.today().date() - datetime.strptime(report_date, '%Y-%m-%d').date() > timedelta(days=3)
 
         user = self.request.user
         my_transactions = Transaction.objects.filter(operator=user)

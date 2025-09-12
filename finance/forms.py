@@ -1,3 +1,4 @@
+from datetime import datetime
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
 from django.shortcuts import redirect
@@ -67,7 +68,7 @@ class TransactionFrom(forms.ModelForm):
         model = Transaction
         fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty']
         
-    def save(self, commit = ..., operator=None):
+    def save(self, commit = ..., operator=None, date=None):
         transaction = super().save(commit=False)
         if self.cleaned_data['counterparty'] == 'other':
             transaction.counterparty = self.cleaned_data['other_counterparty']
@@ -76,7 +77,12 @@ class TransactionFrom(forms.ModelForm):
         transaction.operator = operator
         transaction.type = 'income'
         if commit:
+
+            print(date)
             transaction.save()
+            transaction.date = datetime.strptime(date, '%Y-%m-%d')
+            transaction.save()  
+        transaction.date = datetime.strptime(date, '%Y-%m-%d')
         return transaction
     
 CATEGORIES = {

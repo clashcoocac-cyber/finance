@@ -21,9 +21,12 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
     
     def post(self, request, *args, **kwargs):
         form = TransactionFrom(request.POST)
+        date = request.GET.get('report_date', None)
+
         if form.is_valid():
-            form.save(operator=request.user)
-            return redirect(self.success_url)
+    
+            form.save(operator=request.user, date=date)
+            return redirect(self.success_url + '?report_date=' + date)
         
         users = User.objects.exclude(role='boss').order_by('role')
         context = {
@@ -31,6 +34,7 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
             'users': users,
             'operator_count': User.objects.filter(role='operator').count(),
             'cashier_count': User.objects.filter(role='cashier').count(),
+            'report_date': date
         }
         return render(request, self.template_name, context)
 
@@ -51,14 +55,14 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        today = date.today()
-        transactions = Transaction.objects.filter(operator=user, date__date=today).order_by('-date')
+        date = request.GET.get('report_date', None)
+        transactions = Transaction.objects.filter(operator=user, date__date=date).order_by('-date')
         shift = request.session.get('shift', None)
 
         report, _ = DailyReport.objects.get_or_create(
             operator=user,
             operator_shift=shift,
-            date=today,
+            date=date,
             defaults={'is_closed': False},
             type='income'
         )
