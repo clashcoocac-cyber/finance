@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, date, timedelta
+from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, ListView, DeleteView, CreateView, UpdateView
@@ -10,7 +11,7 @@ from django.contrib import messages
 from django.db.models import Sum, Q
 from finance.forms import ExpenseForm, TransactionFrom, IncomeCHoices, IncomeForm
 from finance.models import User, Company
-from finance.models import DailyReport
+from finance.models import DailyReport, CLICKS
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, Stat
 
@@ -21,12 +22,11 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
     
     def post(self, request, *args, **kwargs):
         form = TransactionFrom(request.POST)
-        date = request.GET.get('report_date', None)
+        date_param = request.GET.get('report_date', None) or datetime.today().date().strftime('%Y-%m-%d')
 
         if form.is_valid():
-    
-            form.save(operator=request.user, date=date)
-            return redirect(self.success_url + '?report_date=' + date)
+            form.save(operator=request.user, date=date_param)
+            return redirect(self.success_url + '?report_date=' + date_param)
         
         users = User.objects.exclude(role='boss').order_by('role')
         context = {
@@ -34,7 +34,7 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
             'users': users,
             'operator_count': User.objects.filter(role='operator').count(),
             'cashier_count': User.objects.filter(role='cashier').count(),
-            'report_date': date
+            'report_date': date_param
         }
         return render(request, self.template_name, context)
 
@@ -55,46 +55,81 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        date = request.GET.get('report_date', None)
-        transactions = Transaction.objects.filter(operator=user, date__date=date).order_by('-date')
+        report_date_str = request.GET.get('report_date', None) or datetime.today().date().strftime('%Y-%m-%d')
         shift = request.session.get('shift', None)
 
-        report, _ = DailyReport.objects.get_or_create(
-            operator=user,
-            operator_shift=shift,
-            date=date,
-            defaults={'is_closed': False},
-            type='income'
+        try:
+            selected_date = datetime.strptime(report_date_str, '%Y-%m-%d').date()
+        except (ValueError, TypeError):
+            selected_date = datetime.today().date()
+
+        # Collect unreported transactions for this operator on the selected date only
+        unreported = list(
+            Transaction.objects.filter(
+                operator=user, 
+                report__isnull=True,
+                date__date=selected_date
+            ).order_by('-date')
         )
 
-        transactions.update(report=report)
-        comment_tran = transactions.filter(comment__isnull=False).first()
+        if not unreported:
+            return redirect(self.success_url + f'?report_date={report_date_str}')
+
+        # Get or create a report for the selected date
+        report, created = DailyReport.objects.get_or_create(
+            operator=user,
+            operator_shift=shift,
+            date=selected_date,
+            defaults={'is_closed': False, 'type': 'income'},
+        )
+
+        # If a report already existed and was closed, reopen it so boss can confirm
+        if report.is_closed:
+            report.is_closed = False
+
+        # Start from existing details if present
+        result = {
+            'usd': defaultdict(lambda: Decimal('0')),
+            'uzs': defaultdict(lambda: Decimal('0')),
+            'rub': defaultdict(lambda: Decimal('0')),
+            'eur': defaultdict(lambda: Decimal('0')),
+        }
+
+        # seed from existing report details
+        for k, v in (report.usd_detail or {}).items():
+            result['usd'][k] += Decimal(v or 0)
+        for k, v in (report.uzs_detail or {}).items():
+            result['uzs'][k] += Decimal(v or 0)
+        for k, v in (report.rub_detail or {}).items():
+            result['rub'][k] += Decimal(v or 0)
+        for k, v in (report.eur_detail or {}).items():
+            result['eur'][k] += Decimal(v or 0)
+
+        comment_tran = None
+        for tx in unreported:
+            if not comment_tran and tx.comment:
+                comment_tran = tx
+
+            key = tx.click if tx.payment_type == 'click' else tx.payment_type
+            result['usd'][key] += Decimal(tx.amount_usd or 0)
+            result['uzs'][key] += Decimal(tx.amount_uzs or 0)
+            result['rub'][key] += Decimal(tx.amount_rub or 0)
+            result['eur'][key] += Decimal(tx.amount_eur or 0)
+
+        # assign transactions to this report
+        Transaction.objects.filter(pk__in=[t.pk for t in unreported]).update(report=report)
+
         if comment_tran:
             report.comment = comment_tran.comment
-
-        result = {
-        'usd': defaultdict(lambda: 0),
-        'uzs': defaultdict(lambda: 0),
-        'rub': defaultdict(lambda: 0),
-        'eur': defaultdict(lambda: 0),
-    }
-
-        for tx in transactions:
-            if tx.payment_type == 'click':
-                result['usd'][tx.click] += tx.amount_usd or 0
-                result['uzs'][tx.click] += tx.amount_uzs or 0
-                result['rub'][tx.click] += tx.amount_rub or 0
-                result['eur'][tx.click] += tx.amount_eur or 0
-            else:
-                result['usd'][tx.payment_type] += tx.amount_usd or 0
-                result['uzs'][tx.payment_type] += tx.amount_uzs or 0
-                result['rub'][tx.payment_type] += tx.amount_rub or 0
-                result['eur'][tx.payment_type] += tx.amount_eur or 0
 
         report.total_usd = sum(result['usd'].values())
         report.total_uzs = sum(result['uzs'].values())
         report.total_rub = sum(result['rub'].values())
-        report.total_uer = sum(result['eur'].values()) 
+        # keep existing model field name (total_uer) if present
+        try:
+            report.total_uer = sum(result['eur'].values())
+        except Exception:
+            report.total_eur = sum(result['eur'].values())
 
         report.usd_detail = {k: int(v) for k, v in result['usd'].items()}
         report.uzs_detail = {k: int(v) for k, v in result['uzs'].items()}
@@ -103,7 +138,7 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         report.is_closed = False
         report.save()
 
-        return redirect(self.success_url)
+        return redirect(self.success_url + f'?report_date={report_date_str}')
 
 
 class ConfirmIncomeView(LoginRequiredMixin, CashierRequiredMixin, View):
@@ -130,6 +165,8 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
         reposts = DailyReport.objects.filter(type__in=['expense', 'xarajat'], date=report_date).order_by('-date')
         context['reports'] = reposts
         context['date'] = report_date
+        context['clicks'] = CLICKS
+        context['clicks_map'] = dict(CLICKS)
         return render(request, self.template_name, context)
     
     def post(self, request, *args, **kwargs):
@@ -140,7 +177,7 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
             return redirect(self.success_url)
         else:
             print(form.errors)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'clicks': CLICKS})
     
 
 class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
@@ -154,6 +191,8 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
         context['reports'] = reposts
         context['date'] = report_date
         context['choices'] = IncomeCHoices
+        context['clicks'] = CLICKS
+        context['clicks_map'] = dict(CLICKS)
         return render(request, self.template_name, context)
     
     def post(self, request, *args, **kwargs):
@@ -168,7 +207,7 @@ class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):
     template_name = 'transaction_page.html'
 
     def get(self, request, *args, **kwargs):
-        date_from = request.GET.get('from', None) or date.today().strftime('%Y-%m-%d')
+        date_from = request.GET.get('from', None) or (date.today() - timedelta(days=7)).strftime('%Y-%m-%d')
         date_to = request.GET.get('to', None) or date.today().strftime('%Y-%m-%d')
         search_query = request.GET.get('q', '').strip()
 

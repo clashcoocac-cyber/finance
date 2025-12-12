@@ -2,7 +2,7 @@ from datetime import datetime
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
 from django.shortcuts import redirect
-from .models import Company, User, Transaction, DailyReport
+from .models import Company, User, Transaction, DailyReport, CLICKS
 
 
 
@@ -76,13 +76,23 @@ class TransactionFrom(forms.ModelForm):
             transaction.counterparty = self.cleaned_data['counterparty']
         transaction.operator = operator
         transaction.type = 'income'
-        if commit:
 
-            print(date)
+        # If a report date is provided (operator selecting which report/day this
+        # transaction belongs to), keep the current time but set the date part to
+        # the provided report date. This handles shift-cross-midnight cases.
+        if date:
+            try:
+                parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
+                now_time = datetime.now().time()
+                transaction.date = datetime.combine(parsed_date, now_time)
+            except Exception:
+                transaction.date = datetime.now()
+        else:
+            transaction.date = datetime.now()
+
+        if commit:
             transaction.save()
-            transaction.date = datetime.strptime(date, '%Y-%m-%d')
-            transaction.save()  
-        transaction.date = datetime.strptime(date, '%Y-%m-%d')
+
         return transaction
     
 CATEGORIES = {
@@ -105,39 +115,52 @@ IncomeCHoices = [
 class IncomeForm(forms.ModelForm):
     countryparty = forms.ChoiceField(choices=IncomeCHoices)
     other_counterparty = forms.CharField(required=False, max_length=255, label="Boshqa shaxs nomi")
+    click = forms.ChoiceField(choices=CLICKS, required=False)
 
     class Meta:
         model = Transaction
         fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'countryparty', 'other_counterparty']
         
     def save(self, commit = True, operator=None):
+        # build transaction instance (don't save yet)
         transaction = super().save(commit=False)
         if self.cleaned_data['countryparty'] == 'other':
             transaction.counterparty = self.cleaned_data['other_counterparty']
         else:
             transaction.counterparty = self.cleaned_data['countryparty']
         transaction.operator = operator
-        if commit:
-            transaction.save()
 
+        # create the report first (store date as date object)
         report = DailyReport.objects.create(
             operator=operator,
             type='income',
-            is_closed=True
+            is_closed=True,
+            date=datetime.now().date()
         )
+
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
         report.total_usd = self.cleaned_data.get('amount_usd', 0)
         report.total_rub = self.cleaned_data.get('amount_rub', 0)
         report.total_uer = self.cleaned_data.get('amount_eur', 0)
-        report.uzs_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_uzs') or 0)}
-        report.usd_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_usd') or 0)}
-        report.rub_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_rub') or 0)}
-        report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
+
+        # use click value as detail key when payment_type is 'click'
+        payment_type = self.cleaned_data.get('payment_type')
+        detail_key = self.cleaned_data.get('click') if payment_type == 'click' else payment_type
+        report.uzs_detail = {detail_key: int(self.cleaned_data.get('amount_uzs') or 0)}
+        report.usd_detail = {detail_key: int(self.cleaned_data.get('amount_usd') or 0)}
+        report.rub_detail = {detail_key: int(self.cleaned_data.get('amount_rub') or 0)}
+        report.eur_detail = {detail_key: int(self.cleaned_data.get('amount_eur') or 0)}
         report.category = transaction.counterparty
+        report.save()
+
+        # finish transaction fields and save (ensure non-null date for stats/admin)
         transaction.report = report
         transaction.type = 'income'
-        transaction.save()
-        report.save()
+        transaction.click = self.cleaned_data.get('click') if payment_type == 'click' else None
+        transaction.date = datetime.now()
+        if commit:
+            transaction.save()
+
         return transaction
 
 class ExpenseForm(forms.Form):
@@ -147,6 +170,7 @@ class ExpenseForm(forms.Form):
     amount_rub = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
     amount_eur = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
     payment_type = forms.ChoiceField(choices=Transaction.PAYMENT_TYPES)
+    click = forms.ChoiceField(choices=CLICKS, required=False)
     description = forms.CharField(widget=forms.Textarea, required=False)
     exp_type = forms.CharField()
 
@@ -166,17 +190,21 @@ class ExpenseForm(forms.Form):
             type=exp_type,
             is_closed=False,
             category=category,
-            desc=desc
+            desc=desc,
+            date=datetime.now().date()
         )
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
         report.total_usd = self.cleaned_data.get('amount_usd', 0)
         report.total_rub = self.cleaned_data.get('amount_rub', 0)
         report.total_uer = self.cleaned_data.get('amount_eur', 0)
+        # decide detail key: specific click key when payment_type is 'click'
+        payment_type = self.cleaned_data.get('payment_type')
+        detail_key = self.cleaned_data.get('click') if payment_type == 'click' else payment_type
 
-        report.uzs_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_uzs') or 0)}
-        report.usd_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_usd') or 0)}
-        report.rub_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_rub') or 0)}
-        report.eur_detail = {self.cleaned_data['payment_type']: int(self.cleaned_data.get('amount_eur') or 0)}
+        report.uzs_detail = {detail_key: int(self.cleaned_data.get('amount_uzs') or 0)}
+        report.usd_detail = {detail_key: int(self.cleaned_data.get('amount_usd') or 0)}
+        report.rub_detail = {detail_key: int(self.cleaned_data.get('amount_rub') or 0)}
+        report.eur_detail = {detail_key: int(self.cleaned_data.get('amount_eur') or 0)}
         report.save()
 
         transaction = Transaction.objects.create(
@@ -186,11 +214,12 @@ class ExpenseForm(forms.Form):
             amount_rub=self.cleaned_data.get('amount_rub'),
             amount_eur=self.cleaned_data.get('amount_eur'),
             payment_type=self.cleaned_data['payment_type'],
+            click=self.cleaned_data.get('click') if self.cleaned_data.get('payment_type') == 'click' else None,
             description=self.cleaned_data['description'],
             operator=operator,
             report=report,
-            counterparty=category
+            counterparty=category,
+            date=datetime.now()
         )
         transaction.save()
-
-        return redirect('expenses_list')
+        return transaction

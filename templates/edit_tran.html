@@ -110,6 +110,9 @@
                         <a href="{% url 'transaction_list' %}" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-4 px-8 rounded-xl font-semibold transition-colors flex items-center justify-center">
                             Bekor Qilish
                         </a>
+                        <a href="{% url 'transaction_delete' transaction.pk %}" onclick="return confirm('Tranzaksiyani o\'chirilsinmi?')" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-4 px-8 rounded-xl font-semibold transition-colors flex items-center justify-center">
+                            O'chirish
+                        </a>
                     </div>
                 </form>
             </div>

@@ -142,6 +142,9 @@
                                 <a href="{% url 'transaction' transaction.pk %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
                                     Tahrirlash
                                 </a>
+                                <a href="{% url 'transaction_delete' transaction.pk %}" onclick="return confirm('Tranzaksiyani o\'chirilsinmi?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors">
+                                    O'chirish
+                                </a>
                             </div>
                             </td>
                 </tr>

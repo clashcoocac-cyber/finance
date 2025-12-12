@@ -60,7 +60,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.' + env_config.DB_ENGINE,
         'NAME': env_config.DB_NAME,
         'USER': env_config.DB_USER,
-        'PASSWORD': env_config.DB_PASSWORD.get_secret_value(),
+        'PASSWORD': getattr(env_config.DB_PASSWORD, 'get_secret_value', lambda: None)(),
         'HOST': env_config.DB_HOST,
         'PORT': env_config.DB_PORT or '',
     }

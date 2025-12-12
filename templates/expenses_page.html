@@ -82,6 +82,15 @@
                                 <option value="bank">Bank</option>
                             </select>
                         </div>
+                        <div id="expenseClick" class="hidden">
+                            <label class="block text-sm font-medium text-green-500 mb-2">Click kartani tanlang</label>
+                            <select name="click" id="expenseClickSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">---</option>
+                                {% for click in clicks %}
+                                    <option value="{{ click.0 }}">{{ click.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         
                         <button onclick="addExpense()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
                             💸 Chiqim Qo'shish
@@ -110,6 +119,19 @@
                         <div>
                             <p class="font-medium text-gray-800">{{ report.category }}</p>
                             <p class="text-sm text-gray-600">{{ report.date | date:"d/m/Y" }}</p>
+                            {% if report.uzs_detail %}
+                                <p class="text-sm text-gray-700 mt-2">
+                                    {% for key, val in report.uzs_detail.items %}
+                                        {% if key == "click1" %}
+                                            To'lov turi: <span class="font-semibold">Click (SFB)</span>
+                                        {% elif key == "click2" %}
+                                            To'lov turi: <span class="font-semibold">Click (OPT)</span>
+                                        {% else %}
+                                            To'lov turi: <span class="font-semibold">{% if key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
                             {% if not report.is_closed %}
                             <p class="text-sm text-yellow-600">
                                 Kutilmoqda
@@ -164,6 +186,20 @@
                 customDescriptionDiv.classList.remove('hidden');
             } else {
                 customDescriptionDiv.classList.add('hidden');
+            }
+            // also toggle click selector based on payment type
+            const paymentType = document.getElementById('expensePaymentType');
+            const clickDiv = document.getElementById('expenseClick');
+            if (paymentType && clickDiv) {
+                if (paymentType.value === 'click') {
+                    clickDiv.classList.remove('hidden');
+                    const sel = clickDiv.querySelector('select');
+                    if (sel) sel.setAttribute('required', 'true');
+                } else {
+                    clickDiv.classList.add('hidden');
+                    const sel = clickDiv.querySelector('select');
+                    if (sel) sel.removeAttribute('required');
+                }
             }
         }
 

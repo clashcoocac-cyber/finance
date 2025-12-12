@@ -111,7 +111,7 @@
                             </div>
                         </div>
                     {% endif %}
-                    <form action="{% url 'transaction_create' %}?report_date={{ report_date }}" method="POST" class="space-y-4">
+                    <form action="{% url 'transaction_create' %}{% if report_date %}?report_date={{ report_date }}{% endif %}" method="POST" class="space-y-4">
                         {% csrf_token %}
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Kimdan olindi</label>
@@ -177,7 +177,7 @@
                             </select>
                         </div>
                         
-                        <button onclick="addIncome()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
                             Ma'lumot Qo'shish
                         </button>
                     </form>

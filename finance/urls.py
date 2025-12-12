@@ -5,6 +5,7 @@ from .views.accounts import (
     CustomLoginView, CustomLogoutView,
     UserListCreateView, UserUpdateView, UserDeleteView, TransactionView
 )
+from .views.accounts import TransactionDeleteView
 from .views.transaction import (
     TransactionCreateView, ConfirmExpenseView, CloseCashRegister, ConfirmIncomeView,
     ExpensesPageView, IncomesPageView, TransactionList, ChangeStatView
@@ -32,6 +33,7 @@ urlpatterns = [
 
     path('transactions/', TransactionList.as_view(), name='transaction_list'),
     path('transactions/<int:pk>', TransactionView.as_view(), name='transaction'),
+    path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name='transaction_delete'),
     path('transactions/create/', TransactionCreateView.as_view(), name='transaction_create'),
 
     path('reports/<int:pk>/confirm/', ConfirmExpenseView.as_view(), name='confirm_expense'),

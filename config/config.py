@@ -10,8 +10,8 @@ class Settings(BaseSettings):
 
     DB_ENGINE: str
     DB_NAME: str
-    DB_USER: str
-    DB_PASSWORD: SecretStr
+    DB_USER: str | None = None
+    DB_PASSWORD: SecretStr | None = None
     DB_HOST: str = 'localhost'
     DB_PORT: str = ''
 

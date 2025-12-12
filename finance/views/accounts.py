@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, DeleteView
@@ -23,7 +24,7 @@ class BossDashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
+        context['from'] = self.request.GET.get('from', None) or (datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d')
         context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
         context['type'] = self.request.GET.get('type', None)
         context['q'] = self.request.GET.get('q', None)
@@ -44,11 +45,16 @@ class BossDashboardView(TemplateView):
             )
 
         context['reports'] = reports.order_by('-date')
-        
+
+        # apply same date range to transaction aggregates so stats match the report list
+        date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
+        date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
+
         income_qs = Transaction.objects.filter(
             type='income',
             report__is_closed=True,
             payment_type__in=['cash', 'click'],
+            date__date__range=(date_from, date_to),
         )
         income_stats = income_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -67,6 +73,7 @@ class BossDashboardView(TemplateView):
             type='expense',
             report__is_closed=True,
             payment_type__in=['cash', 'click'],
+            date__date__range=(date_from, date_to),
         )
         expense_stats = expense_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -108,7 +115,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['from'] = self.request.GET.get('from', None) or datetime.today().strftime('%Y-%m-%d')
+        context['from'] = self.request.GET.get('from', None) or (datetime.today()- timedelta(days=7)).strftime('%Y-%m-%d')
         context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
         context['q'] = self.request.GET.get('q', None)
 
@@ -127,13 +134,17 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             )
         context['reports'] = reports.order_by('-date')
         
+        # parse date range for consistent filtering
+        date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
+        date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
+
         queryset = Transaction.objects.filter(
-            report__is_closed=True, date__date__range=(context['from'], context['to']), type='income'
+            report__is_closed=True, date__date__range=(date_from, date_to), type='income'
         )
 
         result = {}
         for payment in ['click', 'cash']:
-            if payment is not 'click':
+            if payment != 'click':
                 subquery = queryset.filter(payment_type=payment).aggregate(
                     usd=Sum('amount_usd'),
                     uzs=Sum('amount_uzs'),
@@ -157,6 +168,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             type='income',
             report__is_closed=True,
             payment_type__in=['cash', 'click'],
+            date__date__range=(date_from, date_to),
         )
         income_stats = income_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -175,6 +187,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             type='expense',
             report__is_closed=True,
             payment_type__in=['cash', 'click'],
+            date__date__range=(date_from, date_to),
         )
         expense_stats = expense_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -245,7 +258,7 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
 
         result = {}
         for payment in ['click', 'cash']:
-            if payment is not 'click':
+            if payment != 'click':
                 subquery = queryset.filter(payment_type=payment).aggregate(
                     usd=Sum('amount_usd'),
                     uzs=Sum('amount_uzs'),
@@ -388,3 +401,58 @@ class TransactionView(LoginRequiredMixin, BossRequiredMixin, View):
         transaction.amount_eur = int(data.get('amount_eur', 0) or 0) or None
         transaction.save()
         return redirect('transaction_list')
+
+
+class TransactionDeleteView(BossRequiredMixin, View):
+    success_url = reverse_lazy('transaction_list')
+
+    def get(self, request, pk, *args, **kwargs):
+        transaction = Transaction.objects.filter(pk=pk).first()
+        if not transaction:
+            return redirect(self.success_url)
+
+        report = transaction.report
+        if report:
+            # Safely subtract amounts from report totals and details
+            usd = transaction.amount_usd or Decimal('0')
+            uzs = transaction.amount_uzs or Decimal('0')
+            rub = transaction.amount_rub or Decimal('0')
+            eur = transaction.amount_eur or Decimal('0')
+
+            report.total_usd = (report.total_usd or Decimal('0')) - usd
+            report.total_uzs = (report.total_uzs or Decimal('0')) - uzs
+            report.total_rub = (report.total_rub or Decimal('0')) - rub
+            # note: model has total_uer field name typo in places; use what's on model
+            try:
+                report.total_uer = (report.total_uer or Decimal('0')) - eur
+            except Exception:
+                report.total_eur = (getattr(report, 'total_eur', Decimal('0')) or Decimal('0')) - eur
+
+            key = transaction.click if transaction.payment_type == 'click' else transaction.payment_type
+
+            def subtract_detail(field, amount):
+                detail = getattr(report, field) or {}
+                current = Decimal(detail.get(key, 0) or 0)
+                new = current - (amount or Decimal('0'))
+                if new <= 0:
+                    detail.pop(key, None)
+                else:
+                    # keep previous behaviour of storing ints for detail values
+                    detail[key] = int(new)
+                setattr(report, field, detail)
+
+            subtract_detail('usd_detail', usd)
+            subtract_detail('uzs_detail', uzs)
+            subtract_detail('rub_detail', rub)
+            subtract_detail('eur_detail', eur)
+
+            # If there are other transactions linked to this report, save adjustments;
+            # otherwise remove the empty report.
+            other_exists = Transaction.objects.filter(report=report).exclude(pk=transaction.pk).exists()
+            if other_exists:
+                report.save()
+            else:
+                report.delete()
+
+        transaction.delete()
+        return redirect(self.success_url)
