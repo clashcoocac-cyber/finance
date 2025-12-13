@@ -253,7 +253,7 @@ class ChangeStatView(LoginRequiredMixin, BossRequiredMixin, View):
         income_qs = Transaction.objects.filter(
             type='income',
             report__is_closed=True,
-            payment_type__in=['cash', 'click'],
+            payment_type='cash',
         )
         income_stats = income_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -265,7 +265,7 @@ class ChangeStatView(LoginRequiredMixin, BossRequiredMixin, View):
         expense_qs = Transaction.objects.filter(
             type='expense',
             report__is_closed=True,
-            payment_type__in=['cash', 'click'],
+            payment_type='cash',
         )
         expense_stats = expense_qs.aggregate(
             total_usd=Sum('amount_usd'),

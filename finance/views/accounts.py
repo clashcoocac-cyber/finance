@@ -46,15 +46,11 @@ class BossDashboardView(TemplateView):
 
         context['reports'] = reports.order_by('-date')
 
-        # apply same date range to transaction aggregates so stats match the report list
-        date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
-        date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
-
+        # All-time stats (no date filter) - show complete history
         income_qs = Transaction.objects.filter(
             type='income',
             report__is_closed=True,
-            payment_type__in=['cash', 'click'],
-            date__date__range=(date_from, date_to),
+            payment_type='cash',
         )
         income_stats = income_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -72,8 +68,7 @@ class BossDashboardView(TemplateView):
         expense_qs = Transaction.objects.filter(
             type='expense',
             report__is_closed=True,
-            payment_type__in=['cash', 'click'],
-            date__date__range=(date_from, date_to),
+            payment_type='cash',
         )
         expense_stats = expense_qs.aggregate(
             total_usd=Sum('amount_usd'),

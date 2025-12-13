@@ -23,7 +23,7 @@ PERSONS = [
     ('murodov_zubaydullo', 'Murodov Zubaydullo'),
     ('yarashev_kamol', 'Yarashev Kamol'),
     ('umarov_maxsud', 'Umarov Maxsud'),
-    ('toxtayev_farrux', "To'xtayev Farrux"),
+    ('axmedov_ulugbek', "Axmedov Ulug'bek"),
     ('amonova_rushana', 'Amonova Rushana'),
     ('hamidova_umida', 'Hamidova Umida'),
     ('other', 'Boshqa')
