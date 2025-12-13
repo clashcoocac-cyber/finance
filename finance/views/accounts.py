@@ -162,8 +162,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         income_qs = Transaction.objects.filter(
             type='income',
             report__is_closed=True,
-            payment_type__in=['cash', 'click'],
-            date__date__range=(date_from, date_to),
+            payment_type='cash',
         )
         income_stats = income_qs.aggregate(
             total_usd=Sum('amount_usd'),
@@ -181,8 +180,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         expense_qs = Transaction.objects.filter(
             type='expense',
             report__is_closed=True,
-            payment_type__in=['cash', 'click'],
-            date__date__range=(date_from, date_to),
+            payment_type='cash',
         )
         expense_stats = expense_qs.aggregate(
             total_usd=Sum('amount_usd'),
