@@ -171,10 +171,11 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
     
     def post(self, request, *args, **kwargs):
         form = ExpenseForm(request.POST)
+        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
         if form.is_valid():
-            form.save(operator=request.user)
+            form.save(operator=request.user, date=report_date)
             messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
-            return redirect(self.success_url)
+            return redirect(self.success_url + f'?date={report_date}')
         else:
             print(form.errors)
         return render(request, self.template_name, {'form': form, 'clicks': CLICKS})
@@ -197,9 +198,10 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
     
     def post(self, request, *args, **kwargs):
         form = IncomeForm(request.POST)
+        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
         if form.is_valid():
-            form.save(operator=request.user)
-            return redirect(self.success_url)
+            form.save(operator=request.user, date=report_date)
+            return redirect(self.success_url + f'?date={report_date}')
         return redirect(self.success_url)
 
 

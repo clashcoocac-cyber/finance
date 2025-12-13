@@ -121,7 +121,7 @@ class IncomeForm(forms.ModelForm):
         model = Transaction
         fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'countryparty', 'other_counterparty']
         
-    def save(self, commit = True, operator=None):
+    def save(self, commit = True, operator=None, date=None):
         # build transaction instance (don't save yet)
         transaction = super().save(commit=False)
         if self.cleaned_data['countryparty'] == 'other':
@@ -130,12 +130,21 @@ class IncomeForm(forms.ModelForm):
             transaction.counterparty = self.cleaned_data['countryparty']
         transaction.operator = operator
 
+        # parse date if provided, otherwise use today
+        if date:
+            try:
+                parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
+            except (ValueError, TypeError):
+                parsed_date = datetime.now().date()
+        else:
+            parsed_date = datetime.now().date()
+
         # create the report first (store date as date object)
         report = DailyReport.objects.create(
             operator=operator,
             type='income',
             is_closed=True,
-            date=datetime.now().date()
+            date=parsed_date
         )
 
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
@@ -157,7 +166,8 @@ class IncomeForm(forms.ModelForm):
         transaction.report = report
         transaction.type = 'income'
         transaction.click = self.cleaned_data.get('click') if payment_type == 'click' else None
-        transaction.date = datetime.now()
+        # combine parsed date with current time
+        transaction.date = datetime.combine(parsed_date, datetime.now().time())
         if commit:
             transaction.save()
 
@@ -177,7 +187,7 @@ class ExpenseForm(forms.Form):
     class Meta:
         fields = ['exp_type', 'category', 'amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'description']
         
-    def save(self, commit=True, operator=None):
+    def save(self, commit=True, operator=None, date=None):
         exp_type = self.cleaned_data.get('exp_type', None)
         if self.cleaned_data['category'] in CATEGORIES:
             category = CATEGORIES.get(self.cleaned_data['category'], 'Boshqa xarajatlar')
@@ -185,13 +195,23 @@ class ExpenseForm(forms.Form):
         else:
             category = self.cleaned_data['description']
             desc=None
+        
+        # parse date if provided, otherwise use today
+        if date:
+            try:
+                parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
+            except (ValueError, TypeError):
+                parsed_date = datetime.now().date()
+        else:
+            parsed_date = datetime.now().date()
+        
         report = DailyReport.objects.create(
             operator=operator,
             type=exp_type,
             is_closed=False,
             category=category,
             desc=desc,
-            date=datetime.now().date()
+            date=parsed_date
         )
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
         report.total_usd = self.cleaned_data.get('amount_usd', 0)
@@ -219,7 +239,7 @@ class ExpenseForm(forms.Form):
             operator=operator,
             report=report,
             counterparty=category,
-            date=datetime.now()
+            date=datetime.combine(parsed_date, datetime.now().time())
         )
         transaction.save()
         return transaction
