@@ -133,29 +133,54 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
         date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
 
-        queryset = Transaction.objects.filter(
+        income_qs = Transaction.objects.filter(
             report__is_closed=True, date__date__range=(date_from, date_to), type='income'
+        )
+        expense_qs = Transaction.objects.filter(
+            report__is_closed=True, date__date__range=(date_from, date_to), type='expense'
         )
 
         result = {}
         for payment in ['click', 'cash']:
             if payment != 'click':
-                subquery = queryset.filter(payment_type=payment).aggregate(
+                income_subquery = income_qs.filter(payment_type=payment).aggregate(
                     usd=Sum('amount_usd'),
                     uzs=Sum('amount_uzs'),
                     rub=Sum('amount_rub'),
                     eur=Sum('amount_eur'),
                 )
-                result[payment] = subquery
+                expense_subquery = expense_qs.filter(payment_type=payment).aggregate(
+                    usd=Sum('amount_usd'),
+                    uzs=Sum('amount_uzs'),
+                    rub=Sum('amount_rub'),
+                    eur=Sum('amount_eur'),
+                )
+                result[payment] = {
+                    'usd': (income_subquery['usd'] or 0) - (expense_subquery['usd'] or 0),
+                    'uzs': (income_subquery['uzs'] or 0) - (expense_subquery['uzs'] or 0),
+                    'rub': (income_subquery['rub'] or 0) - (expense_subquery['rub'] or 0),
+                    'eur': (income_subquery['eur'] or 0) - (expense_subquery['eur'] or 0),
+                }
             else:
                 for click in CLICKS:
-                    subquery = queryset.filter(payment_type=payment, click=click[0]).aggregate(
+                    income_subquery = income_qs.filter(payment_type=payment, click=click[0]).aggregate(
                         usd=Sum('amount_usd'),
                         uzs=Sum('amount_uzs'),
                         rub=Sum('amount_rub'),
                         eur=Sum('amount_eur'),
                     )
-                    result[click[0]] = subquery
+                    expense_subquery = expense_qs.filter(payment_type=payment, click=click[0]).aggregate(
+                        usd=Sum('amount_usd'),
+                        uzs=Sum('amount_uzs'),
+                        rub=Sum('amount_rub'),
+                        eur=Sum('amount_eur'),
+                    )
+                    result[click[0]] = {
+                        'usd': (income_subquery['usd'] or 0) - (expense_subquery['usd'] or 0),
+                        'uzs': (income_subquery['uzs'] or 0) - (expense_subquery['uzs'] or 0),
+                        'rub': (income_subquery['rub'] or 0) - (expense_subquery['rub'] or 0),
+                        'eur': (income_subquery['eur'] or 0) - (expense_subquery['eur'] or 0),
+                    }
             
         context['total'] = result
 
