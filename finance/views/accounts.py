@@ -5,6 +5,7 @@ from django.views import View
 from django.views.generic import TemplateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
@@ -113,6 +114,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         context['from'] = self.request.GET.get('from', None) or (datetime.today()- timedelta(days=7)).strftime('%Y-%m-%d')
         context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
         context['q'] = self.request.GET.get('q', None)
+        context['q'] = context['q'].casefold() if context['q'] else None
 
         reports = DailyReport.objects.filter(type='income')
         if context['from']:
@@ -122,11 +124,17 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
             reports = reports.filter(date__lte=date_to)
         if context['q']:
-            reports = reports.filter(
-                Q(operator__username__icontains=context['q']) |
-                Q(operator__company__name__icontains=context['q']) |
-                Q(category__icontains=context['q'])
+            q = context['q'].lower()
+            reports = reports.annotate(
+                op_username_l=Lower('operator__username'),
+                company_name_l=Lower('operator__company__name'),
+                category_l=Lower('category'),
+            ).filter(
+                Q(op_username_l__icontains=q) |
+                Q(company_name_l__icontains=q) |
+                Q(category_l__icontains=q)
             )
+
         context['reports'] = reports.order_by('-date')
         
         # parse date range for consistent filtering
