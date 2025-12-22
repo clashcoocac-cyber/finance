@@ -119,7 +119,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
             reports = reports.filter(date__gte=date_from)
         if context['to']:
-            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date() + timedelta(days=1)
+            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
             reports = reports.filter(date__lte=date_to)
         if context['q']:
             reports = reports.filter(
