@@ -125,9 +125,9 @@ class IncomeForm(forms.ModelForm):
         # build transaction instance (don't save yet)
         transaction = super().save(commit=False)
         if self.cleaned_data['countryparty'] == 'other':
-            transaction.counterparty = self.cleaned_data['other_counterparty']
+            transaction.counterparty = self.cleaned_data['other_counterparty'].lower()
         else:
-            transaction.counterparty = self.cleaned_data['countryparty']
+            transaction.counterparty = self.cleaned_data['countryparty'].lower()
         transaction.operator = operator
 
         # parse date if provided, otherwise use today
@@ -190,7 +190,7 @@ class ExpenseForm(forms.Form):
     def save(self, commit=True, operator=None, date=None):
         exp_type = self.cleaned_data.get('exp_type', None)
         if self.cleaned_data['category'] in CATEGORIES:
-            category = CATEGORIES.get(self.cleaned_data['category'], 'Boshqa xarajatlar')
+            category = CATEGORIES.get(self.cleaned_data['category'], 'Boshqa xarajatlar').lower()
             desc = self.cleaned_data.get('description', '')
         else:
             category = self.cleaned_data['description']
