@@ -194,6 +194,7 @@ class ExpenseForm(forms.Form):
             desc = self.cleaned_data.get('description', '')
         else:
             category = self.cleaned_data['description']
+            category = category.lower() if category else None
             desc=None
         
         # parse date if provided, otherwise use today
