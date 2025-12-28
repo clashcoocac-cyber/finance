@@ -110,10 +110,17 @@ def _recalc_report(report_id):
 
     # Simple details: totals grouped by counterparty for each currency
     if qs.exists():
-        uzs = list(qs.values('counterparty').annotate(total=Sum('amount_uzs')))
-        usd = list(qs.values('counterparty').annotate(total=Sum('amount_usd')))
-        rub = list(qs.values('counterparty').annotate(total=Sum('amount_rub')))
-        eur = list(qs.values('counterparty').annotate(total=Sum('amount_eur')))
+        uzs_q = list(qs.values('counterparty').annotate(total=Sum('amount_uzs')))
+        usd_q = list(qs.values('counterparty').annotate(total=Sum('amount_usd')))
+        rub_q = list(qs.values('counterparty').annotate(total=Sum('amount_rub')))
+        eur_q = list(qs.values('counterparty').annotate(total=Sum('amount_eur')))
+
+        # Convert to dicts with JSON-serializable numeric values (ints)
+        uzs = {item['counterparty']: int(item['total'] or 0) for item in uzs_q}
+        usd = {item['counterparty']: int(item['total'] or 0) for item in usd_q}
+        rub = {item['counterparty']: int(item['total'] or 0) for item in rub_q}
+        eur = {item['counterparty']: int(item['total'] or 0) for item in eur_q}
+
         report.uzs_detail = uzs
         report.usd_detail = usd
         report.rub_detail = rub
