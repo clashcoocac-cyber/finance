@@ -233,7 +233,7 @@
                                         <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">So'm</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_uzs | default:0 | format_currency }}</div></div>
                                         <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Dollar</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_usd | default:0 | format_currency }} $</div></div>
                                         <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Rubl</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_rub | default:0 | format_currency }} ₽</div></div>
-                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Yevro</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_uer | default:0 | format_currency }} €</div></div>
+                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Yevro</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_eur | default:0 | format_currency }} €</div></div>
                                     </div>
                                 </div>
                          </div>

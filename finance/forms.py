@@ -150,7 +150,7 @@ class IncomeForm(forms.ModelForm):
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
         report.total_usd = self.cleaned_data.get('amount_usd', 0)
         report.total_rub = self.cleaned_data.get('amount_rub', 0)
-        report.total_uer = self.cleaned_data.get('amount_eur', 0)
+        report.total_eur = self.cleaned_data.get('amount_eur', 0)
 
         # use click value as detail key when payment_type is 'click'
         payment_type = self.cleaned_data.get('payment_type')
@@ -217,7 +217,7 @@ class ExpenseForm(forms.Form):
         report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
         report.total_usd = self.cleaned_data.get('amount_usd', 0)
         report.total_rub = self.cleaned_data.get('amount_rub', 0)
-        report.total_uer = self.cleaned_data.get('amount_eur', 0)
+        report.total_eur = self.cleaned_data.get('amount_eur', 0)
         # decide detail key: specific click key when payment_type is 'click'
         payment_type = self.cleaned_data.get('payment_type')
         detail_key = self.cleaned_data.get('click') if payment_type == 'click' else payment_type

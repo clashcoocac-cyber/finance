@@ -125,11 +125,8 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         report.total_usd = sum(result['usd'].values())
         report.total_uzs = sum(result['uzs'].values())
         report.total_rub = sum(result['rub'].values())
-        # keep existing model field name (total_uer) if present
-        try:
-            report.total_uer = sum(result['eur'].values())
-        except Exception:
-            report.total_eur = sum(result['eur'].values())
+        # set EUR total
+        report.total_eur = sum(result['eur'].values())
 
         report.usd_detail = {k: int(v) for k, v in result['usd'].items()}
         report.uzs_detail = {k: int(v) for k, v in result['uzs'].items()}
