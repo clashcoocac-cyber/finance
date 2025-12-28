@@ -25,17 +25,11 @@
             <div class="flex flex-wrap gap-2 justify-end w-full sm:w-auto">
                 <form method="POST" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
                     {% csrf_token %}
-                    {% if is_expired %}
-                    <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm">
-                        🔒 Kassani Yopish
-                    </button>
-                    {% else %}
                     <button type="submit"
                         onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')"
                         class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm">
                         🔒 Kassani Yopish
                     </button>
-                    {% endif %}
                 </form>
                 <a href="{% url 'logout' %}"
                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm">
