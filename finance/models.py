@@ -108,18 +108,20 @@ def _recalc_report(report_id):
     report.total_rub = qs.aggregate(_sum=Sum('amount_rub'))['_sum'] or 0
     report.total_eur = qs.aggregate(_sum=Sum('amount_eur'))['_sum'] or 0
 
-    # Simple details: totals grouped by counterparty for each currency
+    # Details: totals grouped by payment type / click key for each currency
     if qs.exists():
-        uzs_q = list(qs.values('counterparty').annotate(total=Sum('amount_uzs')))
-        usd_q = list(qs.values('counterparty').annotate(total=Sum('amount_usd')))
-        rub_q = list(qs.values('counterparty').annotate(total=Sum('amount_rub')))
-        eur_q = list(qs.values('counterparty').annotate(total=Sum('amount_eur')))
+        uzs = {}
+        usd = {}
+        rub = {}
+        eur = {}
 
-        # Convert to dicts with JSON-serializable numeric values (ints)
-        uzs = {item['counterparty']: int(item['total'] or 0) for item in uzs_q}
-        usd = {item['counterparty']: int(item['total'] or 0) for item in usd_q}
-        rub = {item['counterparty']: int(item['total'] or 0) for item in rub_q}
-        eur = {item['counterparty']: int(item['total'] or 0) for item in eur_q}
+        for tr in qs:
+            key = tr.click if tr.payment_type == 'click' else tr.payment_type
+            # ensure numeric values are integers for JSON storage (previous behaviour)
+            uzs[key] = int((uzs.get(key, 0) or 0) + (tr.amount_uzs or 0))
+            usd[key] = int((usd.get(key, 0) or 0) + (tr.amount_usd or 0))
+            rub[key] = int((rub.get(key, 0) or 0) + (tr.amount_rub or 0))
+            eur[key] = int((eur.get(key, 0) or 0) + (tr.amount_eur or 0))
 
         report.uzs_detail = uzs
         report.usd_detail = usd
