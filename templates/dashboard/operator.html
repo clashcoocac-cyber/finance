@@ -5,413 +5,307 @@
 
 {% block content %}
 <div id="operatorDashboard" class="min-h-screen">
-        <nav class="bg-white shadow-lg border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-wrap justify-between items-center gap-2 py-3">
-            <!-- Chap tomon: Icon, Title, Company, Smena -->
-            <div class="flex flex-wrap items-center gap-2">
-                <h1 class="text-xl font-bold text-gray-800">SFBMSSB</h1>
-                <span class="ms-3 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="operatorCompanyName">
-                    {{ request.user.username }}
-                </span>
-                {% if request.session.shift %}
-                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+    <nav class="border-b" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-between items-center gap-2 py-3">
+                <div class="flex flex-wrap items-center gap-2">
+                    <h1 class="text-xl font-bold" style="color: var(--color-text);">SFBMSSB</h1>
+                    <span class="ms-3 px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);" id="operatorCompanyName">
+                        {{ request.user.username }}
+                    </span>
+                    {% if request.session.shift %}
+                    <span class="px-3 py-1 rounded-full text-sm" style="background: var(--color-pending-bg); color: var(--color-pending);">
                         {{ request.session.shift }}-smena
                     </span>
-                {% endif %}
-            </div>
-
-            <!-- O'ng tomon: Tugmalar -->
-            <div class="flex flex-wrap gap-2 justify-end w-full sm:w-auto">
-                <form method="POST" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
-                    {% csrf_token %}
-                    <button type="submit"
-                        onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')"
-                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm">
-                        🔒 Kassani Yopish
-                    </button>
-                </form>
-                <a href="{% url 'logout' %}"
-                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm">
-                    Chiqish
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
-
-
-        <div class="max-w-7xl mx-auto p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 {% if 'OPT' in request.user.username %}lg:grid-cols-2{%else%}lg:grid-cols-3{% endif %} gap-4 mb-8" id="div1">
-                {% if not 'OPT' in request.user.username %}
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click {{ clicks.0.1 }}</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click1.uzs | default:0 | format_currency }} so'm</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click1.usd | default:0 | format_currency }} $</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click1.rub | default:0 | format_currency  }} ₽</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click1.eur | default:0 | format_currency }} €</p>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click {{ clicks.1.1 }}</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click2.uzs | default:0 | format_currency }} so'm</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click2.usd | default:0 | format_currency }} $</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click2.rub | default:0 | format_currency }} ₽</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click2.eur | default:0 | format_currency }} €</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">💵</div>
-                    <p class="text-sm text-gray-600">Naqd</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-green-600" id="operatorCashUZS">{{ total.cash.uzs | default:0 | format_currency }} so'm</p>
-                        <p class="text-xs font-semibold text-green-600" id="operatorCashUSD">{{ total.cash.usd | default:0 | format_currency }} $</p>
-                        <p class="text-xs font-semibold text-green-600" id="operatorCashRUB">{{ total.cash.rub | default:0 | format_currency }} ₽</p>
-                        <p class="text-xs font-semibold text-green-600" id="operatorCashEUR">{{ total.cash.eur | default:0 | format_currency }} €</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Ma'lumot Qo'shish {{ form.counterparty.option }}</h2>
-                    {% if form.errors %}
-                        <div class="django-errors bg-red-50 border border-red-200 rounded-lg p-4 mb-6 fade-in">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">Quyidagi xatolarni tuzating:</h3>
-                                    <div class="mt-2 text-sm text-red-700">
-                                        <ul class="list-disc pl-5 space-y-1">
-                                            {% if form.errors %}
-                                            {% for field, errors in form.errors.items %}
-                                                <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
-                                            {% endfor %}
-                                            {% else %}
-                                                <li>Ma'lumotlarni to'ldiring</li>
-                                            {% endif %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     {% endif %}
-                    <form action="{% url 'transaction_create' %}{% if report_date %}?report_date={{ report_date }}{% endif %}" method="POST" class="space-y-4">
+                </div>
+
+                <div class="flex flex-wrap gap-2 justify-end w-full sm:w-auto">
+                    <form method="POST" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
                         {% csrf_token %}
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Kimdan olindi</label>
-                            <select onchange="seeWho()" id="counterparty" required name="counterparty" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Shaxsni tanlang</option>
-                                {% for person in persons %}
-                                    <option value="{{ person.0 }}">{{ person.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div id="otherCounterparty" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Boshqa shaxs</label>
-                            <input type="text" name="other_counterparty" placeholder="Boshqa shaxs nomi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">So'm</label>
-                                <input type="number" name="amount_uzs" id="incomeAmountUZS" placeholder="So'm miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Dollar</label>
-                                <input type="number" name="amount_usd" id="incomeAmountUSD" placeholder="Dollar miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Rubl</label>
-                                <input type="number" name="amount_rub" id="incomeAmountRUB" placeholder="Rubl miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Yevro</label>
-                                <input type="number" name="amount_eur" id="incomeAmountEUR" placeholder="Yevro miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Kurs haqida izoh (ixtiyoriy)</label>
-                            <textarea id="incomeExchangeComment" name="comment" placeholder="Masalan: Dollar kursi 12,250 so'm, Yevro kursi 13,500 so'm..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" rows="2"></textarea>
-                            <p class="text-xs text-gray-500 mt-1">Valyuta kursi yoki boshqa muhim ma'lumotlarni kiriting</p>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">To'lov turi</label>
-                            <select required onchange="changePaymentType()" id="incomePaymentType" name="payment_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">To'lov turini tanlang</option>
-                                <option value="click">Click</option>
-                                <option value="cash">Naqd</option>
-                                <option value="terminal">Terminal</option>
-                                <option value="bank">Bank</option>
-                            </select>
-                        </div>
-
-                        <div id="click" class="hidden">
-                            <label class="block text-sm font-medium text-green-500 mb-2">Click kartani tanlang</label>
-                            <select name="click" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">---</option>
-                                {% for click in clicks %}
-                                    <option value="{{ click.0 }}">{{ click.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                            Ma'lumot Qo'shish
+                        <button type="submit"
+                            onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')"
+                            class="px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm font-medium" style="background: var(--color-pending); color: var(--color-brand-foreground);">
+                            🔒 Kassani Yopish
                         </button>
                     </form>
+                    <a href="{% url 'logout' %}"
+                       class="px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm font-medium" style="background: var(--color-negative); color: var(--color-brand-foreground);">
+                        Chiqish
+                    </a>
                 </div>
+            </div>
+        </div>
+    </nav>
 
-                <!-- Today's Summary -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <div class="flex items-center gap-5 mb-4">
-                        <label for="reportDate" class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                            📅 Kun tanlash:
-                        </label>
-                        <input 
-                            type="date" 
-                            id="reportDate" 
-                            name="report_date" 
-                            value="{{ report_date }}" 
-                            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                            onchange="window.location.href = `?report_date=${this.value}`"
-                        >
-                    </div>
-<hr>                    
-                    <div class="flex justify-between items-center mb-4 mt-4">   
-                        <h2 class="text-xl font-bold text-gray-800">Kunlik Hisobotlarim</h2>
-                    </div>
-                    <div class="space-y-3 max-h-96 overflow-y-auto" id="operatorDailyReports">
-                    <div class="space-y-4">
+    <div class="max-w-7xl mx-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 {% if 'OPT' in request.user.username %}lg:grid-cols-2{% else %}lg:grid-cols-3{% endif %} gap-4 mb-8" id="div1">
+            {% if not 'OPT' in request.user.username %}
+            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
+                <div class="text-2xl mb-2">💳</div>
+                <p class="text-sm" style="color: var(--color-text-muted);">Click {{ clicks.0.1 }}</p>
+                <div class="space-y-1 money" style="color: var(--color-positive);">
+                    <p class="text-sm font-bold">{{ total.click1.uzs | default:0 | format_currency }} so'm</p>
+                    <p class="text-xs font-semibold">{{ total.click1.usd | default:0 | format_currency }} $</p>
+                    <p class="text-xs font-semibold">{{ total.click1.rub | default:0 | format_currency }} ₽</p>
+                    <p class="text-xs font-semibold">{{ total.click1.eur | default:0 | format_currency }} €</p>
+                </div>
+            </div>
+            {% endif %}
+            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
+                <div class="text-2xl mb-2">💳</div>
+                <p class="text-sm" style="color: var(--color-text-muted);">Click {{ clicks.1.1 }}</p>
+                <div class="space-y-1 money" style="color: var(--color-positive);">
+                    <p class="text-sm font-bold">{{ total.click2.uzs | default:0 | format_currency }} so'm</p>
+                    <p class="text-xs font-semibold">{{ total.click2.usd | default:0 | format_currency }} $</p>
+                    <p class="text-xs font-semibold">{{ total.click2.rub | default:0 | format_currency }} ₽</p>
+                    <p class="text-xs font-semibold">{{ total.click2.eur | default:0 | format_currency }} €</p>
+                </div>
+            </div>
+            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
+                <div class="text-2xl mb-2">💵</div>
+                <p class="text-sm" style="color: var(--color-text-muted);">Naqd</p>
+                <div class="space-y-1 money" style="color: var(--color-positive);">
+                    <p class="text-sm font-bold">{{ total.cash.uzs | default:0 | format_currency }} so'm</p>
+                    <p class="text-xs font-semibold">{{ total.cash.usd | default:0 | format_currency }} $</p>
+                    <p class="text-xs font-semibold">{{ total.cash.rub | default:0 | format_currency }} ₽</p>
+                    <p class="text-xs font-semibold">{{ total.cash.eur | default:0 | format_currency }} €</p>
+                </div>
+            </div>
+        </div>
 
-                        {% for report in reports %}
-                        <div class="bg-white rounded-xl shadow-sm border p-6 pb-1 border-l-4 {% if report.is_closed %}border-green-500 bg-green-50 {% else %}border-yellow-500 bg-red-50 {% endif %}">
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="flex items-center">
-                                    <div class="text-2xl mr-3">📅</div>
-                                    <div>
-                                        <h3 class="font-bold text-lg text-gray-800">{{ report.date }}</h3>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="flex items-center justify-end mb-1">
-                                        <span class="text-sm {% if report.is_closed %} text-green-600 bg-green-50 {% else %} text-yellow-600 bg-yellow-50 {% endif %} px-2 py-1 rounded-full font-medium">
-                                            {% if report.is_closed %}Tasdiqlangan{% else %}Kutilmoqda{% endif %}
-                                        </span>
-                                    </span>
-                                    </div>
-                                </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="rounded-xl shadow-lg p-6" style="background: var(--color-surface);">
+                <h2 class="text-xl font-bold mb-4" style="color: var(--color-text);">Ma'lumot Qo'shish</h2>
+                {% if form.errors %}
+                <div class="django-errors rounded-lg p-4 mb-6 fade-in border" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
+                    <h3 class="text-sm font-medium mb-2" style="color: var(--color-negative);">Quyidagi xatolarni tuzating:</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-sm" style="color: var(--color-negative);">
+                        {% for field, errors in form.errors.items %}
+                        <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                <form action="{% url 'transaction_create' %}{% if report_date %}?report_date={{ report_date }}{% endif %}" method="POST" class="space-y-4" x-data="{ paymentType: '{{ form.payment_type.value|default_if_none:'' }}' }">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Kimdan olindi</label>
+                        {% include "partials/_select_or_new_field.html" with field=form.counterparty new_field=form.other_counterparty new_label="Yangi shaxs nomi" %}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">So'm</label>
+                            <input type="number" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Dollar</label>
+                            <input type="number" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Rubl</label>
+                            <input type="number" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Yevro</label>
+                            <input type="number" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Kurs haqida izoh (ixtiyoriy)</label>
+                        <textarea name="comment" placeholder="Masalan: Dollar kursi 12,250 so'm, Yevro kursi 13,500 so'm..." class="w-full px-4 py-3 border rounded-lg text-sm resize-none" style="border-color: var(--color-border);" rows="2">{{ form.comment.value|default_if_none:'' }}</textarea>
+                        <p class="text-xs mt-1" style="color: var(--color-text-muted);">Valyuta kursi yoki boshqa muhim ma'lumotlarni kiriting</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">To'lov turi</label>
+                        <select required x-model="paymentType" name="payment_type" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <option value="">To'lov turini tanlang</option>
+                            <option value="click">Click</option>
+                            <option value="cash">Naqd</option>
+                            <option value="terminal">Terminal</option>
+                            <option value="bank">Bank</option>
+                        </select>
+                    </div>
+
+                    <div x-show="paymentType === 'click'" x-cloak>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-positive);">Click kartani tanlang</label>
+                        <select name="click" :required="paymentType === 'click'" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <option value="">---</option>
+                            {% for click in clicks %}
+                            <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-6 rounded-lg font-medium transition-colors" style="background: var(--color-positive); color: var(--color-brand-foreground);">
+                        Ma'lumot Qo'shish
+                    </button>
+                </form>
+            </div>
+
+            <!-- Today's Summary -->
+            <div class="rounded-xl shadow-lg p-6" style="background: var(--color-surface);">
+                <div class="flex items-center gap-5 mb-4">
+                    <label for="reportDate" class="text-sm font-medium whitespace-nowrap" style="color: var(--color-text);">
+                        📅 Kun tanlash:
+                    </label>
+                    <input
+                        type="date"
+                        id="reportDate"
+                        name="report_date"
+                        value="{{ report_date }}"
+                        class="px-4 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);"
+                        onchange="const params = new URLSearchParams(window.location.search); params.set('report_date', this.value); window.location.search = params.toString();"
+                    >
+                </div>
+                <hr style="border-color: var(--color-border);">
+                <div class="flex justify-between items-center mb-4 mt-4">
+                    <h2 class="text-xl font-bold" style="color: var(--color-text);">Kunlik Hisobotlarim</h2>
+                </div>
+                <div class="space-y-4 max-h-96 overflow-y-auto" id="operatorDailyReports">
+                    {% for report in reports %}
+                    <div class="rounded-xl border p-4" style="background: var(--color-surface-muted); border-color: var(--color-border);">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <div class="text-2xl mr-3">📅</div>
+                                <h3 class="font-bold text-lg" style="color: var(--color-text);">{{ report.date }}</h3>
                             </div>
-                            
-                            <!-- Currency Status Breakdown -->
-                            <div class="bg-gradient-to-r from-gray-50 {% if report.is_closed %}to-green-50{% else %}to-yellow-50{% endif %} rounded-lg p-4 mb-4">
-                                
-                                <!-- Approved -->
-                                <div class="{% if report.is_closed %} bg-green-50 border-green-200 {% else %} bg-yellow-50 border-yellow-200 {% endif %} border  rounded-lg p-3 mb-3">
-                                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 font-medium">
-                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">So'm</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_uzs | default:0 | format_currency }}</div></div>
-                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Dollar</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_usd | default:0 | format_currency }} $</div></div>
-                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Rubl</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_rub | default:0 | format_currency }} ₽</div></div>
-                                        <div class="text-center bg-white rounded p-2"><div class="text-xs text-gray-600">Yevro</div><div class="{% if report.is_closed %} text-green-700 {% else %} text-yellow-700 {% endif %}">{{ report.total_eur | default:0 | format_currency }} €</div></div>
-                                    </div>
-                                </div>
-                         </div>
-                         </div>
-                         {% endfor %}       
-
+                            {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                        </div>
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 font-medium money">
+                            <div class="text-center rounded p-2" style="background: var(--color-surface);"><div class="text-xs" style="color: var(--color-text-muted);">So'm</div><div style="color: var(--color-positive);">{{ report.total_uzs | default:0 | format_currency }}</div></div>
+                            <div class="text-center rounded p-2" style="background: var(--color-surface);"><div class="text-xs" style="color: var(--color-text-muted);">Dollar</div><div style="color: var(--color-positive);">{{ report.total_usd | default:0 | format_currency }} $</div></div>
+                            <div class="text-center rounded p-2" style="background: var(--color-surface);"><div class="text-xs" style="color: var(--color-text-muted);">Rubl</div><div style="color: var(--color-positive);">{{ report.total_rub | default:0 | format_currency }} ₽</div></div>
+                            <div class="text-center rounded p-2" style="background: var(--color-surface);"><div class="text-xs" style="color: var(--color-text-muted);">Yevro</div><div style="color: var(--color-positive);">{{ report.total_eur | default:0 | format_currency }} €</div></div>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
+            </div>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="rounded-xl shadow-lg p-6" id="div2" style="background: var(--color-surface);">
+            <h2 class="text-xl font-bold mb-4" style="color: var(--color-text);">Mening Tranzaksiyalarim</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 my-6">
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--color-text);">Boshlanish sanasi</label>
+                    <input type="date" value="{{ from }}" id="filterStartDate" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);" onchange="applyTransactionFilters()">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--color-text);">Tugash sanasi</label>
+                    <input type="date" value="{{ to }}" id="filterEndDate" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);" onchange="applyTransactionFilters()">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-1" style="color: var(--color-text);">Qidiruv</label>
+                    <input type="text" id="filterSearch" value="{{ q | default:'' }}" placeholder="Tavsif yoki operator..." class="w-full px-4 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                </div>
+                <div class="flex items-end">
+                    <button id="applyFiltersButton" class="w-full px-4 py-2 rounded-lg transition-colors text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);" onclick="applyTransactionFilters()">
+                        Filtrlarni qo'llash
+                    </button>
                 </div>
             </div>
 
-            <!-- Transactions Table -->
-            <div class="bg-white rounded-xl shadow-lg p-6" id="div2">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Mening Tranzaksiyalarim</h2>
-                
-                <!-- Qidiruv va filterlar -->
-    <div class="space-y-4">
-        <!-- Qidiruv input -->
-        
-
-        <!-- Filterlar -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 my-6 mt-5 justify-">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Boshlanish sanasi</label>
-                <input type="date" value="{{from}}" id="filterStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead style="background: var(--color-surface-muted);">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Vaqt</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Kimdan</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Miqdor</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Kommentariya</th>
+                            <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">To'lov turi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="operatorTransactionsTable" class="divide-y" style="border-color: var(--color-border);">
+                        {% for transaction in my_transactions %}
+                        <tr>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.date | date:"d.m.Y" }}<br>{{ transaction.date | time:"H:i" }}</td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.counterparty }}</td>
+                            <td class="px-4 py-3 text-sm">
+                                <div class="space-y-1 font-semibold money" style="color: var(--color-positive);">
+                                    {% if transaction.amount_uzs %}<div>{{ transaction.amount_uzs | format_currency }} so'm</div>{% endif %}
+                                    {% if transaction.amount_usd %}<div>{{ transaction.amount_usd | format_currency }} $</div>{% endif %}
+                                    {% if transaction.amount_rub %}<div>{{ transaction.amount_rub | format_currency }} ₽</div>{% endif %}
+                                    {% if transaction.amount_eur %}<div>{{ transaction.amount_eur | format_currency }} €</div>{% endif %}
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.comment | default:"" }}</td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                {{ transaction.get_payment_type_display }}
+                                {% if transaction.payment_type == 'click' %}
+                                <span class="font-medium">{{ transaction.get_click_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tugash sanasi</label>
-                <input type="date" value="{{to}}"  id="filterEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-            </div>
-        <div class="md:col-span-2 justify-end">
-                            <label class="block text-sm font-medium text-gray-700 mb-1"> Qidiruv</label>
-
-            <input 
-                type="text" 
-                id="filterSearch" 
-                value="{{ q | default:"" }}" 
-                placeholder="Tavsif yoki operator..." 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-            >
         </div>
-        <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">.</label>
 
-            <button
-                id="applyFiltersButton" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                onclick="applyTransactionFilters()"
-            > 
-                Filtrlarni qo'llash
-        </button>
-        </div>
+        <div class="flex justify-center my-6">
+            <button onclick="generatePDF()" class="px-8 py-3 rounded-lg font-medium transition-colors" style="background: var(--color-positive); color: var(--color-brand-foreground);">
+                📊 Kunlik Hisobot Yuklab Olish
+            </button>
         </div>
     </div>
+</div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Vaqt</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kimdan</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kommentariya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov turi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="operatorTransactionsTable" class="divide-y divide-gray-200">
-                            {% for transaction in my_transactions %}
-                            <tr>
-        
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.date | date:"d.m.Y" }}<br> {{ transaction.date | time:"H:i" }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.get_counterparty_display }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            {% if transaction.amount_uzs %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_uzs | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if transaction.amount_usd %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_usd | format_currency }} $</div>
-                            {% endif %}
-                            {% if transaction.amount_rub %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_rub | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if transaction.amount_eur %}
-                                <div class="font-semibold text-green-600">{{ transaction.amount_eur | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.comment | default:"" }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        {{ transaction.get_payment_type_display }}
-                        {% if transaction.payment_type == 'click' %}
-                            <span class="font-medium"> {{ transaction.get_click_display }}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-    </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="flex justify-center my-6">
-                <button onclick="generatePDF()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
-                    📊 Kunlik Hisobot Yuklab Olish
-                </button>
-            </div>
-        </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
 
 <script>
     function generatePDF() {
-    const container = document.createElement("div");
-    container.classList.add('max-w-7xl', 'mx-auto', 'p-6')
+        const container = document.createElement("div");
+        container.classList.add('max-w-7xl', 'mx-auto', 'p-6');
 
-    const div1 = document.getElementById("div1").cloneNode(true);
-    const div2 = document.getElementById("div2").cloneNode(true);
+        const div1 = document.getElementById("div1").cloneNode(true);
+        const div2 = document.getElementById("div2").cloneNode(true);
 
-    container.appendChild(div1);
-    container.appendChild(div2);
+        container.appendChild(div1);
+        container.appendChild(div2);
 
-    const opt = {
-        margin:       0,
-        filename:     'document.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  {
-            scale: 2,
-            useCORS: true, // agar rasm bo'lsa
-            logging: true,
-            scrollY: 0, // skrollni hisobga olmasin
-            windowWidth: document.body.scrollWidth,
-            windowHeight: document.body.scrollHeight,
-        },
-        jsPDF:        {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'landscape' // <-- bu albom ko‘rinish uchun
-        }
-    };
-
-    html2pdf().set(opt).from(container).save();
-}
-
-        function changePaymentType() {
-            const paymentType = document.getElementById('incomePaymentType');
-            const customDescriptionDiv = document.getElementById('click');
-            const firstSelect = customDescriptionDiv.querySelector('select');
-
-            if (paymentType.value === 'click') {
-                customDescriptionDiv.classList.remove('hidden');
-                firstSelect.setAttribute('required', true);
-            } else {
-                customDescriptionDiv.classList.add('hidden');
-                firstSelect.removeAttribute('required');
+        const opt = {
+            margin: 0,
+            filename: 'document.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                logging: true,
+                scrollY: 0,
+                windowWidth: document.body.scrollWidth,
+                windowHeight: document.body.scrollHeight,
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'landscape'
             }
-        }
+        };
 
-        function seeWho() {
-            const counterpartySelect = document.getElementById('counterparty');
-            const otherCounterpartyDiv = document.getElementById('otherCounterparty');
-            const firstInput = otherCounterpartyDiv.querySelector('input');
+        html2pdf().set(opt).from(container).save();
+    }
 
-            if (counterpartySelect.value === 'other') {
-                otherCounterpartyDiv.classList.remove('hidden');
-                firstInput.setAttribute('required', true);
-            } else {
-                otherCounterpartyDiv.classList.add('hidden');
-                firstInput.removeAttribute('required');
-            }
-        }
+    function applyTransactionFilters() {
+        const from = document.getElementById('filterStartDate').value;
+        const to = document.getElementById('filterEndDate').value;
+        const q = document.getElementById('filterSearch').value;
 
-        function applyTransactionFilters() {
-    const from = document.getElementById('filterStartDate').value;
-    const to = document.getElementById('filterEndDate').value;
-    const q = document.getElementById('filterSearch').value;
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('from', from);
+        urlParams.set('to', to);
+        urlParams.set('q', q);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('from', from);
-    urlParams.set('to', to);
-    urlParams.set('q', q);
-
-    window.location.search = urlParams.toString();
-}
+        window.location.search = urlParams.toString();
+    }
 </script>
-
 {% endblock %}
