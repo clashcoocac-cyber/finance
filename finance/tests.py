@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from finance.models import User, Transaction, DailyReport, Category, Counterparty
-from finance.forms import ExpenseForm
+from finance.forms import ExpenseForm, TransactionFrom
 
 
 class DataMigrationBackfillTests(TestCase):
@@ -93,3 +93,22 @@ class ExpenseFormCategoryTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         form.save(operator=self.cashier, date='2026-09-07')
         self.assertEqual(Category.objects.filter(name__iexact='chikako zavod').count(), 1)
+
+
+class OperatorCounterpartyFormTests(TestCase):
+    def setUp(self):
+        self.operator = User.objects.create_user(username='op_cf', password='pass12345', role='operator')
+
+    def test_new_counterparty_persists_for_next_form(self):
+        form = TransactionFrom(data={
+            'counterparty': '__new__', 'other_counterparty': 'Yangi Aka',
+            'amount_uzs': '50000', 'payment_type': 'cash',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save(operator=self.operator, date='2026-09-07')
+
+        self.assertTrue(Counterparty.objects.filter(name__iexact='yangi aka').exists())
+
+        next_form = TransactionFrom()
+        choice_values = dict(next_form.fields['counterparty'].choices)
+        self.assertIn('Yangi Aka', choice_values)

@@ -188,23 +188,30 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
     success_url = reverse_lazy('incomes_list')
 
     def get(self, request, *args, **kwargs):
-        context = {}
-        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
-        reposts = DailyReport.objects.filter(type='income', operator=request.user, date=report_date).order_by('-date')
-        context['reports'] = reposts
-        context['date'] = report_date
-        context['choices'] = IncomeCHoices
-        context['clicks'] = CLICKS
-        context['clicks_map'] = dict(CLICKS)
-        return render(request, self.template_name, context)
-    
+        return self._render(request)
+
     def post(self, request, *args, **kwargs):
         form = IncomeForm(request.POST)
         report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
         if form.is_valid():
             form.save(operator=request.user, date=report_date)
+            messages.success(request, "Kirim muvaffaqiyatli qo'shildi.")
             return redirect(self.success_url + f'?date={report_date}')
-        return redirect(self.success_url)
+        messages.error(request, "Formani tekshiring.")
+        return self._render(request, form=form)
+
+    def _render(self, request, form=None):
+        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
+        reports = DailyReport.objects.filter(type='income', operator=request.user, date=report_date).order_by('-date')
+        context = {
+            'form': form or IncomeForm(),
+            'reports': reports,
+            'date': report_date,
+            'choices': IncomeCHoices,
+            'clicks': CLICKS,
+            'clicks_map': dict(CLICKS),
+        }
+        return render(request, self.template_name, context)
 
 
 class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):

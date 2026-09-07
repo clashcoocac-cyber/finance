@@ -62,24 +62,38 @@ class UserUpdateForm(UserChangeForm):
 
 
 class TransactionFrom(forms.ModelForm):
+    counterparty = forms.ChoiceField(choices=[])
     other_counterparty = forms.CharField(required=False, max_length=255, label="Boshqa shaxs nomi")
 
     class Meta:
         model = Transaction
-        fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty']
-        
-    def save(self, commit = ..., operator=None, date=None):
+        fields = ['amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['counterparty'].choices = (
+            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True)] + [('__new__', "+ Yangi qo'shish")]
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        counterparty = cleaned_data.get('counterparty')
+        other = (cleaned_data.get('other_counterparty') or '').strip()
+        if counterparty == '__new__':
+            if not other:
+                self.add_error('other_counterparty', "Yangi shaxs nomini kiriting.")
+            else:
+                cleaned_data['counterparty'] = other
+        return cleaned_data
+
+    def save(self, commit=True, operator=None, date=None):
         transaction = super().save(commit=False)
-        if self.cleaned_data['counterparty'] == 'other':
-            transaction.counterparty = self.cleaned_data['other_counterparty']
-        else:
-            transaction.counterparty = self.cleaned_data['counterparty']
+        counterparty = self.cleaned_data['counterparty']
+        Counterparty.objects.get_or_create(name__iexact=counterparty, defaults={'name': counterparty})
+        transaction.counterparty = counterparty
         transaction.operator = operator
         transaction.type = 'income'
 
-        # If a report date is provided (operator selecting which report/day this
-        # transaction belongs to), keep the current time but set the date part to
-        # the provided report date. This handles shift-cross-midnight cases.
         if date:
             try:
                 parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
@@ -94,7 +108,7 @@ class TransactionFrom(forms.ModelForm):
             transaction.save()
 
         return transaction
-    
+
 IncomeCHoices = [
     ('almashdi', 'Almashdi'),
     ('vozvrat', 'Vozvrat rasx den'),
@@ -102,21 +116,21 @@ IncomeCHoices = [
 ]
 
 class IncomeForm(forms.ModelForm):
-    countryparty = forms.ChoiceField(choices=IncomeCHoices)
+    counterparty = forms.ChoiceField(choices=IncomeCHoices)
     other_counterparty = forms.CharField(required=False, max_length=255, label="Boshqa shaxs nomi")
     click = forms.ChoiceField(choices=CLICKS, required=False)
 
     class Meta:
         model = Transaction
-        fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'countryparty', 'other_counterparty']
-        
+        fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty', 'other_counterparty']
+
     def save(self, commit = True, operator=None, date=None):
         # build transaction instance (don't save yet)
         transaction = super().save(commit=False)
-        if self.cleaned_data['countryparty'] == 'other':
+        if self.cleaned_data['counterparty'] == 'other':
             transaction.counterparty = self.cleaned_data['other_counterparty'].lower()
         else:
-            transaction.counterparty = self.cleaned_data['countryparty'].lower()
+            transaction.counterparty = self.cleaned_data['counterparty'].lower()
         transaction.operator = operator
 
         # parse date if provided, otherwise use today
@@ -136,18 +150,18 @@ class IncomeForm(forms.ModelForm):
             date=parsed_date
         )
 
-        report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
-        report.total_usd = self.cleaned_data.get('amount_usd', 0)
-        report.total_rub = self.cleaned_data.get('amount_rub', 0)
-        report.total_eur = self.cleaned_data.get('amount_eur', 0)
+        report.total_uzs = self.cleaned_data.get('amount_uzs') or 0
+        report.total_usd = self.cleaned_data.get('amount_usd') or 0
+        report.total_rub = self.cleaned_data.get('amount_rub') or 0
+        report.total_eur = self.cleaned_data.get('amount_eur') or 0
 
         # use click value as detail key when payment_type is 'click'
         payment_type = self.cleaned_data.get('payment_type')
         detail_key = self.cleaned_data.get('click') if payment_type == 'click' else payment_type
-        report.uzs_detail = {detail_key: int(self.cleaned_data.get('amount_uzs') or 0)}
-        report.usd_detail = {detail_key: int(self.cleaned_data.get('amount_usd') or 0)}
-        report.rub_detail = {detail_key: int(self.cleaned_data.get('amount_rub') or 0)}
-        report.eur_detail = {detail_key: int(self.cleaned_data.get('amount_eur') or 0)}
+        report.uzs_detail = {detail_key: float(self.cleaned_data.get('amount_uzs') or 0)}
+        report.usd_detail = {detail_key: float(self.cleaned_data.get('amount_usd') or 0)}
+        report.rub_detail = {detail_key: float(self.cleaned_data.get('amount_rub') or 0)}
+        report.eur_detail = {detail_key: float(self.cleaned_data.get('amount_eur') or 0)}
         report.category = transaction.counterparty
         report.save()
 

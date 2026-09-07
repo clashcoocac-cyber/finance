@@ -9,7 +9,7 @@ from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
-from finance.models import PERSONS, Stat, StatTypes, User
+from finance.models import Counterparty, Stat, StatTypes, User
 from finance.models import DailyReport
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, CLICKS
@@ -276,7 +276,7 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
             )
         context['my_transactions'] = my_transactions.order_by('-date')
         context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:3]
-        context['persons'] = PERSONS
+        context['counterparties'] = Counterparty.objects.filter(is_active=True)
 
         queryset = Transaction.objects.filter(
             operator=self.request.user, date__date__range=(context['from'], context['to'])
@@ -406,7 +406,6 @@ class TransactionView(LoginRequiredMixin, BossRequiredMixin, View):
         context = {
             'form': form,
             'transaction': transaction,
-            'persons': PERSONS,
             'clicks': CLICKS,
             'choices': Transaction.PAYMENT_TYPES,
         }
