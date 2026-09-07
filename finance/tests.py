@@ -168,3 +168,27 @@ class ReportDetailPrecisionTests(TestCase):
         )
         report.refresh_from_db()
         self.assertEqual(report.uzs_detail['cash'], 1000.75)
+
+
+class DeleteViewsRequirePostTests(TestCase):
+    def setUp(self):
+        self.boss = User.objects.create_user(username='boss_del', password='pass12345', role='boss')
+        self.other_boss = User.objects.create_user(username='boss_del2', password='pass12345', role='boss')
+
+    def test_get_no_longer_deletes_user(self):
+        self.client.force_login(self.boss)
+        target = User.objects.create_user(username='op_del', password='pass12345', role='operator')
+        response = self.client.get(reverse('user_delete', args=[target.pk]))
+        self.assertEqual(response.status_code, 405)
+        self.assertTrue(User.objects.filter(pk=target.pk).exists())
+
+    def test_post_deletes_user(self):
+        self.client.force_login(self.boss)
+        target = User.objects.create_user(username='op_del2', password='pass12345', role='operator')
+        self.client.post(reverse('user_delete', args=[target.pk]))
+        self.assertFalse(User.objects.filter(pk=target.pk).exists())
+
+    def test_cannot_delete_boss_user(self):
+        self.client.force_login(self.boss)
+        self.client.post(reverse('user_delete', args=[self.other_boss.pk]))
+        self.assertTrue(User.objects.filter(pk=self.other_boss.pk).exists())

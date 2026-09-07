@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import TemplateView, DeleteView
+from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models.functions import Lower
@@ -276,12 +276,14 @@ class UserUpdateView(LoginRequiredMixin, BossRequiredMixin, View):
 
 
 
-class UserDeleteView(BossRequiredMixin, DeleteView):
-    model = User
+class UserDeleteView(LoginRequiredMixin, BossRequiredMixin, View):
     success_url = reverse_lazy('users')
 
-    def get(self, request, *args, **kwargs):
-        return super().delete(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        user = User.objects.filter(pk=kwargs['pk']).first()
+        if user and user.role != 'boss':
+            user.delete()
+        return redirect(self.success_url)
 
 
 class HomeView(View):
@@ -333,7 +335,7 @@ class TransactionView(LoginRequiredMixin, BossRequiredMixin, View):
 class TransactionDeleteView(BossRequiredMixin, View):
     success_url = reverse_lazy('transaction_list')
 
-    def get(self, request, pk, *args, **kwargs):
+    def post(self, request, pk, *args, **kwargs):
         transaction = Transaction.objects.filter(pk=pk).first()
         if not transaction:
             return redirect(self.success_url)
