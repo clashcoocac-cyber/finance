@@ -3,21 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moliyaviy Boshqaruv Tizimi</title>
+    <title>{% block title %}Moliyaviy Boshqaruv Tizimi{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"
+        integrity="sha384-l8f0VcPi/M1iHPv8egOnY/15TDwqgbOR1anMIJWvU6nLRgZVLTLSaNqi/TOoT5Fh"
+        crossorigin="anonymous" defer></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Mona Sans', sans-serif; }
-        .fade-in { animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .slide-in { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        :root {
+            --color-bg: #F8FAFC;
+            --color-surface: #FFFFFF;
+            --color-surface-muted: #F1F5F9;
+            --color-border: #E2E8F0;
+            --color-text: #0F172A;
+            --color-text-muted: #64748B;
+            --color-brand: #1E3A8A;
+            --color-brand-foreground: #FFFFFF;
+            --color-positive: #16A34A;
+            --color-positive-bg: #F0FDF4;
+            --color-negative: #DC2626;
+            --color-negative-bg: #FEF2F2;
+            --color-pending: #D97706;
+            --color-pending-bg: #FFFBEB;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-bg: #0F172A;
+                --color-surface: #1B2336;
+                --color-surface-muted: #1A1E2F;
+                --color-border: #334155;
+                --color-text: #F8FAFC;
+                --color-text-muted: #94A3B8;
+            }
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--color-bg); color: var(--color-text); }
+        .money { font-variant-numeric: tabular-nums; font-family: ui-monospace, 'SFMono-Regular', 'Fira Code', monospace; }
+        .fade-in { animation: fadeIn 0.2s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+<body class="min-h-screen">
 {% block content %}{% endblock %}
+<script>
+    function bulkSelect() {
+        return {
+            selected: [],
+            allSelected: false,
+            toggleAll(event) {
+                const checked = event.target.checked;
+                this.selected = checked
+                    ? Array.from(document.querySelectorAll('input[name="report_ids"]')).map(el => el.value)
+                    : [];
+            },
+        };
+    }
+</script>
 </body>
 </html>
