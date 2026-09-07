@@ -1,0 +1,7 @@
+<div class="flex items-center justify-between mb-3 px-4 py-2 rounded-lg" style="background: var(--color-surface-muted);">
+    <span class="text-sm" style="color: var(--color-text-muted);" x-text="selected.length + ' ta belgilandi'"></span>
+    <button type="submit" :disabled="selected.length === 0" :class="selected.length === 0 ? 'opacity-40 cursor-not-allowed' : ''"
+        class="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+        Tasdiqlash
+    </button>
+</div>

@@ -1,0 +1,13 @@
+{% load custom_filters %}
+<div class="rounded-xl p-5 border" style="background: var(--color-surface); border-color: var(--color-border);">
+    <div class="flex items-center justify-between mb-3">
+        <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
+        {% include "partials/_status_badge.html" with status=status %}
+    </div>
+    <div class="space-y-1 money text-sm" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
+        {% if amounts.total_uzs %}<div class="text-lg font-semibold">{{ amounts.total_uzs|format_currency }} so'm</div>{% endif %}
+        {% if amounts.total_usd %}<div>{{ amounts.total_usd|format_currency }} $</div>{% endif %}
+        {% if amounts.total_rub %}<div>{{ amounts.total_rub|format_currency }} ₽</div>{% endif %}
+        {% if amounts.total_eur %}<div>{{ amounts.total_eur|format_currency }} €</div>{% endif %}
+    </div>
+</div>
