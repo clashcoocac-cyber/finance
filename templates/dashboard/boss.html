@@ -1,371 +1,313 @@
 {% extends "../base.html" %}
-{% load custom_filters %}
+{% load custom_filters l10n %}
 {% block title %}Boshliq Dashboard{% endblock %}
 
 {% block content %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <div id="boshliqDashboard" class="min-h-screen">
-        <nav class="bg-white shadow-lg border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <h1 class="ml-3 text-xl font-bold text-gray-800">SFBMSSB</h1>
-                        <span class="ms-4 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm" id="operatorCompanyName">
-                    {{ request.user.username }}
-                </span>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <a href="{% url 'transaction_list' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            Tranzaksiyalar
-                        </a>
-                        <a href="{% url 'users' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            Foydalanuvchilar
-                        </a>
-                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            Chiqish
-                        </a>
-                    </div>
+    <nav class="border-b" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="ml-3 text-xl font-bold" style="color: var(--color-text);">SFBMSSB</h1>
+                    <span class="ms-4 px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);" id="operatorCompanyName">
+                        {{ request.user.username }}
+                    </span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <a href="{% url 'transaction_list' %}" class="px-4 py-2 rounded-lg transition-colors text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                        Tranzaksiyalar
+                    </a>
+                    <a href="{% url 'users' %}" class="px-4 py-2 rounded-lg transition-colors text-sm font-medium border" style="border-color: var(--color-border); color: var(--color-text);">
+                        Foydalanuvchilar
+                    </a>
+                    <a href="{% url 'logout' %}" class="px-4 py-2 rounded-lg transition-colors text-sm font-medium" style="background: var(--color-negative); color: #FFFFFF;">
+                        Chiqish
+                    </a>
                 </div>
             </div>
-        </nav>
+        </div>
+    </nav>
 
-        <div class="max-w-7xl mx-auto p-6" id="invoice">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+    <div class="max-w-7xl mx-auto p-6" id="invoice">
+        <div class="space-y-3 mb-8">
+            <h2 class="text-sm font-semibold" style="color: var(--color-text-muted);">Tasdiqlangan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="relative group">
+                    <button type="button" onclick="editDailyStats('income')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded" style="background: var(--color-surface-muted);">✏️</button>
+                    {% include "partials/_stat_card.html" with title="Tasdiqlangan kirim" amounts=stats.confirmed.income status="confirmed" tone="positive" %}
+                </div>
+                <div class="relative group">
+                    <button type="button" onclick="editDailyStats('expense')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded" style="background: var(--color-surface-muted);">✏️</button>
+                    {% include "partials/_stat_card.html" with title="Tasdiqlangan chiqim" amounts=stats.confirmed.expense status="confirmed" tone="negative" %}
+                </div>
+                <div class="relative group">
+                    <button type="button" onclick="editDailyStats('diff')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded" style="background: var(--color-surface-muted);">✏️</button>
+                    {% include "partials/_stat_card.html" with title="Tasdiqlangan qoldiq" amounts=stats.confirmed.diff status="confirmed" tone="neutral" %}
+                </div>
+            </div>
+        </div>
 
-                    <div class="flex items-center justify-between relative group">
-                        <div class="">
-                            <button onclick="editDailyStats('income')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-gray-200 hover:bg-gray-300 text-white p-1 rounded text-xs transition-all">
-                            ✏️
+        <div class="space-y-3 mb-8">
+            <h2 class="text-sm font-semibold" style="color: var(--color-text-muted);">Kutilmoqda</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% include "partials/_stat_card.html" with title="Kutilayotgan kirim" amounts=stats.pending.income status="pending" tone="positive" %}
+                {% include "partials/_stat_card.html" with title="Kutilayotgan chiqim" amounts=stats.pending.expense status="pending" tone="negative" %}
+                {% include "partials/_stat_card.html" with title="Kutilayotgan qoldiq" amounts=stats.pending.diff status="pending" tone="neutral" %}
+            </div>
+        </div>
+
+        <div class="rounded-xl shadow-lg p-6 space-y-6" style="background: var(--color-surface);">
+            <!-- Sarlavha -->
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold" style="color: var(--color-text);">Barcha Hisobotlar</h2>
+                <button onclick="generatePDF()" class="px-6 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    📥 Yuklab Olish
+                </button>
+            </div>
+
+            <!-- Qidiruv va filterlar -->
+            <form method="get" action="{{ request.path }}" x-data="{ categoriesOpen: false }" class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Boshlanish sanasi</label>
+                        <input type="date" name="from" value="{{ from }}" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Tugash sanasi</label>
+                        <input type="date" name="to" value="{{ to }}" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                    </div>
+                    <div class="relative">
+                        <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Kategoriya</label>
+                        <button type="button" @click="categoriesOpen = !categoriesOpen" class="w-full px-3 py-2 border rounded-lg text-sm text-left" style="border-color: var(--color-border);">
+                            {{ categories|length|default:0 }} tanlangan
                         </button>
-                            <p class="text-sm font-medium text-gray-600">Umumiy Kirim</p>
-                            <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-green-600" id="totalIncomeUZS">{{ stats.income.total_uzs | default:0 | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-green-600" id="totalIncomeUSD">{{ stats.income.total_usd | default:0 | format_currency }} $</p>
-                                <p class="text-sm font-medium text-green-600" id="totalIncomeRUB">{{ stats.income.total_rub | default:0 | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-green-600" id="totalIncomeEUR">{{ stats.income.total_eur | default:0 | format_currency }} €</p>
-                            </div>
+                        <div x-show="categoriesOpen" @click.outside="categoriesOpen = false" x-cloak
+                            class="absolute z-10 mt-1 w-full rounded-lg border shadow-lg p-2 max-h-56 overflow-y-auto" style="background: var(--color-surface); border-color: var(--color-border);">
+                            {% for cat in category_options %}
+                            <label class="flex items-center gap-2 px-2 py-1 text-sm rounded">
+                                <input type="checkbox" name="category" value="{{ cat.name }}" {% if cat.name in categories %}checked{% endif %}>
+                                {{ cat.name }}
+                            </label>
+                            {% endfor %}
                         </div>
-                        <div class="text-green-500 text-3xl">📈</div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Tranzaksiya turi</label>
+                        <select name="type" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <option value="">Barchasi</option>
+                            <option value="income" {% if type == 'income' %}selected{% endif %}>📈 Kirimlar</option>
+                            <option value="expense" {% if type == 'expense' %}selected{% endif %}>📉 Chiqimlar</option>
+                            <option value="xarajat" {% if type == 'xarajat' %}selected{% endif %}>📉 Xarajatlar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Qidiruv</label>
+                        <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Operator, kategoriya..." class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-500">
-                    <div class="flex items-center justify-between relative group">
-                        <div>
-                            <button onclick="editDailyStats('expense')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-gray-200 hover:bg-gray-300 text-white p-1 rounded text-xs transition-all">
-                            ✏️
-                        </button>
-                            <p class="text-sm font-medium text-gray-600">Umumiy Chiqim</p>
-                            <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-red-600" id="totalExpenseUZS">{{ stats.expense.total_uzs | default:0 | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-red-600" id="totalExpenseUSD">{{ stats.expense.total_usd | default:0 | format_currency }} $</p>
-                                <p class="text-sm font-medium text-red-600" id="totalExpenseRUB">{{ stats.expense.total_rub | default:0 | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-red-600" id="totalExpenseEUR">{{ stats.expense.total_eur | default:0 | format_currency }} €</p>
-                            </div>
-                        </div>
-                        <div class="text-red-500 text-3xl">📉</div>
-                    </div>
+                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    Filtrlarni qo'llash
+                </button>
+            </form>
+
+            <!-- Jadval -->
+            <form method="post" action="{% url 'bulk_confirm_reports' %}" x-data="bulkSelect()" class="space-y-3">
+                {% csrf_token %}
+                <input type="hidden" name="current_qs" value="{{ request.GET.urlencode }}">
+                {% include "partials/_bulk_action_bar.html" %}
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead style="background: var(--color-surface-muted);">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">
+                                    <input type="checkbox" x-model="allSelected" @change="toggleAll($event)">
+                                </th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Sana</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Operator</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Kompaniya / Kategoriya</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Turi</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Miqdor</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Holat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allReportsTable" class="divide-y" style="border-color: var(--color-border);">
+                            {% for report in reports %}
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    {% if report.type != 'income' and not report.is_closed %}
+                                    <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected">
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.date | date:"d/m/Y" }}</td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                    {% if report.type == 'income' %}
+                                        <div class="space-y-1">
+                                            <div>{{ report.operator.username }}</div>
+                                            {% if report.operator_shift %}
+                                            <div class="text-xs" style="color: var(--color-text-muted);">{{ report.operator_shift }}-smena</div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                    {% if report.type == 'income' %}
+                                        {{ report.operator.company.name }}
+                                    {% else %}
+                                        {{ report.category }}
+                                        <div style="color: var(--color-text-muted);">{{ report.desc | default:"" }}</div>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <span class="px-2 py-1 text-xs rounded-full" style="{% if report.type == 'income' %}background: var(--color-positive-bg); color: var(--color-positive);{% elif report.type == 'xarajat' %}background: var(--color-pending-bg); color: var(--color-pending);{% else %}background: var(--color-negative-bg); color: var(--color-negative);{% endif %}">
+                                        {{ report.get_type_display | lower }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <div class="space-y-1 font-medium money" style="color: {% if report.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
+                                        {% if report.total_uzs %}
+                                            <div>{{ report.total_uzs | format_currency }} so'm</div>
+                                        {% endif %}
+                                        {% if report.total_usd %}
+                                            <div>{{ report.total_usd | format_currency }} $</div>
+                                        {% endif %}
+                                        {% if report.total_rub %}
+                                            <div>{{ report.total_rub | format_currency }} ₽</div>
+                                        {% endif %}
+                                        {% if report.total_eur %}
+                                            <div>{{ report.total_eur | format_currency }} €</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
-                    <div class="flex items-center justify-between relative group">
-                        <div>
-                            <button onclick="editDailyStats('diff')" class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-gray-200 hover:bg-gray-300 text-white p-1 rounded text-xs transition-all">
-                            ✏️
-                        </button>
-                            <p class="text-sm font-medium text-gray-600">Qoldiq</p>
-                            <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-yellow-600" id="totalBalanceUZS">{{ stats.diff.total_uzs | default:0 | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceUSD">{{ stats.diff.total_usd | default:0 | format_currency }} $</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceRUB">{{ stats.diff.total_rub | default:0 | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceEUR">{{ stats.diff.total_eur | default:0 | format_currency }} €</p>
-                            </div>
-                        </div>
-                        <div class="text-blue-500 text-3xl">💰</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-lg p-6 space-y-6">
-    <!-- Sarlavha -->
-    <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold text-gray-800">Barcha Hisobotlar</h2>
-        <button onclick="generatePDF()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors">
-            📥 Yuklab Olish
-        </button>
-    </div>
-
-    <!-- Qidiruv va filterlar -->
-    <div class="space-y-4">
-        <!-- Qidiruv input -->
-        
-
-        <!-- Filterlar -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Boshlanish sanasi</label>
-                <input type="date" value="{{from}}" id="filterStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tugash sanasi</label>
-                <input type="date" value="{{to}}"  id="filterEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tranzaksiya turi</label>
-                <select value="{{request.GET.type}}"  id="filterTransactionType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-                    <option value="">Barchasi</option>
-                    <option value="income" {% if request.GET.type == 'income' %}selected{% endif %}>📈 Kirimlar</option>
-                    <option value="expense" {% if request.GET.type == 'expense' %}selected{% endif %}>📉 Chiqimlar</option>
-                    <option value="xarajat" {% if request.GET.type == 'xarajat' %}selected{% endif %}>📉 Xarajatlar</option>
-                    </select>
-            </div>
+            </form>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="md:col-span-3">
-            <input 
-                type="text" 
-                id="filterSearch" 
-                value="{{ q | default:"" }}" 
-                placeholder="Tavsif yoki operator..." 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-            >
-        </div>
-        <div>
-            <button
-                id="applyFiltersButton" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                onclick="applyTransactionFilters()"
-            > 
-                Filtrlarni qo'llash
-        </button>
-        </div>
-        </div>
-    </div>
-
-    <!-- Jadval -->
-    <div class="overflow-x-auto">
-        <table class="w-full table-auto">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya / Kategoriya</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Turi</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
-                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Holat</th>
-                </tr>
-            </thead>
-            <tbody id="allReportsTable" class="divide-y divide-gray-200">
-                {% for report in reports %}
-                <tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ report.date | date:"d/m/Y" }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        {% if report.type == 'income' %}
-                            <div class="space-y-1">
-                                <div>{{ report.operator.username }}</div>
-                                {% if report.operator_shift %}
-                                <div class="text-xs text-gray-500">{{ report.operator_shift }}-smena</div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        {% if report.type == 'income' %}
-                            {{ report.operator.company.name }}
-                        {% else %}
-                            {{ report.category }}
-                            <div class="text-gray-500">{{ report.desc | default:""}}</div>
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        <span class="px-2 py-1 text-xs rounded-full {% if report.type == 'income' %} bg-green-100 text-green-800 {% elif report.type == 'xarajat' %} bg-yellow-100 text-yellow-800 {% else %} bg-red-100 text-red-800 {% endif %}">
-                            {{ report.get_type_display | lower }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1 font-medium {% if report.type == 'income' %} text-green-600 {% else %} text-red-600 {% endif %}">
-                            {% if report.total_uzs %}
-                                <div>{{ report.total_uzs | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if report.total_usd %}
-                                <div>{{ report.total_usd | format_currency }} $</div>
-                            {% endif %}
-                            {% if report.total_rub %}
-                                <div>{{ report.total_rub | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if report.total_eur %}
-                                <div>{{ report.total_eur | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        {% if report.is_closed %}
-                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Tasdiqlangan</span>
-                        {% elif report.type == 'income' %}
-                            <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">Kutilmoqda</span>
-                        {% else %}
-                            <form action="{% url 'confirm_expense' report.pk %}" method="POST">
-                                {% csrf_token %}
-                                <button type="submit" onclick="return confirm('Rostan ham tasdiqlamoqchimisiz?')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                    Tasdiqlash
-                                </button>
-                            </form>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 </div>
 
+<!-- Edit Daily Stats Modal -->
+<div id="editStatsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <form method="POST" action="{% url 'change_stat' %}" class="rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in" style="background: var(--color-surface);">
+        {% csrf_token %}
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold" style="color: var(--color-text);" id="editStatsTitle">Statistikani Tahrirlash</h2>
+            <button type="button" onclick="closeEditStatsModal()" class="text-2xl" style="color: var(--color-text-muted);">×</button>
         </div>
-    </div>
 
-
- <!-- Edit Daily Stats Modal -->
-    <div id="editStatsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <form method="POST" action="{% url 'change_stat' %}" class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
-            {% csrf_token %}
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-800" id="editStatsTitle">Statistikani Tahrirlash</h2>
-                <button onclick="closeEditStatsModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+        <div class="space-y-4">
+            <div class="hidden">
+                <input type="hidden" name="stat_type" id="StatType">
             </div>
-            
-            <div class="space-y-4">
-                <div class="hidden">
-                    <input type="hidden" name="stat_type" id="StatType">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">So'm miqdori</label>
-                    <input type="number" name="total_uzs" id="editStatsUZS" placeholder="So'm miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Dollar miqdori</label>
-                    <input type="number" name="total_usd" id="editStatsUSD" placeholder="Dollar miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Rubl miqdori</label>
-                    <input type="number" name="total_rub" id="editStatsRUB" placeholder="Rubl miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Yevro miqdori</label>
-                    <input type="number" name="total_eur" id="editStatsEUR" placeholder="Yevro miqdorini kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                    <div class="flex items-start">
-                        <span class="text-yellow-600 mr-2">⚠️</span>
-                        <div class="text-sm text-yellow-800">
-                            <p class="font-medium mb-1">Diqqat!</p>
-                            <p>Bu o'zgarishlar kunlik hisobotga ta'sir qiladi. Faqat zarur hollarda o'zgartiring.</p>
-                        </div>
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">So'm miqdori</label>
+                <input type="number" name="total_uzs" id="editStatsUZS" placeholder="So'm miqdorini kiriting" class="w-full px-4 py-3 border rounded-lg" style="border-color: var(--color-border);">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Dollar miqdori</label>
+                <input type="number" name="total_usd" id="editStatsUSD" placeholder="Dollar miqdorini kiriting" class="w-full px-4 py-3 border rounded-lg" style="border-color: var(--color-border);">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Rubl miqdori</label>
+                <input type="number" name="total_rub" id="editStatsRUB" placeholder="Rubl miqdorini kiriting" class="w-full px-4 py-3 border rounded-lg" style="border-color: var(--color-border);">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Yevro miqdori</label>
+                <input type="number" name="total_eur" id="editStatsEUR" placeholder="Yevro miqdorini kiriting" class="w-full px-4 py-3 border rounded-lg" style="border-color: var(--color-border);">
+            </div>
+
+            <div class="rounded-lg p-3 border" style="background: var(--color-pending-bg); border-color: var(--color-pending);">
+                <div class="flex items-start">
+                    <span class="mr-2" style="color: var(--color-pending);">⚠️</span>
+                    <div class="text-sm" style="color: var(--color-pending);">
+                        <p class="font-medium mb-1">Diqqat!</p>
+                        <p>Bu o'zgarishlar kunlik hisobotga ta'sir qiladi. Faqat zarur hollarda o'zgartiring.</p>
                     </div>
                 </div>
-                
-                <div class="flex space-x-4 pt-4">
-                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                        Saqlash
-                    </button>
-                    <button onclick="closeEditStatsModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                        Bekor qilish
-                    </button>
-                </div>
             </div>
-        </form>
-    </div>
 
+            <div class="flex space-x-4 pt-4">
+                <button type="submit" class="flex-1 py-3 px-6 rounded-lg font-medium transition-colors" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    Saqlash
+                </button>
+                <button type="button" onclick="closeEditStatsModal()" class="flex-1 py-3 px-6 rounded-lg font-medium transition-colors border" style="border-color: var(--color-border); color: var(--color-text);">
+                    Bekor qilish
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
 
 <script>
     function generatePDF() {
-    const element = document.getElementById("invoice");
+        const element = document.getElementById("invoice");
 
-    const opt = {
-        margin:       0,
-        filename:     'document.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  {
-            scale: 2,
-            useCORS: true, // agar rasm bo'lsa
-            logging: true,
-            scrollY: 0, // skrollni hisobga olmasin
-            windowWidth: document.body.scrollWidth,
-            windowHeight: document.body.scrollHeight,
-        },
-        jsPDF:        {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'landscape' // <-- bu albom ko‘rinish uchun
-        }
-    };
+        const opt = {
+            margin:       0,
+            filename:     'document.pdf',
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  {
+                scale: 2,
+                useCORS: true, // agar rasm bo'lsa
+                logging: true,
+                scrollY: 0, // skrollni hisobga olmasin
+                windowWidth: document.body.scrollWidth,
+                windowHeight: document.body.scrollHeight,
+            },
+            jsPDF:        {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'landscape' // <-- bu albom ko'rinish uchun
+            }
+        };
 
-    html2pdf().set(opt).from(element).save();
-}
+        html2pdf().set(opt).from(element).save();
+    }
 
-function applyTransactionFilters() {
-    const from = document.getElementById('filterStartDate').value;
-    const to = document.getElementById('filterEndDate').value;
-    const type = document.getElementById('filterTransactionType').value;
-    const q = document.getElementById('filterSearch').value;
+    function editDailyStats(type) {
+        // Set modal title
+        const titles = {
+            'income': 'Umumiy Kirimni Tahrirlash',
+            'expense': 'Umumiy Chiqimni Tahrirlash',
+            'diff': 'Umumiy Qoldiqni Tahrirlash'
+        };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('from', from);
-    urlParams.set('to', to);
-    urlParams.set('type', type);
-    urlParams.set('q', q);
+        document.getElementById('editStatsTitle').textContent = titles[type];
+        document.getElementById('StatType').value = type;
 
-    window.location.search = urlParams.toString();
-}
-
-function editDailyStats(type) {
-            
-            // Set modal title and date
-            const titles = {
-                'income': 'Umumiy Kirimni Tahrirlash',
-                'expense': 'Umumiy Chiqimni Tahrirlash',
-                'diff': 'Umumiy Qoldiqni Tahrirlash'
-            };
-            
-            document.getElementById('editStatsTitle').textContent = titles[type];
-            document.getElementById('StatType').value = type;
-            
-            // Calculate current values
-            const currencies = ['uzs', 'usd', 'rub', 'eur'];
-            currencies.forEach(currency => {
-                let currentValue = 0;
-                
-                if (type === 'income') {
-                    document.getElementById('editStatsUZS').value = {{ stats.income.total_uzs | default:0 }};
-                    document.getElementById('editStatsUSD').value = {{ stats.income.total_usd | default:0 }};
-                    document.getElementById('editStatsRUB').value = {{ stats.income.total_rub | default:0 }};
-                    document.getElementById('editStatsEUR').value = {{ stats.income.total_eur | default:0 }};
-                } 
-                else if (type === 'expense') {
-                    document.getElementById('editStatsUZS').value = {{ stats.expense.total_uzs | default:0 }};
-                    document.getElementById('editStatsUSD').value = {{ stats.expense.total_usd | default:0 }};
-                    document.getElementById('editStatsRUB').value = {{ stats.expense.total_rub | default:0 }};
-                    document.getElementById('editStatsEUR').value = {{ stats.expense.total_eur | default:0 }};
-                } 
-                else if (type === 'diff') {
-                    document.getElementById('editStatsUZS').value = {{ stats.diff.total_uzs | default:0 }};
-                    document.getElementById('editStatsUSD').value = {{ stats.diff.total_usd | default:0 }};
-                    document.getElementById('editStatsRUB').value = {{ stats.diff.total_rub | default:0 }};
-                    document.getElementById('editStatsEUR').value = {{ stats.diff.total_eur | default:0 }};
-                } 
-            });
-            
-            document.getElementById('editStatsModal').classList.remove('hidden');
+        if (type === 'income') {
+            document.getElementById('editStatsUZS').value = {{ stats.confirmed.income.total_uzs | default:0 | unlocalize }};
+            document.getElementById('editStatsUSD').value = {{ stats.confirmed.income.total_usd | default:0 | unlocalize }};
+            document.getElementById('editStatsRUB').value = {{ stats.confirmed.income.total_rub | default:0 | unlocalize }};
+            document.getElementById('editStatsEUR').value = {{ stats.confirmed.income.total_eur | default:0 | unlocalize }};
+        } else if (type === 'expense') {
+            document.getElementById('editStatsUZS').value = {{ stats.confirmed.expense.total_uzs | default:0 | unlocalize }};
+            document.getElementById('editStatsUSD').value = {{ stats.confirmed.expense.total_usd | default:0 | unlocalize }};
+            document.getElementById('editStatsRUB').value = {{ stats.confirmed.expense.total_rub | default:0 | unlocalize }};
+            document.getElementById('editStatsEUR').value = {{ stats.confirmed.expense.total_eur | default:0 | unlocalize }};
+        } else if (type === 'diff') {
+            document.getElementById('editStatsUZS').value = {{ stats.confirmed.diff.total_uzs | default:0 | unlocalize }};
+            document.getElementById('editStatsUSD').value = {{ stats.confirmed.diff.total_usd | default:0 | unlocalize }};
+            document.getElementById('editStatsRUB').value = {{ stats.confirmed.diff.total_rub | default:0 | unlocalize }};
+            document.getElementById('editStatsEUR').value = {{ stats.confirmed.diff.total_eur | default:0 | unlocalize }};
         }
 
-        function closeEditStatsModal() {
-            document.getElementById('editStatsModal').classList.add('hidden');
-        }
+        document.getElementById('editStatsModal').classList.remove('hidden');
+    }
+
+    function closeEditStatsModal() {
+        document.getElementById('editStatsModal').classList.add('hidden');
+    }
 </script>
 
 {% endblock %}
