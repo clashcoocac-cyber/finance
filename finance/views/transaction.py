@@ -11,7 +11,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Sum, Q
 from finance.forms import ExpenseForm, TransactionFrom, IncomeCHoices, IncomeForm
-from finance.models import User, Company
+from finance.models import User, Company, Category
 from finance.models import DailyReport, CLICKS
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, Stat
@@ -234,6 +234,9 @@ class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):
                 Q(report__category__icontains=search_query) |
                 Q(counterparty__icontains=search_query)
             )
+        categories = request.GET.getlist('category')
+        if categories:
+            transactions = transactions.filter(report__category__in=categories)
 
         context = {
             'transactions': transactions,
@@ -243,7 +246,9 @@ class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):
             'total_eur': transactions.aggregate(Sum('amount_eur'))['amount_eur__sum'] or 0,
             'from': date_from,
             'to': date_to,
-            'q': search_query
+            'q': search_query,
+            'categories': categories,
+            'category_options': Category.objects.filter(is_active=True),
         }
         return render(request, self.template_name, context)
 

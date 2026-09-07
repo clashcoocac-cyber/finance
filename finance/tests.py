@@ -136,3 +136,21 @@ class MoneyStatsTests(TestCase):
         stats = compute_money_stats()
         self.assertEqual(stats['confirmed']['income'].total_uzs, Decimal('100000'))
         self.assertEqual(stats['pending']['income']['total_uzs'], Decimal('40000'))
+
+
+class MultiCategoryFilterTests(TestCase):
+    def setUp(self):
+        self.boss = User.objects.create_user(username='boss_cf', password='pass12345', role='boss')
+        self.operator = User.objects.create_user(username='op_cf2', password='pass12345', role='operator')
+        today = timezone.now().date()
+        self.r1 = DailyReport.objects.create(operator=self.operator, type='expense', category='chikako zavod', date=today, is_closed=True)
+        self.r2 = DailyReport.objects.create(operator=self.operator, type='expense', category='jasur un', date=today, is_closed=True)
+        self.r3 = DailyReport.objects.create(operator=self.operator, type='expense', category='ravshan $', date=today, is_closed=True)
+
+    def test_boss_dashboard_filters_multiple_categories(self):
+        self.client.force_login(self.boss)
+        response = self.client.get(reverse('boss_dashboard'), {'category': ['chikako zavod', 'jasur un']})
+        reports = list(response.context['reports'])
+        self.assertIn(self.r1, reports)
+        self.assertIn(self.r2, reports)
+        self.assertNotIn(self.r3, reports)

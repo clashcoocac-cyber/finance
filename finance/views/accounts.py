@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.db.models import Sum
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
 from finance.models import Counterparty, User
-from finance.models import DailyReport
+from finance.models import DailyReport, Category
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, CLICKS
 from django.db.models import Sum, Q
@@ -45,6 +45,10 @@ class BossDashboardView(TemplateView):
                 Q(operator__company__name__icontains=context['q']) |
                 Q(category__icontains=context['q'])
             )
+        context['categories'] = self.request.GET.getlist('category')
+        if context['categories']:
+            reports = reports.filter(category__in=context['categories'])
+        context['category_options'] = Category.objects.filter(is_active=True)
 
         context['reports'] = reports.order_by('-date')
 
@@ -81,9 +85,13 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
                 Q(company_name_l__icontains=q) |
                 Q(category_l__icontains=q)
             )
+        context['categories'] = self.request.GET.getlist('category')
+        if context['categories']:
+            reports = reports.filter(category__in=context['categories'])
+        context['category_options'] = Category.objects.filter(is_active=True)
 
         context['reports'] = reports.order_by('-date')
-        
+
         # parse date range for consistent filtering
         date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
         date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
