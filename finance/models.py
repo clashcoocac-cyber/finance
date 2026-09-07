@@ -134,10 +134,10 @@ def _recalc_report(report_id):
         for tr in qs:
             key = tr.click if tr.payment_type == 'click' else tr.payment_type
             # ensure numeric values are integers for JSON storage (previous behaviour)
-            uzs[key] = int((uzs.get(key, 0) or 0) + (tr.amount_uzs or 0))
-            usd[key] = int((usd.get(key, 0) or 0) + (tr.amount_usd or 0))
-            rub[key] = int((rub.get(key, 0) or 0) + (tr.amount_rub or 0))
-            eur[key] = int((eur.get(key, 0) or 0) + (tr.amount_eur or 0))
+            uzs[key] = float((uzs.get(key, 0) or 0) + (tr.amount_uzs or 0))
+            usd[key] = float((usd.get(key, 0) or 0) + (tr.amount_usd or 0))
+            rub[key] = float((rub.get(key, 0) or 0) + (tr.amount_rub or 0))
+            eur[key] = float((eur.get(key, 0) or 0) + (tr.amount_eur or 0))
 
         report.uzs_detail = uzs
         report.usd_detail = usd

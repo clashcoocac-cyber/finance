@@ -322,10 +322,10 @@ class TransactionView(LoginRequiredMixin, BossRequiredMixin, View):
         transaction = Transaction.objects.filter(pk=pk).first()
         transaction.payment_type = data.get('payment_type')
         transaction.click = data.get('click') or None
-        transaction.amount_usd = int(data.get('amount_usd', 0) or 0) or None
-        transaction.amount_uzs = int(data.get('amount_uzs', 0) or 0) or None
-        transaction.amount_rub = int(data.get('amount_rub', 0) or 0) or None
-        transaction.amount_eur = int(data.get('amount_eur', 0) or 0) or None
+        transaction.amount_usd = Decimal(data.get('amount_usd') or 0) or None
+        transaction.amount_uzs = Decimal(data.get('amount_uzs') or 0) or None
+        transaction.amount_rub = Decimal(data.get('amount_rub') or 0) or None
+        transaction.amount_eur = Decimal(data.get('amount_eur') or 0) or None
         transaction.save()
         return redirect('transaction_list')
 

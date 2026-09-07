@@ -154,3 +154,17 @@ class MultiCategoryFilterTests(TestCase):
         self.assertIn(self.r1, reports)
         self.assertIn(self.r2, reports)
         self.assertNotIn(self.r3, reports)
+
+
+class ReportDetailPrecisionTests(TestCase):
+    def setUp(self):
+        self.operator = User.objects.create_user(username='op_prec', password='pass12345', role='operator')
+
+    def test_recalc_report_preserves_decimal_amount(self):
+        report = DailyReport.objects.create(operator=self.operator, type='income', date=timezone.now().date(), is_closed=False)
+        Transaction.objects.create(
+            type='income', payment_type='cash', amount_uzs=Decimal('1000.75'),
+            operator=self.operator, counterparty='Test', report=report, date=timezone.now(),
+        )
+        report.refresh_from_db()
+        self.assertEqual(report.uzs_detail['cash'], 1000.75)
