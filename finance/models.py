@@ -17,6 +17,34 @@ class Company(models.Model):
     name = models.CharField(max_length=255)
 
 
+class Category(models.Model):
+    GROUPS = [('expense', 'Chiqim'), ('xarajat', 'Xarajat')]
+
+    name = models.CharField(max_length=100, unique=True)
+    group = models.CharField(max_length=10, choices=GROUPS)
+    is_active = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Counterparty(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    is_active = models.BooleanField(default=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = 'counterparties'
+
+    def __str__(self):
+        return self.name
+
+
 PERSONS = [
     ('kenjayev_jasur', 'Kenjayev Jasur'),
     ('abdullayev_vohid', 'Abdullayev Vohid'),
@@ -56,7 +84,7 @@ class Transaction(models.Model):
     payment_type = models.CharField(max_length=10, choices=PAYMENT_TYPES)
     description = models.TextField()
     operator = models.ForeignKey(User, on_delete=models.CASCADE)
-    counterparty = models.CharField(max_length=255, choices=PERSONS)
+    counterparty = models.CharField(max_length=255)
     report = models.ForeignKey('DailyReport', on_delete=models.CASCADE, null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
 
