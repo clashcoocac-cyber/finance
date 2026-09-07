@@ -7,7 +7,7 @@ from .views.accounts import (
 )
 from .views.accounts import TransactionDeleteView
 from .views.transaction import (
-    TransactionCreateView, ConfirmExpenseView, CloseCashRegister, ConfirmIncomeView,
+    TransactionCreateView, BulkConfirmReportsView, CloseCashRegister,
     ExpensesPageView, IncomesPageView, TransactionList, ChangeStatView
 )
 
@@ -36,9 +36,8 @@ urlpatterns = [
     path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name='transaction_delete'),
     path('transactions/create/', TransactionCreateView.as_view(), name='transaction_create'),
 
-    path('reports/<int:pk>/confirm/', ConfirmExpenseView.as_view(), name='confirm_expense'),
+    path('reports/bulk-confirm/', BulkConfirmReportsView.as_view(), name='bulk_confirm_reports'),
     path('cash-register/close/', CloseCashRegister.as_view(), name='close_cash_register'),
-    path('confirm-income/<int:pk>/', ConfirmIncomeView.as_view(), name='confirm_income'),
 
     path('expenses/', ExpensesPageView.as_view(), name='expenses_list'),
     path('incomes/', IncomesPageView.as_view(), name='incomes_list'),

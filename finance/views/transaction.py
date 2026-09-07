@@ -6,6 +6,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DeleteView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
+from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Sum, Q
@@ -14,6 +15,7 @@ from finance.models import User, Company
 from finance.models import DailyReport, CLICKS
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, Stat
+from finance.views.helpers import preserve_filters
 
 
 class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
@@ -39,14 +41,27 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
-class ConfirmExpenseView(LoginRequiredMixin, BossRequiredMixin, View):
-    success_url = reverse_lazy('home')
+class BulkConfirmReportsView(LoginRequiredMixin, View):
+    success_url_boss = reverse_lazy('boss_dashboard')
+    success_url_cashier = reverse_lazy('cashier_dashboard')
 
-    def post(self, request, pk, *args, **kwargs):
-        report = DailyReport.objects.filter(id=pk).first()
-        report.is_closed = True
-        report.save()
-        return redirect(self.success_url)
+    def post(self, request, *args, **kwargs):
+        role = request.user.role
+        if role == 'boss':
+            allowed_types = ['expense', 'xarajat']
+            success_url = str(self.success_url_boss)
+        elif role == 'cashier':
+            allowed_types = ['income']
+            success_url = str(self.success_url_cashier)
+        else:
+            return HttpResponseForbidden()
+
+        report_ids = request.POST.getlist('report_ids')
+        if report_ids:
+            DailyReport.objects.filter(pk__in=report_ids, type__in=allowed_types).update(is_closed=True)
+            messages.success(request, "Tanlangan hisobotlar tasdiqlandi.")
+
+        return redirect(preserve_filters(request, success_url))
 
 
 class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
@@ -136,20 +151,6 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         report.save()
 
         return redirect(self.success_url + f'?report_date={report_date_str}')
-
-
-class ConfirmIncomeView(LoginRequiredMixin, CashierRequiredMixin, View):
-    success_url = reverse_lazy('cashier_dashboard')
-
-    def post(self, request, pk, *args, **kwargs):
-        report = DailyReport.objects.filter(id=pk).first()
-        if report:
-            report.is_closed = True
-            report.save()
-            messages.success(request, "Kirim tasdiqlandi.")
-        else:
-            messages.error(request, "Kirim topilmadi.")
-        return redirect(self.success_url)
 
 
 class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):

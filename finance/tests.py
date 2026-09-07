@@ -1,4 +1,6 @@
+from decimal import Decimal
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from finance.models import User, Transaction, DailyReport, Category, Counterparty
 
@@ -13,3 +15,50 @@ class DataMigrationBackfillTests(TestCase):
 
     def test_seed_counterparties_exist(self):
         self.assertTrue(Counterparty.objects.filter(name__iexact='Kenjayev Jasur').exists())
+
+
+class BulkConfirmReportsViewTests(TestCase):
+    def setUp(self):
+        self.boss = User.objects.create_user(username='boss_bc', password='pass12345', role='boss')
+        self.cashier = User.objects.create_user(username='cashier_bc', password='pass12345', role='cashier')
+        self.operator = User.objects.create_user(username='operator_bc', password='pass12345', role='operator')
+        today = timezone.now().date()
+        self.expense_report = DailyReport.objects.create(
+            operator=self.operator, type='expense', date=today, category='test', is_closed=False,
+        )
+        self.income_report = DailyReport.objects.create(
+            operator=self.operator, type='income', date=today, is_closed=False,
+        )
+
+    def test_boss_confirms_expense_reports(self):
+        self.client.force_login(self.boss)
+        response = self.client.post(reverse('bulk_confirm_reports'), {'report_ids': [self.expense_report.pk]})
+        self.expense_report.refresh_from_db()
+        self.assertTrue(self.expense_report.is_closed)
+        self.assertEqual(response.status_code, 302)
+
+    def test_boss_cannot_confirm_income_reports(self):
+        self.client.force_login(self.boss)
+        self.client.post(reverse('bulk_confirm_reports'), {'report_ids': [self.income_report.pk]})
+        self.income_report.refresh_from_db()
+        self.assertFalse(self.income_report.is_closed)
+
+    def test_cashier_confirms_income_reports(self):
+        self.client.force_login(self.cashier)
+        self.client.post(reverse('bulk_confirm_reports'), {'report_ids': [self.income_report.pk]})
+        self.income_report.refresh_from_db()
+        self.assertTrue(self.income_report.is_closed)
+
+    def test_operator_forbidden(self):
+        self.client.force_login(self.operator)
+        response = self.client.post(reverse('bulk_confirm_reports'), {'report_ids': [self.income_report.pk]})
+        self.assertEqual(response.status_code, 403)
+
+    def test_redirect_preserves_query_string(self):
+        self.client.force_login(self.cashier)
+        response = self.client.post(reverse('bulk_confirm_reports'), {
+            'report_ids': [self.income_report.pk],
+            'current_qs': 'from=2026-01-01&to=2026-01-31&category=almashdi',
+        })
+        self.assertIn('from=2026-01-01', response.url)
+        self.assertIn('category=almashdi', response.url)
