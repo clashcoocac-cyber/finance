@@ -2,7 +2,7 @@ from datetime import datetime
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
 from django.shortcuts import redirect
-from .models import Company, User, Transaction, DailyReport, CLICKS
+from .models import Company, User, Transaction, DailyReport, CLICKS, Category, Counterparty
 
 
 
@@ -95,17 +95,6 @@ class TransactionFrom(forms.ModelForm):
 
         return transaction
     
-CATEGORIES = {
-    'chikako': 'Chikako zavod',
-    'jasur': 'Jasur un',
-    'ravshan': 'Ravshan $',
-    'almashdi': 'Almashdi',
-    'msbb_xarajat': 'MSSB xarajat',
-    'opt_xarajat': 'OPT xarajat',
-    'sfb_xarajat': 'SFB xarajat',
-    'rasxod_den': 'Rasxod den'
-}
-
 IncomeCHoices = [
     ('almashdi', 'Almashdi'),
     ('vozvrat', 'Vozvrat rasx den'),
@@ -174,7 +163,8 @@ class IncomeForm(forms.ModelForm):
         return transaction
 
 class ExpenseForm(forms.Form):
-    category = forms.CharField(max_length=100)
+    category = forms.ChoiceField(choices=[])
+    new_category = forms.CharField(required=False, max_length=100, label="Yangi kategoriya nomi")
     amount_usd = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
     amount_uzs = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
     amount_rub = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
@@ -184,20 +174,34 @@ class ExpenseForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea, required=False)
     exp_type = forms.CharField()
 
-    class Meta:
-        fields = ['exp_type', 'category', 'amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'description']
-        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        active_categories = Category.objects.filter(is_active=True)
+        self.category_options = [{'name': c.name, 'group': c.group} for c in active_categories]
+        self.fields['category'].choices = (
+            [(c.name, c.name) for c in active_categories] + [('__new__', "+ Yangi qo'shish")]
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        category = cleaned_data.get('category')
+        new_category = (cleaned_data.get('new_category') or '').strip()
+        if category == '__new__':
+            if not new_category:
+                self.add_error('new_category', "Yangi kategoriya nomini kiriting.")
+            else:
+                cleaned_data['category'] = new_category.lower()
+        return cleaned_data
+
     def save(self, commit=True, operator=None, date=None):
-        exp_type = self.cleaned_data.get('exp_type', None)
-        if self.cleaned_data['category'] in CATEGORIES:
-            category = CATEGORIES.get(self.cleaned_data['category'], 'Boshqa xarajatlar').lower()
-            desc = self.cleaned_data.get('description', '')
-        else:
-            category = self.cleaned_data['description']
-            category = category.lower() if category else None
-            desc=None
-        
-        # parse date if provided, otherwise use today
+        exp_type = self.cleaned_data.get('exp_type')
+        category = self.cleaned_data['category']
+        Category.objects.get_or_create(
+            name__iexact=category,
+            defaults={'name': category, 'group': exp_type if exp_type in dict(Category.GROUPS) else 'expense'},
+        )
+        desc = self.cleaned_data.get('description') or None
+
         if date:
             try:
                 parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
@@ -205,27 +209,22 @@ class ExpenseForm(forms.Form):
                 parsed_date = datetime.now().date()
         else:
             parsed_date = datetime.now().date()
-        
+
         report = DailyReport.objects.create(
-            operator=operator,
-            type=exp_type,
-            is_closed=False,
-            category=category,
-            desc=desc,
-            date=parsed_date
+            operator=operator, type=exp_type, is_closed=False,
+            category=category, desc=desc, date=parsed_date,
         )
-        report.total_uzs = self.cleaned_data.get('amount_uzs', 0)
-        report.total_usd = self.cleaned_data.get('amount_usd', 0)
-        report.total_rub = self.cleaned_data.get('amount_rub', 0)
-        report.total_eur = self.cleaned_data.get('amount_eur', 0)
-        # decide detail key: specific click key when payment_type is 'click'
+        report.total_uzs = self.cleaned_data.get('amount_uzs') or 0
+        report.total_usd = self.cleaned_data.get('amount_usd') or 0
+        report.total_rub = self.cleaned_data.get('amount_rub') or 0
+        report.total_eur = self.cleaned_data.get('amount_eur') or 0
+
         payment_type = self.cleaned_data.get('payment_type')
         detail_key = self.cleaned_data.get('click') if payment_type == 'click' else payment_type
-
-        report.uzs_detail = {detail_key: int(self.cleaned_data.get('amount_uzs') or 0)}
-        report.usd_detail = {detail_key: int(self.cleaned_data.get('amount_usd') or 0)}
-        report.rub_detail = {detail_key: int(self.cleaned_data.get('amount_rub') or 0)}
-        report.eur_detail = {detail_key: int(self.cleaned_data.get('amount_eur') or 0)}
+        report.uzs_detail = {detail_key: float(self.cleaned_data.get('amount_uzs') or 0)}
+        report.usd_detail = {detail_key: float(self.cleaned_data.get('amount_usd') or 0)}
+        report.rub_detail = {detail_key: float(self.cleaned_data.get('amount_rub') or 0)}
+        report.eur_detail = {detail_key: float(self.cleaned_data.get('amount_eur') or 0)}
         report.save()
 
         transaction = Transaction.objects.create(
@@ -234,13 +233,12 @@ class ExpenseForm(forms.Form):
             amount_uzs=self.cleaned_data.get('amount_uzs'),
             amount_rub=self.cleaned_data.get('amount_rub'),
             amount_eur=self.cleaned_data.get('amount_eur'),
-            payment_type=self.cleaned_data['payment_type'],
-            click=self.cleaned_data.get('click') if self.cleaned_data.get('payment_type') == 'click' else None,
+            payment_type=payment_type,
+            click=self.cleaned_data.get('click') if payment_type == 'click' else None,
             description=self.cleaned_data['description'],
             operator=operator,
             report=report,
             counterparty=category,
-            date=datetime.combine(parsed_date, datetime.now().time())
+            date=datetime.combine(parsed_date, datetime.now().time()),
         )
-        transaction.save()
         return transaction

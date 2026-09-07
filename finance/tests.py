@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from finance.models import User, Transaction, DailyReport, Category, Counterparty
+from finance.forms import ExpenseForm
 
 
 class DataMigrationBackfillTests(TestCase):
@@ -62,3 +63,33 @@ class BulkConfirmReportsViewTests(TestCase):
         })
         self.assertIn('from=2026-01-01', response.url)
         self.assertIn('category=almashdi', response.url)
+
+
+class ExpenseFormCategoryTests(TestCase):
+    def setUp(self):
+        self.cashier = User.objects.create_user(username='cashier_ef', password='pass12345', role='cashier')
+
+    def test_new_category_persists_for_next_form(self):
+        form = ExpenseForm(data={
+            'category': '__new__', 'new_category': 'Elektr energiya',
+            'amount_uzs': '150000', 'payment_type': 'cash',
+            'description': "Oylik to'lov", 'exp_type': 'expense',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save(operator=self.cashier, date='2026-09-07')
+
+        self.assertTrue(Category.objects.filter(name__iexact='elektr energiya', group='expense').exists())
+
+        next_form = ExpenseForm()
+        choice_values = dict(next_form.fields['category'].choices)
+        self.assertIn('elektr energiya', choice_values)
+
+    def test_existing_category_selection_does_not_duplicate(self):
+        Category.objects.get_or_create(name='chikako zavod', defaults={'group': 'expense'})
+        form = ExpenseForm(data={
+            'category': 'chikako zavod', 'amount_uzs': '10000', 'payment_type': 'cash',
+            'description': '', 'exp_type': 'expense',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save(operator=self.cashier, date='2026-09-07')
+        self.assertEqual(Category.objects.filter(name__iexact='chikako zavod').count(), 1)

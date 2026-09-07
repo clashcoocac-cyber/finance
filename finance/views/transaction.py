@@ -158,15 +158,8 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
     success_url = reverse_lazy('expenses_list')
 
     def get(self, request, *args, **kwargs):
-        context = {}
-        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
-        reposts = DailyReport.objects.filter(type__in=['expense', 'xarajat'], date=report_date).order_by('-date')
-        context['reports'] = reposts
-        context['date'] = report_date
-        context['clicks'] = CLICKS
-        context['clicks_map'] = dict(CLICKS)
-        return render(request, self.template_name, context)
-    
+        return self._render(request)
+
     def post(self, request, *args, **kwargs):
         form = ExpenseForm(request.POST)
         report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
@@ -174,9 +167,20 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
             form.save(operator=request.user, date=report_date)
             messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
             return redirect(self.success_url + f'?date={report_date}')
-        else:
-            print(form.errors)
-        return render(request, self.template_name, {'form': form, 'clicks': CLICKS})
+        messages.error(request, "Formani tekshiring.")
+        return self._render(request, form=form)
+
+    def _render(self, request, form=None):
+        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
+        reports = DailyReport.objects.filter(type__in=['expense', 'xarajat'], date=report_date).order_by('-date')
+        context = {
+            'form': form or ExpenseForm(),
+            'reports': reports,
+            'date': report_date,
+            'clicks': CLICKS,
+            'clicks_map': dict(CLICKS),
+        }
+        return render(request, self.template_name, context)
     
 
 class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
