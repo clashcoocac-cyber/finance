@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from finance.models import User, Transaction, DailyReport, Category, Counterparty
 from finance.forms import ExpenseForm, TransactionFrom
+from finance.views.helpers import compute_money_stats
 
 
 class DataMigrationBackfillTests(TestCase):
@@ -112,3 +113,26 @@ class OperatorCounterpartyFormTests(TestCase):
         next_form = TransactionFrom()
         choice_values = dict(next_form.fields['counterparty'].choices)
         self.assertIn('Yangi Aka', choice_values)
+
+
+class MoneyStatsTests(TestCase):
+    def setUp(self):
+        self.operator = User.objects.create_user(username='op_ms', password='pass12345', role='operator')
+        today = timezone.now().date()
+
+        closed_report = DailyReport.objects.create(operator=self.operator, type='income', date=today, is_closed=True)
+        Transaction.objects.create(
+            type='income', payment_type='cash', amount_uzs=Decimal('100000'),
+            operator=self.operator, counterparty='Test', report=closed_report, date=timezone.now(),
+        )
+
+        open_report = DailyReport.objects.create(operator=self.operator, type='income', date=today, is_closed=False)
+        Transaction.objects.create(
+            type='income', payment_type='cash', amount_uzs=Decimal('40000'),
+            operator=self.operator, counterparty='Test', report=open_report, date=timezone.now(),
+        )
+
+    def test_confirmed_and_pending_are_separated(self):
+        stats = compute_money_stats()
+        self.assertEqual(stats['confirmed']['income'].total_uzs, Decimal('100000'))
+        self.assertEqual(stats['pending']['income']['total_uzs'], Decimal('40000'))

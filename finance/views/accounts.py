@@ -9,11 +9,12 @@ from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
-from finance.models import Counterparty, Stat, StatTypes, User
+from finance.models import Counterparty, User
 from finance.models import DailyReport
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, CLICKS
 from django.db.models import Sum, Q
+from finance.views.helpers import compute_money_stats
 
 
 
@@ -47,62 +48,8 @@ class BossDashboardView(TemplateView):
 
         context['reports'] = reports.order_by('-date')
 
-        # All-time stats (no date filter) - show complete history
-        income_qs = Transaction.objects.filter(
-            type='income',
-            report__is_closed=True,
-            payment_type='cash',
-        )
-        income_stats = income_qs.aggregate(
-            total_usd=Sum('amount_usd'),
-            total_uzs=Sum('amount_uzs'),
-            total_rub=Sum('amount_rub'),
-            total_eur=Sum('amount_eur')
-        )
-        inc_stat, _ = Stat.objects.get_or_create(type=StatTypes.INCOME)
-        inc_stat.total_uzs = (income_stats['total_uzs'] or 0) - inc_stat.default_uzs
-        inc_stat.total_usd = (income_stats['total_usd'] or 0) - inc_stat.default_usd
-        inc_stat.total_rub = (income_stats['total_rub'] or 0) - inc_stat.default_rub
-        inc_stat.total_eur = (income_stats['total_eur'] or 0) - inc_stat.default_eur
-        inc_stat.save()
+        context['stats'] = compute_money_stats()
 
-        expense_qs = Transaction.objects.filter(
-            type='expense',
-            report__is_closed=True,
-            payment_type='cash',
-        )
-        expense_stats = expense_qs.aggregate(
-            total_usd=Sum('amount_usd'),
-            total_uzs=Sum('amount_uzs'),
-            total_rub=Sum('amount_rub'),
-            total_eur=Sum('amount_eur')
-        )
-        expense_stat, _ = Stat.objects.get_or_create(type=StatTypes.EXPENSE)
-        expense_stat.total_uzs = (expense_stats['total_uzs'] or 0) - expense_stat.default_uzs
-        expense_stat.total_usd = (expense_stats['total_usd'] or 0) - expense_stat.default_usd
-        expense_stat.total_rub = (expense_stats['total_rub'] or 0) - expense_stat.default_rub
-        expense_stat.total_eur = (expense_stats['total_eur'] or 0) - expense_stat.default_eur
-        expense_stat.save()
-
-        diff_stats = {
-            'usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
-            'uzs': (income_stats['total_uzs'] or 0) - (expense_stats['total_uzs'] or 0),
-            'rub': (income_stats['total_rub'] or 0) - (expense_stats['total_rub'] or 0),
-            'eur': (income_stats['total_eur'] or 0) - (expense_stats['total_eur'] or 0),
-        }
-        diff_stat, _ = Stat.objects.get_or_create(type=StatTypes.BALANCE)
-        diff_stat.total_uzs = int(diff_stats['uzs']) - diff_stat.default_uzs
-        diff_stat.total_usd = int(diff_stats['usd']) - diff_stat.default_usd
-        diff_stat.total_rub = int(diff_stats['rub']) - diff_stat.default_rub
-        diff_stat.total_eur = int(diff_stats['eur']) - diff_stat.default_eur
-        diff_stat.save()
-
-        context['stats'] = {
-            'income': inc_stat,
-            'expense': expense_stat,
-            'diff': diff_stat
-        }
-        
         return context
 
 
@@ -192,60 +139,7 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             
         context['total'] = result
 
-        income_qs = Transaction.objects.filter(
-            type='income',
-            report__is_closed=True,
-            payment_type='cash',
-        )
-        income_stats = income_qs.aggregate(
-            total_usd=Sum('amount_usd'),
-            total_uzs=Sum('amount_uzs'),
-            total_rub=Sum('amount_rub'),
-            total_eur=Sum('amount_eur')
-        )
-        inc_stat, _ = Stat.objects.get_or_create(type=StatTypes.INCOME)
-        inc_stat.total_uzs = (income_stats['total_uzs'] or 0) - inc_stat.default_uzs
-        inc_stat.total_usd = (income_stats['total_usd'] or 0) - inc_stat.default_usd
-        inc_stat.total_rub = (income_stats['total_rub'] or 0) - inc_stat.default_rub
-        inc_stat.total_eur = (income_stats['total_eur'] or 0) - inc_stat.default_eur
-        inc_stat.save()
-
-        expense_qs = Transaction.objects.filter(
-            type='expense',
-            report__is_closed=True,
-            payment_type='cash',
-        )
-        expense_stats = expense_qs.aggregate(
-            total_usd=Sum('amount_usd'),
-            total_uzs=Sum('amount_uzs'),
-            total_rub=Sum('amount_rub'),
-            total_eur=Sum('amount_eur')
-        )
-        expense_stat, _ = Stat.objects.get_or_create(type=StatTypes.EXPENSE)
-        expense_stat.total_uzs = (expense_stats['total_uzs'] or 0) - expense_stat.default_uzs
-        expense_stat.total_usd = (expense_stats['total_usd'] or 0) - expense_stat.default_usd
-        expense_stat.total_rub = (expense_stats['total_rub'] or 0) - expense_stat.default_rub
-        expense_stat.total_eur = (expense_stats['total_eur'] or 0) - expense_stat.default_eur
-        expense_stat.save()
-
-        diff_stats = {
-            'usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
-            'uzs': (income_stats['total_uzs'] or 0) - (expense_stats['total_uzs'] or 0),
-            'rub': (income_stats['total_rub'] or 0) - (expense_stats['total_rub'] or 0),
-            'eur': (income_stats['total_eur'] or 0) - (expense_stats['total_eur'] or 0),
-        }
-        diff_stat, _ = Stat.objects.get_or_create(type=StatTypes.BALANCE)
-        diff_stat.total_uzs = int(diff_stats['uzs']) - diff_stat.default_uzs
-        diff_stat.total_usd = int(diff_stats['usd']) - diff_stat.default_usd
-        diff_stat.total_rub = int(diff_stats['rub']) - diff_stat.default_rub
-        diff_stat.total_eur = int(diff_stats['eur']) - diff_stat.default_eur
-        diff_stat.save()
-
-        context['stats'] = {
-            'income': inc_stat,
-            'expense': expense_stat,
-            'diff': diff_stat
-        }
+        context['stats'] = compute_money_stats()
         context['clicks'] = CLICKS
         return context
 

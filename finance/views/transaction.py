@@ -15,7 +15,7 @@ from finance.models import User, Company
 from finance.models import DailyReport, CLICKS
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, Stat
-from finance.views.helpers import preserve_filters
+from finance.views.helpers import preserve_filters, raw_confirmed_totals
 
 
 class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
@@ -249,7 +249,6 @@ class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):
 
 
 class ChangeStatView(LoginRequiredMixin, BossRequiredMixin, View):
-    template_name = 'dashboard/boss.html'
     success_url = reverse_lazy('boss_dashboard')
 
     def post(self, request, *args, **kwargs):
@@ -260,47 +259,13 @@ class ChangeStatView(LoginRequiredMixin, BossRequiredMixin, View):
         total_eur = int(request.POST.get('total_eur', 0))
 
         stat, _ = Stat.objects.get_or_create(type=stat_type)
+        raw = raw_confirmed_totals()
+        data = raw[stat_type]
 
-        income_qs = Transaction.objects.filter(
-            type='income',
-            report__is_closed=True,
-            payment_type='cash',
-        )
-        income_stats = income_qs.aggregate(
-            total_usd=Sum('amount_usd'),
-            total_uzs=Sum('amount_uzs'),
-            total_rub=Sum('amount_rub'),
-            total_eur=Sum('amount_eur')
-        )
-
-        expense_qs = Transaction.objects.filter(
-            type='expense',
-            report__is_closed=True,
-            payment_type='cash',
-        )
-        expense_stats = expense_qs.aggregate(
-            total_usd=Sum('amount_usd'),
-            total_uzs=Sum('amount_uzs'),
-            total_rub=Sum('amount_rub'),
-            total_eur=Sum('amount_eur')
-        )
-
-        diff_stats = {
-            'total_uzs': (income_stats['total_uzs'] or 0) - (expense_stats['total_uzs'] or 0),
-            'total_usd': (income_stats['total_usd'] or 0) - (expense_stats['total_usd'] or 0),
-            'total_rub': (income_stats['total_rub'] or 0) - (expense_stats['total_rub'] or 0),
-            'total_eur': (income_stats['total_eur'] or 0) - (expense_stats['total_eur'] or 0),
-        }
-
-        data = {
-            'income': income_stats,
-            'expense': expense_stats,
-            'diff': diff_stats,
-        }
-        stat.default_uzs = (data[stat_type]['total_uzs'] or 0) - total_uzs
-        stat.default_usd = (data[stat_type]['total_usd'] or 0) - total_usd
-        stat.default_rub = (data[stat_type]['total_rub'] or 0) - total_rub
-        stat.default_eur = (data[stat_type]['total_eur'] or 0) - total_eur
+        stat.default_uzs = (data['total_uzs'] or 0) - total_uzs
+        stat.default_usd = (data['total_usd'] or 0) - total_usd
+        stat.default_rub = (data['total_rub'] or 0) - total_rub
+        stat.default_eur = (data['total_eur'] or 0) - total_eur
         stat.save()
 
         return redirect(self.success_url)
