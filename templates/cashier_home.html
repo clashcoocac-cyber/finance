@@ -1,339 +1,280 @@
 {% extends "base.html" %}
 {% load custom_filters %}
-{% block title %}Фойдаланувчилар{% endblock %}
-{% block content %}    
-    <div id="kassirDashboard" class="min-h-screen">
-        <nav class="bg-white shadow-lg border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-wrap justify-between items-center gap-2 py-3">
-            <div class="flex items-center">
-                <h1 class="ml-3 text-xl font-bold text-gray-800">SFBMSSB</h1>
-                        <span class="ms-4 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm" id="operatorCompanyName">
-                    {{ request.user.username }}
-                </span>
-            </div>
-            <div class="flex gap-2 w-full sm:w-auto justify-end">
-                <a href="{% url 'incomes_list' %}"
-                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors w-full sm:w-auto text-sm text-center">
-                    Kirimlar
-                </a>
-                <a href="{% url 'expenses_list' %}"
-                   class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors w-full sm:w-auto text-sm text-center">
-                    Chiqimlar
-                </a>
-                <a href="{% url 'logout' %}"
-                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors w-full text-sm sm:w-auto text-center">
-                    Chiqish
-                </a>
+{% block title %}Kassir Dashboard{% endblock %}
+{% block content %}
+<div id="kassirDashboard" class="min-h-screen">
+    <nav class="border-b" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-between items-center gap-2 py-3">
+                <div class="flex items-center">
+                    <h1 class="ml-3 text-xl font-bold" style="color: var(--color-text);">SFBMSSB</h1>
+                    <span class="ms-4 px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);" id="operatorCompanyName">
+                        {{ request.user.username }}
+                    </span>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto justify-end">
+                    <a href="{% url 'incomes_list' %}" class="px-4 py-2 rounded-lg transition-colors w-full sm:w-auto text-sm text-center font-medium" style="background: var(--color-positive); color: var(--color-brand-foreground);">
+                        Kirimlar
+                    </a>
+                    <a href="{% url 'expenses_list' %}" class="px-4 py-2 rounded-lg transition-colors w-full sm:w-auto text-sm text-center font-medium" style="background: var(--color-pending); color: var(--color-brand-foreground);">
+                        Chiqimlar
+                    </a>
+                    <a href="{% url 'logout' %}" class="px-4 py-2 rounded-lg transition-colors w-full text-sm sm:w-auto text-center font-medium" style="background: var(--color-negative); color: var(--color-brand-foreground);">
+                        Chiqish
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-
-        <div class="max-w-7xl mx-auto p-6" id="invoice">
-                <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8">
-                <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Qoldiq</p>
-                            <div class="space-y-1 mt-2">
-                                <p class="text-lg font-medium text-yellow-600" id="totalBalanceUZS">{{ stats.diff.total_uzs | default:0 | format_currency }} so'm</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceUSD">{{ stats.diff.total_usd | default:0 | format_currency }} $</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceRUB">{{ stats.diff.total_rub | default:0 | format_currency }} ₽</p>
-                                <p class="text-sm font-medium text-yellow-600" id="totalBalanceEUR">{{ stats.diff.total_eur | default:0 | format_currency }} €</p>
-                            </div>
-                        </div>
-                        <div class="text-blue-500 text-3xl">💰</div>
-                    </div>
-                </div>
+    <div class="max-w-7xl mx-auto p-6" id="invoice">
+        <div class="space-y-3 mb-8">
+            <h2 class="text-sm font-semibold" style="color: var(--color-text-muted);">Tasdiqlangan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% include "partials/_stat_card.html" with title="Tasdiqlangan kirim" amounts=stats.confirmed.income status="confirmed" tone="positive" %}
+                {% include "partials/_stat_card.html" with title="Tasdiqlangan chiqim" amounts=stats.confirmed.expense status="confirmed" tone="negative" %}
+                {% include "partials/_stat_card.html" with title="Tasdiqlangan qoldiq" amounts=stats.confirmed.diff status="confirmed" tone="neutral" %}
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8" id="div1">
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click {{ clicks.0.1 }}</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click1.uzs | default:0 | format_currency }} so'm</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click1.usd | default:0 | format_currency }} $</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click1.rub | default:0 | format_currency }} ₽</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click1.eur | default:0 | format_currency }} €</p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">💳</div>
-                    <p class="text-sm text-gray-600">Click {{ clicks.1.1 }}</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-blue-600" id="operatorClickUZS">{{ total.click2.uzs | default:0 | format_currency }} so'm</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickUSD">{{ total.click2.usd | default:0 | format_currency  }} $</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickRUB">{{ total.click2.rub | default:0 | format_currency }} ₽</p>
-                        <p class="text-xs font-semibold text-blue-600" id="operatorClickEUR">{{ total.click2.eur | default:0 | format_currency }} €</p>
-                    </div>
-                </div>
-                <!-- <div class="bg-white rounded-xl shadow-lg p-4 text-center">
-                    <div class="text-2xl mb-2">💵</div>
-                    <p class="text-sm text-gray-600">Naqd</p>
-                    <div class="space-y-1">
-                        <p class="text-sm font-bold text-green-600" id="operatorCashUZS">{{ total.cash.uzs | default:0 | format_currency }} so'm</p>
-                        <p class="text-xs font-semibold text-green-600" id="operatorCashUSD">{{ total.cash.usd | default:0 | format_currency }} $</p>
-                        <p class="text-xs font-semibold text-green-600" id="operatorCashRUB">{{ total.cash.rub | default:0 | format_currency }} ₽</p>
-                        <p class="text-xs font-semibold text-green-600" id="operatorCashEUR">{{ total.cash.eur | default:0 | format_currency }} €</p>
-                    </div>
-                </div> -->
-            </div>
-            
-
-
-
-            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold text-gray-800">Kunlik Hisobotlar</h2>
-
-                </div>
-                <!-- Qidiruv va filterlar -->
-    <div class="space-y-4">
-        <!-- Qidiruv input -->
-        
-
-        <!-- Filterlar -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 my-6 mt-5 justify-">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Boshlanish sanasi</label>
-                <input type="date" value="{{from}}" id="filterStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tugash sanasi</label>
-                <input type="date" value="{{to}}"  id="filterEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-            </div>
-        <div class="md:col-span-2 justify-end">
-                            <label class="block text-sm font-medium text-gray-700 mb-1"> Qidiruv</label>
-
-            <input 
-                type="text" 
-                id="filterSearch" 
-                value="{{ q | default:"" }}" 
-                placeholder="Tavsif yoki operator..." 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-            >
         </div>
-        <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">.</label>
 
-            <button
-                id="applyFiltersButton" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                onclick="applyTransactionFilters()"
-            > 
-                Filtrlarni qo'llash
-        </button>
+        <div class="space-y-3 mb-8">
+            <h2 class="text-sm font-semibold" style="color: var(--color-text-muted);">Kutilmoqda</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {% include "partials/_stat_card.html" with title="Kutilayotgan kirim" amounts=stats.pending.income status="pending" tone="positive" %}
+                {% include "partials/_stat_card.html" with title="Kutilayotgan chiqim" amounts=stats.pending.expense status="pending" tone="negative" %}
+                {% include "partials/_stat_card.html" with title="Kutilayotgan qoldiq" amounts=stats.pending.diff status="pending" tone="neutral" %}
+            </div>
         </div>
-        </div>
-    </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Sana</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya / Kategoriya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Naqd</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Click {{ clicks.0.1 }}</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Click {{ clicks.1.1 }}</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Terminal</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Bank</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Umumiy</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="kassirReportsTable" class="divide-y divide-gray-200">
-                            {% for report in reports %}
-                            <tr>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div class="">{{ report.date | date:"d/m" }}</div>
-                            <div class="">{{ report.date | date:"Y" }}</div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1">
-                            <div>{{ report.operator.username }}</div>
-                            {% if report.operator_shift %}
-                            <div class="text-xs text-gray-500">{{ report.operator_shift }}-smena</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        {% if report.category %}
-                            {{ report.category}}
-                        {% else %}
-                            {{ report.operator.company.name }}
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1 text-green-600 font-medium">
-                            {% if report.uzs_detail.cash > 0 %}
-                            <div class="">{{ report.uzs_detail.cash | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if report.usd_detail.cash > 0 %}
-                            <div class="">{{ report.usd_detail.cash | format_currency }} $</div>
-                            {% endif %}
-                            {% if report.rub_detail.cash > 0 %}
-                            <div class="">{{ report.rub_detail.cash | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if report.eur_detail.cash > 0 %}
-                            <div class="">{{ report.eur_detail.cash | format_currency }} €</div>
-                            {% endif %}
-                            <div class="text-xs text-gray-500">
-                                {% if report.comment %}
-                                <span class="italic">{{ report.comment }}</span>
-                                {% endif %}
-                            </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1 text-green-600 font-medium">
-                            {% if report.uzs_detail.click1 > 0 %}
-                            <div class="">{{ report.uzs_detail.click1 | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if report.usd_detail.click1 > 0 %}
-                            <div class="">{{ report.usd_detail.click1 | format_currency }} $</div>
-                            {% endif %}
-                            {% if report.rub_detail.click1 > 0 %}
-                            <div class="">{{ report.rub_detail.click1 | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if report.eur_detail.click1 > 0 %}
-                            <div class="">{{ report.eur_detail.click1 | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1 text-green-600 font-medium">
-                            {% if report.uzs_detail.click2 > 0 %}
-                            <div class="">{{ report.uzs_detail.click2 | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if report.usd_detail.click2 > 0 %}
-                            <div class="">{{ report.usd_detail.click2 | format_currency }} $</div>
-                            {% endif %}
-                            {% if report.rub_detail.click2 > 0 %}
-                            <div class="">{{ report.rub_detail.click2 | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if report.eur_detail.click2 > 0 %}
-                            <div class="">{{ report.eur_detail.click2 | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1 text-green-600 font-medium">
-                            {% if report.uzs_detail.terminal > 0 %}
-                            <div class="">{{ report.uzs_detail.terminal | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if report.usd_detail.terminal > 0 %}
-                            <div class="">{{ report.usd_detail.terminal | format_currency }} $</div>
-                            {% endif %}
-                            {% if report.rub_detail.terminal > 0 %}
-                            <div class="">{{ report.rub_detail.terminal | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if report.eur_detail.terminal > 0 %}
-                            <div class="">{{ report.eur_detail.terminal | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1 text-green-600 font-medium">
-                            {% if report.uzs_detail.bank > 0 %}
-                            <div class="">{{ report.uzs_detail.bank | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if report.usd_detail.bank > 0 %}
-                            <div class="">{{ report.usd_detail.bank | format_currency }} $</div>
-                            {% endif %}
-                            {% if report.rub_detail.bank > 0 %}
-                            <div class="">{{ report.rub_detail.bank | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if report.eur_detail.bank > 0 %}
-                            <div class="">{{ report.eur_detail.bank | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        <div class="space-y-1 text-green-600 font-semibold">
-                            {% if report.total_uzs %}
-                            <div class="">{{ report.total_uzs | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if report.total_usd %}
-                            <div class="">{{ report.total_usd | format_currency }} $</div>
-                            {% endif %}
-                            {% if report.total_rub %}
-                            <div class="">{{ report.total_rub | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if report.total_eur %}
-                            <div class="">{{ report.total_eur | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm">
-                        {% if report.is_closed %}
-                        <span class="text-green-600 text-xs">✓ Tasdiqlangan</span>
-                        {% else %}
-                        <form action="{% url 'confirm_income' report.pk %}" method="POST" >
-                            {% csrf_token %}
-                        <button type="submit" onclick="return confirm('Rostan ham tasdiqlamoqchimisiz?')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                Tasdiqlash
-                            </button>
-                        </form>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-</tbody>
-                    </table>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
+                <div class="text-2xl mb-2">💳</div>
+                <p class="text-sm" style="color: var(--color-text-muted);">Click {{ clicks.0.1 }}</p>
+                <div class="space-y-1 money" style="color: var(--color-positive);">
+                    <p class="text-sm font-bold">{{ total.click1.uzs | default:0 | format_currency }} so'm</p>
+                    <p class="text-xs font-semibold">{{ total.click1.usd | default:0 | format_currency }} $</p>
+                    <p class="text-xs font-semibold">{{ total.click1.rub | default:0 | format_currency }} ₽</p>
+                    <p class="text-xs font-semibold">{{ total.click1.eur | default:0 | format_currency }} €</p>
                 </div>
             </div>
+            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
+                <div class="text-2xl mb-2">💳</div>
+                <p class="text-sm" style="color: var(--color-text-muted);">Click {{ clicks.1.1 }}</p>
+                <div class="space-y-1 money" style="color: var(--color-positive);">
+                    <p class="text-sm font-bold">{{ total.click2.uzs | default:0 | format_currency }} so'm</p>
+                    <p class="text-xs font-semibold">{{ total.click2.usd | default:0 | format_currency }} $</p>
+                    <p class="text-xs font-semibold">{{ total.click2.rub | default:0 | format_currency }} ₽</p>
+                    <p class="text-xs font-semibold">{{ total.click2.eur | default:0 | format_currency }} €</p>
+                </div>
+            </div>
+            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
+                <div class="text-2xl mb-2">💵</div>
+                <p class="text-sm" style="color: var(--color-text-muted);">Naqd</p>
+                <div class="space-y-1 money" style="color: var(--color-positive);">
+                    <p class="text-sm font-bold">{{ total.cash.uzs | default:0 | format_currency }} so'm</p>
+                    <p class="text-xs font-semibold">{{ total.cash.usd | default:0 | format_currency }} $</p>
+                    <p class="text-xs font-semibold">{{ total.cash.rub | default:0 | format_currency }} ₽</p>
+                    <p class="text-xs font-semibold">{{ total.cash.eur | default:0 | format_currency }} €</p>
+                </div>
+            </div>
+        </div>
 
-            <div class="flex justify-center">
-                <button onclick="generatePDF()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+        <div class="rounded-xl shadow-lg p-6 space-y-6" style="background: var(--color-surface);">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold" style="color: var(--color-text);">Kunlik Hisobotlar</h2>
+                <button onclick="generatePDF()" class="px-6 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                     📊 Kunlik Hisobot Yuklab Olish
                 </button>
             </div>
+
+            {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options %}
+
+            <form method="post" action="{% url 'bulk_confirm_reports' %}" x-data="bulkSelect()" class="space-y-3">
+                {% csrf_token %}
+                <input type="hidden" name="current_qs" value="{{ request.GET.urlencode }}">
+                {% include "partials/_bulk_action_bar.html" %}
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead style="background: var(--color-surface-muted);">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">
+                                    <input type="checkbox" x-model="allSelected" @change="toggleAll($event)">
+                                </th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Sana</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Username</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Kompaniya</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Naqd</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Click {{ clicks.0.1 }}</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Click {{ clicks.1.1 }}</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Terminal</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Bank</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Umumiy</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Holat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kassirReportsTable" class="divide-y" style="border-color: var(--color-border);">
+                            {% for report in reports %}
+                            <tr>
+                                <td class="px-4 py-3 text-sm">
+                                    {% if not report.is_closed %}
+                                    <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected">
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                    <div class="space-y-1">
+                                        <div>{{ report.date | date:"d/m" }}</div>
+                                        <div>{{ report.date | date:"Y" }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                    <div class="space-y-1">
+                                        <div>{{ report.operator.username }}</div>
+                                        {% if report.operator_shift %}
+                                        <div class="text-xs" style="color: var(--color-text-muted);">{{ report.operator_shift }}-smena</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                    {{ report.operator.company.name }}
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
+                                        {% if report.uzs_detail.cash > 0 %}
+                                        <div>{{ report.uzs_detail.cash | format_currency }} so'm</div>
+                                        {% endif %}
+                                        {% if report.usd_detail.cash > 0 %}
+                                        <div>{{ report.usd_detail.cash | format_currency }} $</div>
+                                        {% endif %}
+                                        {% if report.rub_detail.cash > 0 %}
+                                        <div>{{ report.rub_detail.cash | format_currency }} ₽</div>
+                                        {% endif %}
+                                        {% if report.eur_detail.cash > 0 %}
+                                        <div>{{ report.eur_detail.cash | format_currency }} €</div>
+                                        {% endif %}
+                                        {% if report.comment %}
+                                        <div class="text-xs italic" style="color: var(--color-text-muted);">{{ report.comment }}</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
+                                        {% if report.uzs_detail.click1 > 0 %}
+                                        <div>{{ report.uzs_detail.click1 | format_currency }} so'm</div>
+                                        {% endif %}
+                                        {% if report.usd_detail.click1 > 0 %}
+                                        <div>{{ report.usd_detail.click1 | format_currency }} $</div>
+                                        {% endif %}
+                                        {% if report.rub_detail.click1 > 0 %}
+                                        <div>{{ report.rub_detail.click1 | format_currency }} ₽</div>
+                                        {% endif %}
+                                        {% if report.eur_detail.click1 > 0 %}
+                                        <div>{{ report.eur_detail.click1 | format_currency }} €</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
+                                        {% if report.uzs_detail.click2 > 0 %}
+                                        <div>{{ report.uzs_detail.click2 | format_currency }} so'm</div>
+                                        {% endif %}
+                                        {% if report.usd_detail.click2 > 0 %}
+                                        <div>{{ report.usd_detail.click2 | format_currency }} $</div>
+                                        {% endif %}
+                                        {% if report.rub_detail.click2 > 0 %}
+                                        <div>{{ report.rub_detail.click2 | format_currency }} ₽</div>
+                                        {% endif %}
+                                        {% if report.eur_detail.click2 > 0 %}
+                                        <div>{{ report.eur_detail.click2 | format_currency }} €</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
+                                        {% if report.uzs_detail.terminal > 0 %}
+                                        <div>{{ report.uzs_detail.terminal | format_currency }} so'm</div>
+                                        {% endif %}
+                                        {% if report.usd_detail.terminal > 0 %}
+                                        <div>{{ report.usd_detail.terminal | format_currency }} $</div>
+                                        {% endif %}
+                                        {% if report.rub_detail.terminal > 0 %}
+                                        <div>{{ report.rub_detail.terminal | format_currency }} ₽</div>
+                                        {% endif %}
+                                        {% if report.eur_detail.terminal > 0 %}
+                                        <div>{{ report.eur_detail.terminal | format_currency }} €</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
+                                        {% if report.uzs_detail.bank > 0 %}
+                                        <div>{{ report.uzs_detail.bank | format_currency }} so'm</div>
+                                        {% endif %}
+                                        {% if report.usd_detail.bank > 0 %}
+                                        <div>{{ report.usd_detail.bank | format_currency }} $</div>
+                                        {% endif %}
+                                        {% if report.rub_detail.bank > 0 %}
+                                        <div>{{ report.rub_detail.bank | format_currency }} ₽</div>
+                                        {% endif %}
+                                        {% if report.eur_detail.bank > 0 %}
+                                        <div>{{ report.eur_detail.bank | format_currency }} €</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    <div class="space-y-1 font-semibold money" style="color: var(--color-positive);">
+                                        {% if report.total_uzs %}
+                                        <div>{{ report.total_uzs | format_currency }} so'm</div>
+                                        {% endif %}
+                                        {% if report.total_usd %}
+                                        <div>{{ report.total_usd | format_currency }} $</div>
+                                        {% endif %}
+                                        {% if report.total_rub %}
+                                        <div>{{ report.total_rub | format_currency }} ₽</div>
+                                        {% endif %}
+                                        {% if report.total_eur %}
+                                        <div>{{ report.total_eur | format_currency }} €</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm">
+                                    {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
 
 <script>
     function generatePDF() {
-    const element = document.getElementById("invoice");
+        const element = document.getElementById("invoice");
 
-    const opt = {
-        margin:       0,
-        filename:     'document.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  {
-            scale: 2,
-            useCORS: true, // agar rasm bo'lsa
-            logging: true,
-            scrollY: 0, // skrollni hisobga olmasin
-            windowWidth: document.body.scrollWidth,
-            windowHeight: document.body.scrollHeight,
-        },
-        jsPDF:        {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'landscape' // <-- bu albom ko‘rinish uchun
-        }
-    };
+        const opt = {
+            margin:       0,
+            filename:     'document.pdf',
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas:  {
+                scale: 2,
+                useCORS: true, // agar rasm bo'lsa
+                logging: true,
+                scrollY: 0, // skrollni hisobga olmasin
+                windowWidth: document.body.scrollWidth,
+                windowHeight: document.body.scrollHeight,
+            },
+            jsPDF:        {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'landscape' // <-- bu albom ko'rinish uchun
+            }
+        };
 
-    html2pdf().set(opt).from(element).save();
-}
-       function applyTransactionFilters() {
-    const from = document.getElementById('filterStartDate').value;
-    const to = document.getElementById('filterEndDate').value;
-    const q = document.getElementById('filterSearch').value;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('from', from);
-    urlParams.set('to', to);
-    urlParams.set('q', q);
-
-    window.location.search = urlParams.toString();
-}
+        html2pdf().set(opt).from(element).save();
+    }
 </script>
 {% endblock %}
