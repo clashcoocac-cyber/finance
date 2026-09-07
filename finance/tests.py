@@ -192,3 +192,14 @@ class DeleteViewsRequirePostTests(TestCase):
         self.client.force_login(self.boss)
         self.client.post(reverse('user_delete', args=[self.other_boss.pk]))
         self.assertTrue(User.objects.filter(pk=self.other_boss.pk).exists())
+
+
+class LoginViewErrorRenderingTests(TestCase):
+    def test_bad_credentials_show_visible_error(self):
+        response = self.client.post(reverse('login'), {
+            'username': 'nonexistent_user',
+            'password': 'wrongpass',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['form'].errors)
+        self.assertContains(response, 'Iltimos, to')
