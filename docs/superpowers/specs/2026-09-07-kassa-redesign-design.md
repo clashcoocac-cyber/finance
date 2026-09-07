@@ -24,7 +24,9 @@ Tashqarida: autentifikatsiya mexanizmi (Django auth saqlanadi), `Stat.default_*`
 
 ```python
 class Category(models.Model):
+    GROUPS = [('expense', 'Chiqim'), ('xarajat', 'Xarajat')]
     name = models.CharField(max_length=100, unique=True)
+    group = models.CharField(max_length=10, choices=GROUPS)
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -56,10 +58,12 @@ Forma validatsiyasida: foydalanuvchi "Boshqa" tanlab erkin matn kiritsa →
 ## 4. Funksional talablar (7 ta)
 
 ### 4.1 Kassir: chiqim kategoriyasi eslab qolinadi
-`ExpenseForm.category` — hozirgi `CharField` → `ChoiceField` (DB'dagi `Category.objects.filter(is_active=True)` + `('other', 'Boshqa')`), qo'shimcha matn maydoni faqat "Boshqa" tanlanganda ko'rinadi (Alpine `x-show`). Saqlashda §3.2 oqimi ishlaydi.
+`ExpenseForm.category` — hozirgi `CharField` → `ChoiceField` (DB'dagi `Category.objects.filter(is_active=True)` + `('__new__', '+ Yangi qo'shish')`). UX aniq talab: foydalanuvchi avval mavjud kategoriyalar select'ini ko'radi (u "Boshqa" deb yozmaydi); select tagida/yonida "+" tugma bor — bosilsa select yashirinib text input ko'rinadi (Alpine `x-show`, ikkalasi bir vaqtda emas), matn kiritib saqlaydi. Saqlashda §3.2 oqimi ishlaydi (`get_or_create`), yangi kategoriya select ro'yxatiga navbatdagi so'rovda avtomatik qo'shiladi. `'__new__'` maxsus qiymat forma validatsiyasida "matn maydoni to'ldirilishi shart" qoidasini triggerlaydi.
+
+**Muhim tafsilot (kod tekshiruvida topildi):** hozirgi `expenses_page.html`da kategoriya ro'yxati ikkita mustaqil to'plamga bo'lingan — "Chiqim" (`exp_type='expense'`: chikako/jasur/ravshan/almashdi/rasxod_den) va "Xarajat" (`exp_type='xarajat'`: mssb/opt/sfb xarajat), JS orqali `exp_type` tanlanganda select qayta to'ldiriladi. Shuning uchun `Category.group` maydoni qo'shiladi (`expense`/`xarajat`), yangi select ham shu ikki guruhni Alpine bilan filtrlaydi (server `category` ChoiceField barcha faol kategoriyalarni group bilan birga beradi, shablon `exp_type`ga qarab ko'rsatadi/yashiradi — eski `changeCategories()` JS funksiyasi shu bilan almashadi).
 
 ### 4.2 Operator: "kimdan oldi" xuddi shunday
-`TransactionFrom.counterparty` / `IncomeForm.counterparty` (typo tuzatilgandan keyin) xuddi 4.1 kabi — `Counterparty` DB ro'yxatidan + "Boshqa".
+`TransactionFrom.counterparty` / `IncomeForm.counterparty` (typo tuzatilgandan keyin) xuddi 4.1 kabi — `Counterparty` DB ro'yxatidan select + "+" tugma → text input almashinuvi.
 
 ### 4.3 Kassa yopilmasa ham stats ko'rinishi (boss + kassir)
 `BossDashboardView` va `ChiefCashierDashboardView.get_context_data`: statistika hisoblash ikkiga bo'linadi —
@@ -69,7 +73,7 @@ Forma validatsiyasida: foydalanuvchi "Boshqa" tanlab erkin matn kiritsa →
 Ikkalasi ham kirim / chiqim / foyda(diff) uchun alohida hisoblanadi va shablonda ikki xil stat-card guruhida (rang/badge bilan farqlanib) ko'rsatiladi.
 
 ### 4.4 Checkbox bilan tasdiqlash (hammasida)
-- `ConfirmExpenseView` (bitta pk) va `ConfirmIncomeView` (bitta pk) o'rniga: bitta `BulkConfirmReportsView(LoginRequiredMixin, View)` — POST bilan `report_ids` (checkbox `name="report_ids"` qiymatlar ro'yxati) qabul qiladi. Ruxsat: `request.user.role` `boss` yoki `cashier` bo'lishi kerak (ikkalasi ham shu view'ni chaqiradi, alohida subclass shart emas); queryset shu rolga tegishli report turlariga cheklanadi (boss — hammasi, cashier — faqat `type='income'`), boshqa rol 403.
+- `ConfirmExpenseView` (bitta pk) va `ConfirmIncomeView` (bitta pk) o'rniga: bitta `BulkConfirmReportsView(LoginRequiredMixin, View)` — POST bilan `report_ids` (checkbox `name="report_ids"` qiymatlar ro'yxati) qabul qiladi. Ruxsat: `request.user.role` `boss` yoki `cashier` bo'lishi kerak (ikkalasi ham shu view'ni chaqiradi, alohida subclass shart emas); queryset shu rolga tegishli report turlariga cheklanadi — bu mavjud biznes bo'linishga mos: boss faqat `type in ('expense', 'xarajat')` report'larni tasdiqlaydi (hozirgi `ConfirmExpenseView` xatti-harakati), cashier faqat `type='income'` (hozirgi `ConfirmIncomeView`). Boshqa rol yoki mos kelmagan report turi 403/e'tiborsiz qoldiriladi.
 - Shablonda: har qator checkbox, jadval tepasida "Hammasini belgilash" checkbox + tanlangan sonini ko'rsatuvchi bulk-action bar (Alpine `x-data`), pastda "Tasdiqlash" tugmasi (faqat kamida 1ta belgilanganda faol).
 
 ### 4.5 Kuchli filter — bir nechta kategoriya
