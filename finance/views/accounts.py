@@ -350,10 +350,7 @@ class TransactionDeleteView(BossRequiredMixin, View):
             report.total_uzs = (report.total_uzs or Decimal('0')) - uzs
             report.total_rub = (report.total_rub or Decimal('0')) - rub
             # note: model has total_uer field name typo in places; use what's on model
-            try:
-                report.total_eur = (getattr(report, 'total_eur', Decimal('0')) or Decimal('0')) - eur
-            except Exception:
-                report.total_eur = (getattr(report, 'total_eur', Decimal('0')) or Decimal('0')) - eur
+            report.total_eur = (getattr(report, 'total_eur', Decimal('0')) or Decimal('0')) - eur
 
             key = transaction.click if transaction.payment_type == 'click' else transaction.payment_type
 
