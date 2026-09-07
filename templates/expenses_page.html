@@ -1,126 +1,159 @@
 {% extends "base.html" %}
 {% load custom_filters %}
-{% block title %}Фойдаланувчилар{% endblock %}
-{% block content %}  
+{% block title %}Chiqimlar Boshqaruvi{% endblock %}
+{% block content %}
 <div id="expensesPage" class="min-h-screen">
-        <nav class="bg-white shadow-lg border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <span class="text-2xl">💸</span>
-                        <h1 class="ml-3 text-xl font-bold text-gray-800">Chiqimlar Boshqaruvi</h1>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <a href="{% url 'home' %}" class="text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
-                            ← Orqaga
-                        </a>
-                        <a href="{% url 'logout' %}" class="text-sm bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            Chiqish
-                        </a>
-                    </div>
+    <nav class="border-b" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap justify-between items-center gap-2 py-3">
+                <div class="flex items-center">
+                    <span class="text-2xl">💸</span>
+                    <h1 class="ml-3 text-xl font-bold" style="color: var(--color-text);">Chiqimlar Boshqaruvi</h1>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto justify-end">
+                    <a href="{% url 'cashier_dashboard' %}" class="px-4 py-2 rounded-lg transition-colors text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                        ← Orqaga
+                    </a>
+                    <a href="{% url 'logout' %}" class="px-4 py-2 rounded-lg transition-colors text-sm font-medium" style="background: var(--color-negative); color: var(--color-brand-foreground);">
+                        Chiqish
+                    </a>
                 </div>
             </div>
-        </nav>
+        </div>
+    </nav>
 
-        <div class="max-w-7xl mx-auto p-6">
-            <!-- Add Expense Form -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Chiqim Qo'shish</h2>
-                    <form action="{% url 'expenses_list' %}?date={{ date }}" method="POST" class="space-y-4">
-                        {% csrf_token %}
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">To'lov maqsadi</label>
-                            <select required id="reason" onchange="changeCategories()" name="exp_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Maqsadni tanlang</option>
-                                <option value="expense">Chiqim</option>
-                                <option value="xarajat">Xarajat</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Kategoriya</label>
-                            <select name="category" id="expenseCategory" onchange="toggleCustomDescription()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Kategoriya tanlang</option>
-                            </select>
-                        </div>
-                        
-                        <div id="customDescriptionDiv" class="hidden">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tavsif</label>
-                            <input type="text" name="description" id="customDescription" placeholder="Chiqim tavsifini kiriting..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">So'm</label>
-                                <input type="number" step="1" name="amount_uzs" id="expenseAmountUZS" placeholder="So'm miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Dollar</label>
-                                <input type="number" step="1" name="amount_usd" id="expenseAmountUSD" placeholder="Dollar miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Rubl</label>
-                                <input type="number" step="1" name="amount_rub" id="expenseAmountRUB" placeholder="Rubl miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Yevro</label>
-                                <input type="number" step="1" name="amount_eur" id="expenseAmountEUR" placeholder="Yevro miqdori" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">To'lov turi</label>
-                            <select required name="payment_type" id="expensePaymentType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            onchange="toggleCustomDescription()">
-                                <option value="">To'lov turini tanlang</option>
-                                <option value="click">Click</option>
-                                <option value="cash">Naqd</option>
-                                <option value="terminal">Terminal</option>
-                                <option value="bank">Bank</option>
-                            </select>
-                        </div>
-                        <div id="expenseClick" class="hidden">
-                            <label class="block text-sm font-medium text-green-500 mb-2">Click kartani tanlang</label>
-                            <select name="click" id="expenseClickSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">---</option>
-                                {% for click in clicks %}
-                                    <option value="{{ click.0 }}">{{ click.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <button onclick="addExpense()" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                            💸 Chiqim Qo'shish
-                        </button>
-                    </form>
+    <div class="max-w-7xl mx-auto p-6">
+        {{ form.category_options|json_script:"category-options-data" }}
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="rounded-xl shadow-lg p-6" style="background: var(--color-surface);">
+                <h2 class="text-xl font-bold mb-4" style="color: var(--color-text);">Chiqim Qo'shish</h2>
+                {% if form.errors %}
+                <div class="django-errors rounded-lg p-4 mb-6 fade-in border" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
+                    <h3 class="text-sm font-medium mb-2" style="color: var(--color-negative);">Quyidagi xatolarni tuzating:</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-sm" style="color: var(--color-negative);">
+                        {% for field, errors in form.errors.items %}
+                        <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
+                {% endif %}
+                <form action="{% url 'expenses_list' %}?date={{ date }}" method="POST" class="space-y-4"
+                    x-data="{
+                        expType: '{{ form.exp_type.value|default_if_none:'' }}',
+                        categoryValue: '{{ form.category.value|default_if_none:'' }}',
+                        categoryMode: '{{ form.category.value|default_if_none:'' }}' === '__new__' ? 'new' : 'select',
+                        paymentType: '{{ form.payment_type.value|default_if_none:'' }}',
+                        categoryOptions: [],
+                    }"
+                    x-init="categoryOptions = JSON.parse(document.getElementById('category-options-data').textContent)">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">To'lov maqsadi</label>
+                        <select required x-model="expType" name="exp_type"
+                            @change="categoryValue = ''; categoryMode = 'select'"
+                            class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <option value="">Maqsadni tanlang</option>
+                            <option value="expense">Chiqim</option>
+                            <option value="xarajat">Xarajat</option>
+                        </select>
+                    </div>
 
-                <!-- Today's Expenses Summary -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-800">Kunlik Chiqimlar</h2>
-                        <div class="flex items-center space-x-3">
-                            <div class="flex items-center space-x-2">
-                                <label class="text-sm font-medium text-gray-700">Kun tanlang:</label>
-<input value="{{ date }}" type="date" id="selectedDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" onchange="window.location.href = `?date=${this.value}`">                            </div>
-                            <a href="{% url 'expenses_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">
-                                📅 Bugun
-                            </a>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Kategoriya</label>
+                        <select name="category" x-ref="categorySelect" x-show="categoryMode === 'select'"
+                            @change="categoryValue = $event.target.value; categoryMode = categoryValue === '__new__' ? 'new' : 'select'"
+                            class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <option value="" :selected="categoryValue === ''">Kategoriya tanlang</option>
+                            <template x-for="opt in categoryOptions.filter(o => o.group === expType)" :key="opt.name">
+                                <option :value="opt.name" x-text="opt.name" :selected="opt.name === categoryValue"></option>
+                            </template>
+                            <option value="__new__" :selected="categoryValue === '__new__'">+ Yangi qo'shish</option>
+                        </select>
+                        <div x-show="categoryMode === 'new'" class="flex gap-2">
+                            <input type="text" name="new_category" value="{{ form.new_category.value|default_if_none:'' }}"
+                                placeholder="Yangi kategoriya nomi" class="flex-1 px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <button type="button" @click="categoryMode = 'select'; categoryValue = ''"
+                                class="px-3 py-2 border rounded-lg text-sm whitespace-nowrap" style="border-color: var(--color-border);">
+                                Ro'yxatdan tanlash
+                            </button>
                         </div>
                     </div>
-                    
-                    <div class="space-y-3 max-h-96 overflow-y-auto" id="todayExpenses">
-                        {% for report in reports %}
-                        <div class="bg-gray-50 rounded-lg p-4 slide-in">
-                    <div class="flex justify-between items-center">
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Tavsif</label>
+                        <textarea name="description" placeholder="Chiqim tavsifini kiriting..." rows="2"
+                            class="w-full px-4 py-3 border rounded-lg text-sm resize-none" style="border-color: var(--color-border);">{{ form.description.value|default_if_none:'' }}</textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <p class="font-medium text-gray-800">{{ report.category }}</p>
-                            <p class="text-sm text-gray-600">{{ report.date | date:"d/m/Y" }}</p>
-                            {% if report.uzs_detail %}
-                                <p class="text-sm text-gray-700 mt-2">
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">So'm</label>
+                            <input type="number" step="1" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Dollar</label>
+                            <input type="number" step="1" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Rubl</label>
+                            <input type="number" step="1" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">Yevro</label>
+                            <input type="number" step="1" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text);">To'lov turi</label>
+                        <select required x-model="paymentType" name="payment_type" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <option value="">To'lov turini tanlang</option>
+                            <option value="click">Click</option>
+                            <option value="cash">Naqd</option>
+                            <option value="terminal">Terminal</option>
+                            <option value="bank">Bank</option>
+                        </select>
+                    </div>
+                    <div x-show="paymentType === 'click'" x-cloak>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-positive);">Click kartani tanlang</label>
+                        <select name="click" :required="paymentType === 'click'" class="w-full px-4 py-3 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                            <option value="">---</option>
+                            {% for click in clicks %}
+                            <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-6 rounded-lg font-medium transition-colors" style="background: var(--color-negative); color: var(--color-brand-foreground);">
+                        💸 Chiqim Qo'shish
+                    </button>
+                </form>
+            </div>
+
+            <!-- Today's Expenses Summary -->
+            <div class="rounded-xl shadow-lg p-6" style="background: var(--color-surface);">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold" style="color: var(--color-text);">Kunlik Chiqimlar</h2>
+                    <div class="flex items-center space-x-3">
+                        <input value="{{ date }}" type="date" class="px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);" onchange="window.location.href = `?date=${this.value}`">
+                        <a href="{% url 'expenses_list' %}" class="px-3 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                            📅 Bugun
+                        </a>
+                    </div>
+                </div>
+
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                    {% for report in reports %}
+                    <div class="rounded-lg p-4 fade-in" style="background: var(--color-surface-muted);">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-medium" style="color: var(--color-text);">{{ report.category }}</p>
+                                <p class="text-sm" style="color: var(--color-text-muted);">{{ report.date | date:"d/m/Y" }}</p>
+                                {% if report.uzs_detail %}
+                                <p class="text-sm mt-2" style="color: var(--color-text);">
                                     {% for key, val in report.uzs_detail.items %}
                                         {% if key == "click1" %}
                                             To'lov turi: <span class="font-semibold">Click (SFB)</span>
@@ -131,122 +164,27 @@
                                         {% endif %}
                                     {% endfor %}
                                 </p>
-                            {% endif %}
-                            {% if not report.is_closed %}
-                            <p class="text-sm text-yellow-600">
-                                Kutilmoqda
-                            </p>
-                            {% else %}
-                            <p class="text-sm text-green-600">
-                                Tasdiqlangan
-                            </p>
-                            {% endif %}
-                        </div>
-                        <div class="text-right">
-                            {% if report.total_uzs %}
-                            <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_uzs | format_currency }} so'm</p>
+                                {% endif %}
+                                <div class="mt-2">
+                                    {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                                </div>
                             </div>
-                            {% endif %}
-                            {% if report.total_usd %}
-                            <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_usd | format_currency }} $</p>
+                            <div class="text-right space-y-1 money font-medium" style="color: var(--color-negative);">
+                                {% if report.total_uzs %}<p>{{ report.total_uzs | format_currency }} so'm</p>{% endif %}
+                                {% if report.total_usd %}<p>{{ report.total_usd | format_currency }} $</p>{% endif %}
+                                {% if report.total_rub %}<p>{{ report.total_rub | format_currency }} ₽</p>{% endif %}
+                                {% if report.total_eur %}<p>{{ report.total_eur | format_currency }} €</p>{% endif %}
                             </div>
-                            {% endif %}
-                            {% if report.total_rub %}
-                            <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_rub | format_currency }} ₽</p>
-                            </div>
-                            {% endif %}
-                            {% if report.total_eur %}
-                            <div class="space-y-1">
-                                <p class="font-medium text-red-600">{{ report.total_eur | format_currency }} €</p>
-                            </div>
-                            {% endif %}
-                            
                         </div>
                     </div>
-                </div>
-                {% endfor %}
-                
-            </div>
+                    {% endfor %}
                 </div>
             </div>
-
         </div>
     </div>
+</div>
 
-    <script>
-        function toggleCustomDescription() {
-            const xarOptionValues = ['msbb_xarajat', 'opt_xarajat', 'sfb_xarajat', 'other'];
-
-            const categorySelect = document.getElementById('expenseCategory');
-            const customDescriptionDiv = document.getElementById('customDescriptionDiv');
-            if (xarOptionValues.includes(categorySelect.value)) {
-                customDescriptionDiv.classList.remove('hidden');
-            } else {
-                customDescriptionDiv.classList.add('hidden');
-            }
-            // also toggle click selector based on payment type
-            const paymentType = document.getElementById('expensePaymentType');
-            const clickDiv = document.getElementById('expenseClick');
-            if (paymentType && clickDiv) {
-                if (paymentType.value === 'click') {
-                    clickDiv.classList.remove('hidden');
-                    const sel = clickDiv.querySelector('select');
-                    if (sel) sel.setAttribute('required', 'true');
-                } else {
-                    clickDiv.classList.add('hidden');
-                    const sel = clickDiv.querySelector('select');
-                    if (sel) sel.removeAttribute('required');
-                }
-            }
-        }
-
-         const exp_options = [
-            { value: '', text: 'Kategoriya tanlang' },
-            { value: 'chikako', text: 'Chikako zavod' },
-            { value: 'jasur', text: 'Jasur un' },
-            { value: 'ravshan', text: 'Ravshan $' },
-            { value: 'almashdi', text: 'Almashdi' },
-            { value: 'other', text: 'Boshqa' },
-            { value: 'rasxod_den', text: 'Rasxod den' }
-        ];
-
-         const xar_options = [
-            { value: '', text: 'Kategoriya tanlang' },
-            { value: 'msbb_xarajat', text: 'MSSB xarajat' },
-            { value: 'opt_xarajat', text: 'OPT xarajat' },
-            { value: 'sfb_xarajat', text: 'SFB xarajat' },
-            { value: 'other', text: 'Boshqa' }
-        ];
-
-        function changeCategories() {
-            const categorySelect = document.getElementById('expenseCategory');
-            const reason = document.getElementById('reason');
-            if (reason.value === 'expense') {
-                categorySelect.innerHTML = '';
-                exp_options.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option.value;
-                    opt.textContent = option.text;
-                    categorySelect.appendChild(opt);
-                });
-                toggleCustomDescription();
-            } else if (reason.value === 'xarajat') {
-                categorySelect.innerHTML = '';
-                xar_options.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option.value;
-                    opt.textContent = option.text;
-                    categorySelect.appendChild(opt);
-                });
-                toggleCustomDescription();
-            } else {
-                
-            }
-        }
-
+<script>
 document.querySelectorAll('input[type="number"]').forEach(function(input) {
     input.addEventListener('input', function(e) {
         const value = e.target.value;
@@ -256,5 +194,5 @@ document.querySelectorAll('input[type="number"]').forEach(function(input) {
         }
     });
 });
-    </script>
+</script>
 {% endblock %}
