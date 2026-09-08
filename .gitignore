@@ -4,3 +4,4 @@ env
 db
 .db
 *.db
+staticfiles/
