@@ -5,23 +5,30 @@
 {% block page_title %}Bosh sahifa{% endblock %}
 
 {% block page_content %}
-<div class="max-w-7xl mx-auto space-y-6">
+<div class="max-w-7xl mx-auto space-y-6"
+     x-data="{
+        open: {% if form.errors %}true{% else %}false{% endif %},
+        statType: '',
+        uzs: 0, usd: 0, rub: 0, eur: 0,
+        titles: {income: 'Umumiy Kirimni Tahrirlash', expense: 'Umumiy Chiqimni Tahrirlash', diff: 'Umumiy Qoldiqni Tahrirlash'},
+        editStat(type, uzs, usd, rub, eur) { this.statType = type; this.uzs = uzs; this.usd = usd; this.rub = rub; this.eur = eur; this.open = true; }
+     }">
     <!-- Stat cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="relative group">
-            <button type="button" onclick="editDailyStats('income')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('income', {{ stats.confirmed.income.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.income.total_usd|default:0|unlocalize }}, {{ stats.confirmed.income.total_rub|default:0|unlocalize }}, {{ stats.confirmed.income.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
         </div>
         <div class="relative group">
-            <button type="button" onclick="editDailyStats('expense')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('expense', {{ stats.confirmed.expense.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.expense.total_usd|default:0|unlocalize }}, {{ stats.confirmed.expense.total_rub|default:0|unlocalize }}, {{ stats.confirmed.expense.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
         </div>
         <div class="relative group">
-            <button type="button" onclick="editDailyStats('diff')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('diff', {{ stats.confirmed.diff.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.diff.total_usd|default:0|unlocalize }}, {{ stats.confirmed.diff.total_rub|default:0|unlocalize }}, {{ stats.confirmed.diff.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
             </button>
             {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
@@ -130,45 +137,32 @@
             {% endif %}
         </div>
     </div>
-</div>
 
-<!-- Edit Daily Stats Modal -->
-<div id="editStatsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(15, 23, 42, 0.55);">
-    <form method="POST" action="{% url 'change_stat' %}" class="w-full max-w-md rounded-2xl shadow-2xl fade-in" style="background: var(--color-surface); border: 1px solid var(--color-border);">
-        {% csrf_token %}
-        <div class="flex items-start gap-4 px-6 py-5" style="border-bottom: 1px solid var(--color-border);">
-            <span class="flex items-center justify-center w-12 h-12 rounded-full shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
-            </span>
-            <div class="min-w-0 flex-1">
-                <h2 class="text-xl font-bold" id="editStatsTitle" style="color: var(--color-text);">Statistikani Tahrirlash</h2>
-            </div>
-            <button type="button" onclick="closeEditStatsModal()" class="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Yopish">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-            </button>
-        </div>
-
-        <div class="px-6 py-5 space-y-4">
-            <input type="hidden" name="stat_type" id="StatType">
+    <!-- Edit Daily Stats Modal -->
+    {% include "partials/_modal_open.html" with modal_title="Statistikani tahrirlash" modal_tone="brand" modal_icon="edit" %}
+        <p class="text-sm font-semibold mb-4" style="color: var(--color-text);" x-text="titles[statType]"></p>
+        <form method="POST" action="{% url 'change_stat' %}" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="stat_type" :value="statType">
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm miqdori</label>
-                <input type="number" name="total_uzs" id="editStatsUZS" placeholder="So'm miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_uzs" x-model.number="uzs" placeholder="So'm miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar miqdori</label>
-                <input type="number" name="total_usd" id="editStatsUSD" placeholder="Dollar miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_usd" x-model.number="usd" placeholder="Dollar miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl miqdori</label>
-                <input type="number" name="total_rub" id="editStatsRUB" placeholder="Rubl miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_rub" x-model.number="rub" placeholder="Rubl miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro miqdori</label>
-                <input type="number" name="total_eur" id="editStatsEUR" placeholder="Yevro miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_eur" x-model.number="eur" placeholder="Yevro miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
             <div class="rounded-lg p-3 border" style="background: var(--color-pending-bg); border-color: var(--color-pending);">
@@ -180,47 +174,11 @@
                 <button type="submit" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                     Saqlash
                 </button>
-                <button type="button" onclick="closeEditStatsModal()" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                <button type="button" @click="open = false" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
                     Bekor qilish
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    {% include "partials/_modal_close.html" %}
 </div>
-
-<script>
-    function editDailyStats(type) {
-        const titles = {
-            'income': 'Umumiy Kirimni Tahrirlash',
-            'expense': 'Umumiy Chiqimni Tahrirlash',
-            'diff': 'Umumiy Qoldiqni Tahrirlash'
-        };
-
-        document.getElementById('editStatsTitle').textContent = titles[type];
-        document.getElementById('StatType').value = type;
-
-        if (type === 'income') {
-            document.getElementById('editStatsUZS').value = {{ stats.confirmed.income.total_uzs | default:0 | unlocalize }};
-            document.getElementById('editStatsUSD').value = {{ stats.confirmed.income.total_usd | default:0 | unlocalize }};
-            document.getElementById('editStatsRUB').value = {{ stats.confirmed.income.total_rub | default:0 | unlocalize }};
-            document.getElementById('editStatsEUR').value = {{ stats.confirmed.income.total_eur | default:0 | unlocalize }};
-        } else if (type === 'expense') {
-            document.getElementById('editStatsUZS').value = {{ stats.confirmed.expense.total_uzs | default:0 | unlocalize }};
-            document.getElementById('editStatsUSD').value = {{ stats.confirmed.expense.total_usd | default:0 | unlocalize }};
-            document.getElementById('editStatsRUB').value = {{ stats.confirmed.expense.total_rub | default:0 | unlocalize }};
-            document.getElementById('editStatsEUR').value = {{ stats.confirmed.expense.total_eur | default:0 | unlocalize }};
-        } else if (type === 'diff') {
-            document.getElementById('editStatsUZS').value = {{ stats.confirmed.diff.total_uzs | default:0 | unlocalize }};
-            document.getElementById('editStatsUSD').value = {{ stats.confirmed.diff.total_usd | default:0 | unlocalize }};
-            document.getElementById('editStatsRUB').value = {{ stats.confirmed.diff.total_rub | default:0 | unlocalize }};
-            document.getElementById('editStatsEUR').value = {{ stats.confirmed.diff.total_eur | default:0 | unlocalize }};
-        }
-
-        document.getElementById('editStatsModal').classList.remove('hidden');
-    }
-
-    function closeEditStatsModal() {
-        document.getElementById('editStatsModal').classList.add('hidden');
-    }
-</script>
 {% endblock %}

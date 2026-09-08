@@ -133,6 +133,30 @@
             </div>
         </div>
 
+        <div class="rounded-xl border p-5 flex flex-wrap items-center justify-between gap-4" style="background: var(--color-surface); border-color: var(--color-border);">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: {% if unreported_count %}var(--color-pending-bg){% else %}var(--color-surface-muted){% endif %}; color: {% if unreported_count %}var(--color-pending){% else %}var(--color-text-muted){% endif %};">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 7v5l3 3"></path>
+                </svg>
+                {{ unreported_count }} ta tranzaksiya hisobotga kiritilmagan
+            </span>
+            <form method="post" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
+                {% csrf_token %}
+                <button type="submit"
+                    {% if not unreported_count %}disabled{% endif %}
+                    onclick="return confirm('Rostan ham kassani yopmoqchimisiz?')"
+                    class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2 {% if not unreported_count %}opacity-50 cursor-not-allowed{% endif %}"
+                    style="background: var(--color-negative-bg); color: var(--color-negative);">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                        <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+                    </svg>
+                    Kassani yopish
+                </button>
+            </form>
+        </div>
+
         <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
             <div class="px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-3">

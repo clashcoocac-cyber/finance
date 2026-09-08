@@ -41,7 +41,7 @@
                             <td class="px-4 py-3 text-sm" style="color: var(--color-text-muted);">{{ forloop.counter }}</td>
                             <td class="px-4 py-3 text-sm font-medium" style="color: var(--color-text);">{{ user.username }}</td>
                             <td class="px-4 py-3 text-sm">
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="{% if user.role == 'operator' %}background: var(--color-positive-bg); color: var(--color-positive);{% elif user.role == 'cashier' %}background: var(--color-pending-bg); color: var(--color-pending);{% else %}background: var(--color-surface-muted); color: var(--color-text);{% endif %}">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="{% if user.is_operator %}background: var(--color-positive-bg); color: var(--color-positive);{% elif user.is_cashier %}background: var(--color-pending-bg); color: var(--color-pending);{% else %}background: var(--color-surface-muted); color: var(--color-text);{% endif %}">
                                     {{ user.get_role_display }}
                                 </span>
                             </td>
@@ -55,7 +55,7 @@
                                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
                                         Tahrirlash
                                     </button>
-                                    {% if user.role != 'boss' %}
+                                    {% if not user.is_boss %}
                                     <form method="post" action="{% url 'user_delete' user.pk %}" onsubmit="return confirm('Rostan o\'chirmoqchimisiz?')">
                                         {% csrf_token %}
                                         <button type="submit" class="rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-negative-bg); color: var(--color-negative);">
