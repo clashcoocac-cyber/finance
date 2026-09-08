@@ -22,7 +22,7 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100">
         <div class="flex items-start gap-4 px-6 py-5" style="border-bottom: 1px solid var(--color-border);">
-            <span class="flex items-center justify-center w-12 h-12 rounded-full shrink-0"
+            <span class="flex items-center justify-center w-12 h-12 rounded-lg shrink-0"
                   style="background: {% if modal_tone == 'positive' %}var(--color-positive-bg){% elif modal_tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
                          color: {% if modal_tone == 'positive' %}var(--color-positive){% elif modal_tone == 'negative' %}var(--color-negative){% else %}var(--color-brand){% endif %};">
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

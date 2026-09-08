@@ -8,7 +8,7 @@ Sidebar nav link. Params:
 {% endcomment %}
 <a href="{{ url }}"
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if current == match or current == match2 %}font-semibold{% else %}font-medium{% endif %}"
-   style="{% if current == match or current == match2 %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
+   style="{% if current == match or current == match2 %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text); box-shadow: 0 2px 6px rgba(105, 108, 255, 0.4);{% else %}color: var(--color-sidebar-text);{% endif %}">
     <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         {% if icon == 'home' %}
             <path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path>
