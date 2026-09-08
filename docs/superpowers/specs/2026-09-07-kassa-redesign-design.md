@@ -167,6 +167,20 @@ Alpine.js CDN: `https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js` (`d
 
 Ishga tushirish: `python manage.py test finance`.
 
+## 9. Dizayn amendment (2026-09-08) — App shell (sidebar navigatsiya)
+
+Komron 5 ta referens screenshot yubordi (zamonaviy admin dashboard: chap tomonda tungi (dark) sidebar, yuqorida breadcrumb+bildirishnoma+avatar topbar). Ko'rsatma: aynan nusxa emas, kerakli qismlarini olib, barcha sahifalarga (allaqachon qurilganlariga ham) qo'llash.
+
+**Qabul qilingan o'zgarishlar:**
+- Har bir sahifaning o'z ichida yozilgan `<nav>` (top bar, faqat 3-4 link) butunlay bekor qilinadi. O'rniga umumiy **app shell**: chap tomonda doimiy sidebar (`--color-bg` emas, alohida to'q token — sidebar o'zining fon rangini ishlatadi, boshqa tokenlar bilan aralashmaydi) + yuqorida breadcrumb topbar (sahifa nomi + foydalanuvchi avatar/rol + logout).
+- Sidebar nav elementlari rolga qarab: boss → Bosh sahifa (`boss_dashboard`), Tranzaksiyalar (`transaction_list`), Foydalanuvchilar (`users`); cashier → Bosh sahifa (`cashier_dashboard`), Kirimlar (`incomes_list`), Chiqimlar (`expenses_list`); operator → Bosh sahifa (`operator_dashboard`). Har biri SVG icon + label, joriy sahifa active-holat bilan ajratiladi (fon rangi/border).
+- `_stat_card.html` yangilanadi: sarlavha yonida rangli doira ichida icon (icon-badge), pastda hozirgi kabi summalar + status badge — badge o'rni endi kartaning yuqori-o'ng burchagida (referensdagi kabi).
+- `_bulk_action_bar.html` qayta ishlanadi: hozirgi "yuqorida inline bar" o'rniga **pastda yopishqoq (sticky) footer bar** — "N ta tanlandi" + tanlanganlar umumiy summasi (taxminiy) + "Bekor qilish"/"Saqlash" tugmalari, referensdagi 4-screenshot uslubida.
+- Login sahifasi **o'zgarmaydi** — u hali autentifikatsiyadan oldingi ekran, sidebar tegishli emas (referens screenshotlarda ham login yo'q).
+- Haqiqiy sahifalash (pagination, "Jami N ta natija / 10/sahifa") referensda ko'rinadi, lekin bu backend queryset'ga `Paginator` qo'shishni talab qiladi — **hozircha qo'shilmaydi** (ishlamaydigan dekorativ pagination yasash noto'g'ri bo'lardi); alohida keyingi task sifatida taklif qilinadi, hozirgi plan doirasidan tashqarida.
+
+**Ijro tartibi:** yangi "App shell" task (partial + `base.html`/yangi `base_app.html` qatlami) → allaqachon qurilgan sahifalarni (boss/cashier/operator/expenses) shu shell'ga ko'chirish (bitta batch task, bir xil turdagi o'zgarish) → qolgan sahifalar (incomes/transactions/edit_tran/user_list) to'g'ridan-to'g'ri yangi shell asosida qurilib davom etadi.
+
 ## 8. Xavf / cheklovlar
 
 - Data-migration eski `Transaction.counterparty`/`DailyReport.category` erkin matn qiymatlarida yozuv xatolari (turli register/probel) bo'lsa, duplicate-ga o'xshash lekin boshqa `Counterparty`/`Category` yozuvlari paydo bo'lishi mumkin — migration `strip().lower()` normalizatsiya bilan yoziladi, lekin 100% tozalik kafolatlanmaydi (mavjud "iflos" ma'lumot muammosi, yangi emas).
