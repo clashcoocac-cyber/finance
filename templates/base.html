@@ -44,7 +44,7 @@
             --color-sidebar-active-bg: #696CFF;
             --color-sidebar-active-text: #FFFFFF;
 
-            --shadow-card: 0 2px 10px rgba(105, 108, 255, 0.08);
+            --shadow-card: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
         }
         @media (prefers-color-scheme: dark) {
             :root:not([data-theme="light"]) {
@@ -60,7 +60,7 @@
                 --color-sidebar-text: #A7A3C0;
                 --color-sidebar-text-muted: #6B7290;
 
-                --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.3);
+                --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.32);
             }
         }
         body {
@@ -87,6 +87,13 @@
         .flatpickr-day.today { border-color: var(--color-brand); }
         /* Sneat-style soft elevation on every surface card (border + surface-bg combo). */
         [class*="rounded-xl"][style*="var(--color-surface)"]:not([style*="var(--color-surface-muted)"]) { box-shadow: var(--shadow-card); }
+        /* Sneat's violet focus glow, applied globally so every input/select/textarea/button gets it. */
+        input:not([type="checkbox"]):not([type="radio"]):focus,
+        select:focus, textarea:focus, button:focus-visible, a:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0.25rem 0.05rem rgba(105, 108, 255, 0.25);
+            border-color: var(--color-brand) !important;
+        }
     </style>
 </head>
 <body class="min-h-screen">

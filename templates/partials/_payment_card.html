@@ -3,7 +3,7 @@
    but a plain amounts shape (uzs/usd/rub/eur, no "total_" prefix, no confirmed/pending split).
    icon: "cash" gets a positive-tinted badge, anything else (click channels) gets a brand-tinted badge —
    so the cash channel reads visually distinct from the card channels.{% endcomment %}
-<div class="rounded-xl p-5 border" style="background: var(--color-surface); border-color: var(--color-border);">
+<div class="rounded-xl p-5" style="background: var(--color-surface);">
     <div class="flex items-center gap-3 mb-3">
         <span class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
               style="background: {% if icon == 'cash' %}var(--color-positive-bg){% else %}var(--color-surface-muted){% endif %};

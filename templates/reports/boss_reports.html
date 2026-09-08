@@ -7,7 +7,7 @@
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
     <!-- Filter bar -->
-    <div class="rounded-xl border p-5" style="background: var(--color-surface); border-color: var(--color-border);">
+    <div class="rounded-xl p-5" style="background: var(--color-surface);">
         {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options type_filter=True type_value=type %}
     </div>
 
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Reports table -->
-    <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
+    <div class="rounded-xl" style="background: var(--color-surface);">
         <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">

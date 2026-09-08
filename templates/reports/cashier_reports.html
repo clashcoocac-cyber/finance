@@ -17,11 +17,11 @@
             </span>
         </div>
 
-        <div class="rounded-xl border p-5" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="rounded-xl p-5" style="background: var(--color-surface);">
             {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options %}
         </div>
 
-        <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="rounded-xl" style="background: var(--color-surface);">
             <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
                     <i class="fa-solid fa-arrow-trend-up text-lg"></i>

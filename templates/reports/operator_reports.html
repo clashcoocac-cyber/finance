@@ -7,7 +7,7 @@
 
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6">
-        <div class="rounded-xl border p-5 flex flex-wrap items-center gap-3" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="rounded-xl p-5 flex flex-wrap items-center gap-3" style="background: var(--color-surface);">
             <label for="reportDate" class="text-sm font-medium whitespace-nowrap" style="color: var(--color-text);">Kun tanlash</label>
             <div class="relative">
                 <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
@@ -45,7 +45,7 @@
             </span>
         </div>
 
-        <div class="rounded-xl border p-3" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="rounded-xl p-3" style="background: var(--color-surface);">
             <form method="get" class="flex flex-wrap items-end gap-2">
                 <div>
                     {% include "partials/_date_range_input.html" with date_from=from date_to=to label="Sana oralig'i" %}
@@ -62,7 +62,7 @@
             </form>
         </div>
 
-        <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="rounded-xl" style="background: var(--color-surface);">
             <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
                     <i class="fa-solid fa-receipt text-lg"></i>
