@@ -7,34 +7,16 @@
 
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-            <div class="flex flex-wrap items-center gap-2">
-                {% if request.session.shift %}
-                <span class="px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                    {{ request.session.shift }}-smena
-                </span>
-                {% endif %}
-                <span class="text-sm" style="color: var(--color-text-muted);">
-                    Bugun {{ today_transaction_count }} ta tranzaksiya
-                    {% if unreported_count %}&middot; {{ unreported_count }} ta hisobotga kiritilmagan{% endif %}
-                </span>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="{% url 'operator_transactions' %}" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-                        <path d="M3 10h18"></path>
-                    </svg>
-                    Tranzaksiyalar
-                </a>
-                <a href="{% url 'operator_reports' %}" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
-                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                    </svg>
-                    Kunlik hisobotlar
-                </a>
-            </div>
+        <div class="flex flex-wrap items-center gap-2">
+            {% if request.session.shift %}
+            <span class="px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                {{ request.session.shift }}-smena
+            </span>
+            {% endif %}
+            <span class="text-sm" style="color: var(--color-text-muted);">
+                Bugun {{ today_transaction_count }} ta tranzaksiya
+                {% if unreported_count %}&middot; {{ unreported_count }} ta hisobotga kiritilmagan{% endif %}
+            </span>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 {% if 'OPT' in request.user.username %}lg:grid-cols-2{% else %}lg:grid-cols-3{% endif %} gap-4">
@@ -48,10 +30,7 @@
         <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
             <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
-                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                    </svg>
+                    <i class="fa-solid fa-receipt text-lg"></i>
                 </span>
                 <div>
                     <div class="text-lg font-bold" style="color: var(--color-text);">So'nggi hisobotlarim</div>
@@ -65,10 +44,7 @@
                     <div class="rounded-lg border p-4 flex flex-wrap items-center justify-between gap-3" style="background: var(--color-surface-muted); border-color: var(--color-border);">
                         <div class="flex items-center gap-3">
                             <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-surface); color: var(--color-text-muted);">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                                    <path d="M16 2v4M8 2v4M3 10h18"></path>
-                                </svg>
+                                <i class="fa-solid fa-calendar-days"></i>
                             </span>
                             <span class="font-semibold" style="color: var(--color-text);">{{ report.date }}</span>
                             {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
@@ -85,10 +61,7 @@
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
                     <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
-                            <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                        </svg>
+                        <i class="fa-solid fa-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hozircha hisobotlar yo'q</p>
                 </div>

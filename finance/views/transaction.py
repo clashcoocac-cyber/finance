@@ -31,6 +31,7 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
         date_from = request.GET.get('from') or report_date
         date_to = request.GET.get('to') or report_date
         q = request.GET.get('q') or ''
+        counterparty = request.GET.get('counterparty') or ''
 
         my_transactions = Transaction.objects.filter(operator=request.user).filter(
             date__date__gte=datetime.strptime(date_from, '%Y-%m-%d').date(),
@@ -40,6 +41,8 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
             my_transactions = my_transactions.filter(
                 Q(counterparty__icontains=q) | Q(description__icontains=q)
             )
+        if counterparty:
+            my_transactions = my_transactions.filter(counterparty__icontains=counterparty)
 
         context = {
             'form': form or TransactionFrom(),
@@ -55,6 +58,7 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
             'from': date_from,
             'to': date_to,
             'q': q,
+            'counterparty': counterparty,
             'clicks': CLICKS,
         }
         return render(request, self.template_name, context)
@@ -69,7 +73,7 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
 
         if form.is_valid():
             form.save(operator=request.user, date=date_param)
-            messages.success(request, "Tranzaksiya qo'shildi.")
+            messages.success(request, "Amaliyot qo'shildi.")
             return redirect(str(self.success_url) + '?report_date=' + date_param)
 
         messages.error(request, "Formani tekshiring.")

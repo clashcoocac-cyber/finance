@@ -1,20 +1,17 @@
 {% extends "../base_app.html" %}
 {% load custom_filters %}
 
-{% block title %}Tranzaksiyalarim{% endblock %}
+{% block title %}Amaliyotlarim{% endblock %}
 
-{% block page_title %}Tranzaksiyalarim{% endblock %}
+{% block page_title %}Amaliyotlarim{% endblock %}
 
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6">
         <div class="rounded-xl border p-5 flex flex-wrap items-center justify-between gap-4" style="background: var(--color-surface); border-color: var(--color-border);">
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-3">
                 <label for="reportDate" class="text-sm font-medium whitespace-nowrap" style="color: var(--color-text);">Kun tanlash</label>
                 <div class="relative">
-                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);">
-                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                        <path d="M16 2v4M8 2v4M3 10h18"></path>
-                    </svg>
+                    <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
                     <input
                         type="date"
                         id="reportDate"
@@ -25,141 +22,130 @@
                     >
                 </div>
             </div>
-            <div x-data="{ open: {% if form.errors %}true{% else %}false{% endif %} }">
-                <button type="button" @click="open = true" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 5v14M5 12h14"></path>
-                    </svg>
-                    Yangi tranzaksiya
-                </button>
-                {% include "partials/_modal_open.html" with modal_title="Tranzaksiya qo'shish" modal_subtitle="Kassaga tushgan mablag'ni kiriting" modal_tone="positive" modal_icon="plus" %}
-                <form action="{% url 'transaction_create' %}?report_date={{ report_date }}" method="POST" class="space-y-4" x-data="{ paymentType: '{{ form.payment_type.value|default_if_none:'' }}' }">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: {% if unreported_count %}var(--color-pending-bg){% else %}var(--color-surface-muted){% endif %}; color: {% if unreported_count %}var(--color-pending){% else %}var(--color-text-muted){% endif %};">
+                    <i class="fa-solid fa-clock"></i>
+                    {{ unreported_count }} ta amaliyot hisobotga kiritilmagan
+                </span>
+                <form method="post" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
                     {% csrf_token %}
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kimdan olindi</label>
-                        {% include "partials/_select_or_new_field.html" with field=form.counterparty new_field=form.other_counterparty new_label="Yangi shaxs nomi" %}
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
-                            <div class="relative">
-                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);">
-                                    <circle cx="12" cy="12" r="9"></circle>
-                                    <path d="M12 7v10M9 15h4a2 2 0 0 0 0-4H11a2 2 0 0 1 0-4h4"></path>
-                                </svg>
-                                <input type="number" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                            </div>
-                            {% if form.amount_uzs.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_uzs.errors|striptags }}</p>{% endif %}
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
-                            <div class="relative">
-                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);">
-                                    <circle cx="12" cy="12" r="9"></circle>
-                                    <path d="M12 7v10M9 15h4a2 2 0 0 0 0-4H11a2 2 0 0 1 0-4h4"></path>
-                                </svg>
-                                <input type="number" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                            </div>
-                            {% if form.amount_usd.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_usd.errors|striptags }}</p>{% endif %}
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
-                            <div class="relative">
-                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);">
-                                    <circle cx="12" cy="12" r="9"></circle>
-                                    <path d="M12 7v10M9 15h4a2 2 0 0 0 0-4H11a2 2 0 0 1 0-4h4"></path>
-                                </svg>
-                                <input type="number" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                            </div>
-                            {% if form.amount_rub.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_rub.errors|striptags }}</p>{% endif %}
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
-                            <div class="relative">
-                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);">
-                                    <circle cx="12" cy="12" r="9"></circle>
-                                    <path d="M12 7v10M9 15h4a2 2 0 0 0 0-4H11a2 2 0 0 1 0-4h4"></path>
-                                </svg>
-                                <input type="number" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                            </div>
-                            {% if form.amount_eur.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_eur.errors|striptags }}</p>{% endif %}
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kurs haqida izoh (ixtiyoriy)</label>
-                        <textarea name="comment" placeholder="Masalan: Dollar kursi 12,250 so'm, Yevro kursi 13,500 so'm..." class="w-full px-4 py-2.5 rounded-lg border text-sm resize-none" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" rows="2">{{ form.comment.value|default_if_none:'' }}</textarea>
-                        {% if form.comment.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.comment.errors|striptags }}</p>{% endif %}
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
-                        <select required x-model="paymentType" name="payment_type" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                            <option value="">To'lov turini tanlang</option>
-                            <option value="click">Click</option>
-                            <option value="cash">Naqd</option>
-                            <option value="terminal">Terminal</option>
-                            <option value="bank">Bank</option>
-                        </select>
-                        {% if form.payment_type.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.payment_type.errors|striptags }}</p>{% endif %}
-                    </div>
-
-                    <div x-show="paymentType === 'click'" x-cloak>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Click kartani tanlang</label>
-                        <select name="click" :required="paymentType === 'click'" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                            <option value="">---</option>
-                            {% for click in clicks %}
-                            <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
-                            {% endfor %}
-                        </select>
-                        {% if form.click.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.click.errors|striptags }}</p>{% endif %}
-                    </div>
-
-                    <div class="flex justify-end gap-2 pt-2">
-                        <button type="button" @click="open = false" class="rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">Bekor qilish</button>
-                        <button type="submit" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive); color: var(--color-brand-foreground);">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 5v14M5 12h14"></path>
-                            </svg>
-                            Ma'lumot qo'shish
-                        </button>
-                    </div>
+                    <button type="submit"
+                        {% if not unreported_count %}disabled{% endif %}
+                        onclick="return confirm('Rostan ham kassani yopmoqchimisiz?')"
+                        class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2 {% if not unreported_count %}opacity-50 cursor-not-allowed{% endif %}"
+                        style="background: var(--color-negative-bg); color: var(--color-negative);">
+                        <i class="fa-solid fa-lock"></i>
+                        Kassani yopish
+                    </button>
                 </form>
-                {% include "partials/_modal_close.html" %}
-            </div>
-        </div>
+                <div x-data="{ open: {% if form.errors %}true{% else %}false{% endif %} }">
+                    <button type="button" @click="open = true" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive-bg); color: var(--color-positive);">
+                        <i class="fa-solid fa-plus"></i>
+                        Yangi amaliyot
+                    </button>
+                    {% include "partials/_modal_open.html" with modal_title="Amaliyot qo'shish" modal_subtitle="Kassaga tushgan mablag'ni kiriting" modal_tone="positive" modal_icon="plus" %}
+                    <form action="{% url 'transaction_create' %}?report_date={{ report_date }}" method="POST" class="space-y-4" x-data="{ paymentType: '{{ form.payment_type.value|default_if_none:'' }}' }">
+                        {% csrf_token %}
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5 inline-flex items-center gap-1.5" style="color: var(--color-text);">
+                                <i class="fa-solid fa-user text-xs" style="color: var(--color-text-muted);"></i>
+                                Kimdan olindi
+                            </label>
+                            {% include "partials/_select_or_new_field.html" with field=form.counterparty new_field=form.other_counterparty new_label="Yangi shaxs nomi" %}
+                        </div>
 
-        <div class="rounded-xl border p-5 flex flex-wrap items-center justify-between gap-4" style="background: var(--color-surface); border-color: var(--color-border);">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: {% if unreported_count %}var(--color-pending-bg){% else %}var(--color-surface-muted){% endif %}; color: {% if unreported_count %}var(--color-pending){% else %}var(--color-text-muted){% endif %};">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M12 7v5l3 3"></path>
-                </svg>
-                {{ unreported_count }} ta tranzaksiya hisobotga kiritilmagan
-            </span>
-            <form method="post" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
-                {% csrf_token %}
-                <button type="submit"
-                    {% if not unreported_count %}disabled{% endif %}
-                    onclick="return confirm('Rostan ham kassani yopmoqchimisiz?')"
-                    class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2 {% if not unreported_count %}opacity-50 cursor-not-allowed{% endif %}"
-                    style="background: var(--color-negative-bg); color: var(--color-negative);">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="5" y="11" width="14" height="10" rx="2"></rect>
-                        <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
-                    </svg>
-                    Kassani yopish
-                </button>
-            </form>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                </div>
+                                {% if form.amount_uzs.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_uzs.errors|striptags }}</p>{% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                </div>
+                                {% if form.amount_usd.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_usd.errors|striptags }}</p>{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                </div>
+                                {% if form.amount_rub.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_rub.errors|striptags }}</p>{% endif %}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                </div>
+                                {% if form.amount_eur.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_eur.errors|striptags }}</p>{% endif %}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5 inline-flex items-center gap-1.5" style="color: var(--color-text);">
+                                <i class="fa-solid fa-comment-dots text-xs" style="color: var(--color-text-muted);"></i>
+                                Kurs haqida izoh (ixtiyoriy)
+                            </label>
+                            <textarea name="comment" placeholder="Masalan: Dollar kursi 12,250 so'm, Yevro kursi 13,500 so'm..." class="w-full px-4 py-2.5 rounded-lg border text-sm resize-none" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" rows="2">{{ form.comment.value|default_if_none:'' }}</textarea>
+                            {% if form.comment.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.comment.errors|striptags }}</p>{% endif %}
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-credit-card absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                <select required x-model="paymentType" name="payment_type" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                    <option value="">To'lov turini tanlang</option>
+                                    <option value="click">Click</option>
+                                    <option value="cash">Naqd</option>
+                                    <option value="terminal">Terminal</option>
+                                    <option value="bank">Bank</option>
+                                </select>
+                            </div>
+                            {% if form.payment_type.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.payment_type.errors|striptags }}</p>{% endif %}
+                        </div>
+
+                        <div x-show="paymentType === 'click'" x-cloak>
+                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Click kartani tanlang</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-right-left absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                <select name="click" :required="paymentType === 'click'" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                    <option value="">---</option>
+                                    {% for click in clicks %}
+                                    <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% if form.click.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.click.errors|striptags }}</p>{% endif %}
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-2">
+                            <button type="button" @click="open = false" class="rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">Bekor qilish</button>
+                            <button type="submit" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive); color: var(--color-brand-foreground);">
+                                <i class="fa-solid fa-check"></i>
+                                Ma'lumot qo'shish
+                            </button>
+                        </div>
+                    </form>
+                    {% include "partials/_modal_close.html" %}
+                </div>
+            </div>
         </div>
 
         <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
             <div class="px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
-                <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <form method="get" class="grid grid-cols-1 md:grid-cols-6 gap-3">
                     <input type="hidden" name="report_date" value="{{ report_date }}">
                     <div>
                         <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Boshlanish sanasi</label>
@@ -173,8 +159,15 @@
                         <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Qidiruv</label>
                         <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Tavsif yoki shaxs..." class="w-full px-3 py-2 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
+                    <div>
+                        <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Kimdan</label>
+                        <input type="text" name="counterparty" value="{{ counterparty|default:'' }}" placeholder="Shaxs nomi..." class="w-full px-3 py-2 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                    </div>
                     <div class="flex items-end">
-                        <button type="submit" class="w-full rounded-lg px-4 py-2 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">Filtrlarni qo'llash</button>
+                        <button type="submit" class="w-full rounded-lg px-4 py-2 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                            <i class="fa-solid fa-filter"></i>
+                            Filtrlarni qo'llash
+                        </button>
                     </div>
                 </form>
             </div>
@@ -224,12 +217,9 @@
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
                     <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-                            <path d="M3 10h18"></path>
-                        </svg>
+                        <i class="fa-solid fa-receipt text-xl"></i>
                     </span>
-                    <p class="text-sm" style="color: var(--color-text-muted);">Tranzaksiyalar topilmadi</p>
+                    <p class="text-sm" style="color: var(--color-text-muted);">Amaliyotlar topilmadi</p>
                 </div>
                 {% endif %}
             </div>

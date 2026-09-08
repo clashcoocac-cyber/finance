@@ -10,10 +10,7 @@
         <div class="rounded-xl border p-5 flex flex-wrap items-center gap-3" style="background: var(--color-surface); border-color: var(--color-border);">
             <label for="reportDate" class="text-sm font-medium whitespace-nowrap" style="color: var(--color-text);">Kun tanlash</label>
             <div class="relative">
-                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);">
-                    <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                    <path d="M16 2v4M8 2v4M3 10h18"></path>
-                </svg>
+                <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
                 <input
                     type="date"
                     id="reportDate"
@@ -32,41 +29,48 @@
 
         {% if is_expired %}
         <div class="rounded-lg border p-4 flex items-center gap-3 text-sm" style="background: var(--color-pending-bg); border-color: var(--color-pending); color: var(--color-pending);">
-            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 9v4M12 17h.01"></path>
-                <circle cx="12" cy="12" r="9"></circle>
-            </svg>
+            <i class="fa-solid fa-triangle-exclamation text-lg shrink-0"></i>
             Tanlangan sana 3 kundan eski &mdash; hisobot muddati o'tgan bo'lishi mumkin.
         </div>
         {% endif %}
 
         <div class="flex flex-wrap items-center gap-3">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M12 7v5l3 3"></path>
-                </svg>
+                <i class="fa-solid fa-clock"></i>
                 Kutilmoqda: {{ pending_count }}
             </span>
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 6L9 17l-5-5"></path>
-                </svg>
+                <i class="fa-solid fa-check"></i>
                 Tasdiqlangan: {{ confirmed_count }}
             </span>
         </div>
 
-        <div class="rounded-xl border p-5" style="background: var(--color-surface); border-color: var(--color-border);">
-            {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options %}
+        <div class="rounded-xl border p-3" style="background: var(--color-surface); border-color: var(--color-border);">
+            <form method="get" class="flex flex-wrap items-end gap-2">
+                <div>
+                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Sanadan</label>
+                    <input type="date" name="from" value="{{ from }}" class="px-3 py-2 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Sanagacha</label>
+                    <input type="date" name="to" value="{{ to }}" class="px-3 py-2 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                </div>
+                <button type="button"
+                    onclick="const p = new URLSearchParams(window.location.search); const t = new Date().toISOString().slice(0,10); p.set('from', t); p.set('to', t); window.location.search = p.toString();"
+                    class="px-3 py-2 rounded-lg text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                    Bugun
+                </button>
+                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    Qidirish
+                </button>
+            </form>
         </div>
 
         <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
             <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
-                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                    </svg>
+                    <i class="fa-solid fa-receipt text-lg"></i>
                 </span>
                 <div>
                     <div class="text-lg font-bold" style="color: var(--color-text);">Kunlik hisobotlar</div>
@@ -81,7 +85,6 @@
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Turi</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kategoriya</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov kanallari</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Umumiy</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
@@ -99,41 +102,12 @@
                                 <td class="px-4 py-3 text-sm">
                                     {% include "partials/_status_badge.html" with status=report.type %}
                                 </td>
-                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.category|default:"" }}</td>
                                 <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
-                                    <div class="space-y-0.5 text-xs">
-                                        {% for key, val in report.uzs_detail.items %}
-                                            {% if val %}
-                                            <div>
-                                                {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
-                                                <span class="font-medium money">{{ val|format_currency }} so'm</span>
-                                            </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {% for key, val in report.usd_detail.items %}
-                                            {% if val %}
-                                            <div>
-                                                {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
-                                                <span class="font-medium money">{{ val|format_currency }} $</span>
-                                            </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {% for key, val in report.rub_detail.items %}
-                                            {% if val %}
-                                            <div>
-                                                {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
-                                                <span class="font-medium money">{{ val|format_currency }} ₽</span>
-                                            </div>
-                                            {% endif %}
-                                        {% endfor %}
-                                        {% for key, val in report.eur_detail.items %}
-                                            {% if val %}
-                                            <div>
-                                                {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
-                                                <span class="font-medium money">{{ val|format_currency }} €</span>
-                                            </div>
-                                            {% endif %}
-                                        {% endfor %}
+                                    <div class="flex flex-wrap gap-1">
+                                        {% for key, val in report.uzs_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} so'm</span>{% endif %}{% endfor %}
+                                        {% for key, val in report.usd_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} $</span>{% endif %}{% endfor %}
+                                        {% for key, val in report.rub_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} ₽</span>{% endif %}{% endfor %}
+                                        {% for key, val in report.eur_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} €</span>{% endif %}{% endfor %}
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-sm">
@@ -155,10 +129,7 @@
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
                     <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
-                            <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                        </svg>
+                        <i class="fa-solid fa-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                 </div>
