@@ -7,11 +7,11 @@
 {% block page_content %}
 <div class="max-w-7xl mx-auto">
     {{ form.category_options|json_script:"category-options-data" }}
-    <div class="rounded-lg" style="background: var(--color-surface);">
+    <div class="card rounded-lg" style="background: var(--color-surface);">
             <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <div class="flex items-center gap-3">
                     <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                        <i class="fa-solid fa-receipt text-lg"></i>
+                        <i class="bx bx-receipt text-lg"></i>
                     </span>
                     <div>
                         <div class="text-lg font-bold" style="color: var(--color-text);">Kunlik chiqimlar</div>
@@ -19,14 +19,14 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <input value="{{ date }}" type="date" class="px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" onchange="window.location.href = `?date=${this.value}`">
+                    <input value="{{ date }}" type="date" class="form-control px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" onchange="window.location.href = `?date=${this.value}`">
                     <a href="{% url 'expenses_list' %}" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                        <i class="fa-solid fa-calendar-days"></i>
+                        <i class="bx bx-calendar"></i>
                         Bugun
                     </a>
                     <div x-data="{ open: {% if form.errors %}true{% else %}false{% endif %} }">
-                        <button type="button" @click="open = true" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                            <i class="fa-solid fa-plus"></i>
+                        <button type="button" @click="open = true" class="finance-income-create btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-negative-bg); color: var(--color-negative);">
+                            <i class="bx bx-plus"></i>
                             Yangi chiqim
                         </button>
                         {% include "partials/_modal_open.html" with modal_title="Chiqim qo'shish" modal_subtitle="Chiqim ma'lumotlarini to'ldiring va tizimga kiriting" modal_tone="negative" modal_icon="plus" %}
@@ -54,7 +54,7 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov maqsadi</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="fa-solid fa-filter"></i>
+                                            <i class="bx bx-filter"></i>
                                         </span>
                                         <select required x-model="expType" name="exp_type"
                                             @change="categoryValue = ''; categoryMode = 'select'"
@@ -70,7 +70,7 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kategoriya</label>
                                     <div class="relative" x-show="categoryMode === 'select'">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="fa-solid fa-list"></i>
+                                            <i class="bx bx-list-ul"></i>
                                         </span>
                                         <select name="category" x-ref="categorySelect"
                                             @change="categoryValue = $event.target.value; categoryMode = categoryValue === '__new__' ? 'new' : 'select'"
@@ -85,13 +85,13 @@
                                     <div x-show="categoryMode === 'new'" class="flex gap-2">
                                         <div class="relative flex-1">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="fa-solid fa-list"></i>
+                                                <i class="bx bx-list-ul"></i>
                                             </span>
                                             <input type="text" name="new_category" value="{{ form.new_category.value|default_if_none:'' }}"
-                                                placeholder="Yangi kategoriya nomi" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                                placeholder="Yangi kategoriya nomi" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
                                         <button type="button" @click="categoryMode = 'select'; categoryValue = ''"
-                                            class="px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text);">
+                                            class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text);">
                                             Ro'yxatdan tanlash
                                         </button>
                                     </div>
@@ -100,7 +100,7 @@
                                 <div>
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Tavsif</label>
                                     <textarea name="description" placeholder="Chiqim tavsifini kiriting..." rows="2"
-                                        class="w-full px-4 py-2.5 rounded-md border text-sm resize-none" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">{{ form.description.value|default_if_none:'' }}</textarea>
+                                        class="form-control w-full px-4 py-2.5 rounded-md border text-sm resize-none" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">{{ form.description.value|default_if_none:'' }}</textarea>
                                 </div>
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -108,18 +108,18 @@
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="fa-solid fa-coins"></i>
+                                                <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="1" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="fa-solid fa-coins"></i>
+                                                <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="1" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
                                     </div>
                                 </div>
@@ -129,18 +129,18 @@
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="fa-solid fa-coins"></i>
+                                                <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="1" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="fa-solid fa-coins"></i>
+                                                <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="1" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
                                     </div>
                                 </div>
@@ -149,9 +149,9 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="fa-solid fa-credit-card"></i>
+                                            <i class="bx bx-credit-card"></i>
                                         </span>
-                                        <select required x-model="paymentType" name="payment_type" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                        <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                             <option value="">To'lov turini tanlang</option>
                                             <option value="click">Click</option>
                                             <option value="cash">Naqd</option>
@@ -164,9 +164,9 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-positive);">Click kartani tanlang</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="fa-solid fa-credit-card"></i>
+                                            <i class="bx bx-credit-card"></i>
                                         </span>
-                                        <select name="click" :required="paymentType === 'click'" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                        <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                             <option value="">---</option>
                                             {% for click in clicks %}
                                             <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
@@ -175,8 +175,8 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                                    <i class="fa-solid fa-plus"></i>
+                                <button type="submit" class="btn w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-negative-bg); color: var(--color-negative);">
+                                    <i class="bx bx-plus"></i>
                                     Chiqim qo'shish
                                 </button>
                             </form>
@@ -185,62 +185,46 @@
                 </div>
             </div>
 
-            <div class="p-5">
+            <div class="card-body p-5">
                 {% if reports %}
-                <div class="-mx-2">
+                <div class="table-responsive overflow-x-auto">
+                    <table class="table table-hover align-middle mb-0 w-full finance-income-table">
+                        <thead style="background: var(--color-surface-muted);">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kategoriya</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                     {% for report in reports %}
-                    <div class="rounded-md px-3 py-3 transition-colors hover:bg-[var(--color-surface-muted)]" style="border-bottom: 1px solid var(--color-border);">
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                                    <i class="fa-solid fa-arrow-trend-down"></i>
-                                </span>
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <p class="font-semibold truncate" style="color: var(--color-text);">{{ report.category }}</p>
-                                        {% include "partials/_status_badge.html" with status=report.type %}
-                                    </div>
-                                </div>
+                    <tr style="border-bottom: 1px solid var(--color-border);">
+                        <td class="px-4 py-3 text-sm whitespace-nowrap" style="color: var(--color-text);"><div class="font-medium">{{ report.date|date:"d/m/Y" }}</div></td>
+                        <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                            <div class="flex items-center gap-2">
+                                <span class="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);"><i class="bx bx-trending-down"></i></span>
+                                <div class="min-w-0"><div class="font-semibold truncate" title="{{ report.category }}">{{ report.category }}</div>{% if report.desc %}<div class="text-xs truncate" style="color: var(--color-text-muted);" title="{{ report.desc }}">{{ report.desc }}</div>{% endif %}</div>
                             </div>
-                            <div class="text-right shrink-0">
-                                <div class="space-y-0.5 money" style="color: var(--color-negative);">
-                                    {% if report.total_uzs %}<p class="text-xl font-bold">{{ report.total_uzs|format_currency }} so'm</p>{% endif %}
-                                    {% if report.total_usd %}<p class="text-sm font-semibold">{{ report.total_usd|format_currency }} $</p>{% endif %}
-                                    {% if report.total_rub %}<p class="text-sm font-semibold">{{ report.total_rub|format_currency }} ₽</p>{% endif %}
-                                    {% if report.total_eur %}<p class="text-sm font-semibold">{{ report.total_eur|format_currency }} €</p>{% endif %}
-                                </div>
-                                <div class="mt-1.5">
-                                    {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs" style="border-top: 1px solid var(--color-border); color: var(--color-text-muted);">
-                            <div class="min-w-0">
-                                <span class="flex items-center gap-1.5 uppercase tracking-wide text-[10px] opacity-75"><i class="fa-solid fa-credit-card"></i>To'lov turi</span>
-                                <p class="mt-0.5 font-medium truncate" style="color: var(--color-text);">
-                                    {% if report.uzs_detail %}
-                                    {% for key, val in report.uzs_detail.items %}{% if val %}{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}
-                                    {% else %}&mdash;{% endif %}
-                                </p>
-                            </div>
-                            <div class="min-w-0">
-                                <span class="flex items-center gap-1.5 uppercase tracking-wide text-[10px] opacity-75"><i class="fa-solid fa-calendar-days"></i>Sana</span>
-                                <p class="mt-0.5 font-medium" style="color: var(--color-text);">{{ report.date|date:"d/m/Y" }}</p>
-                            </div>
-                            {% if report.desc %}
-                            <div class="min-w-0 col-span-2 sm:col-span-1">
-                                <span class="flex items-center gap-1.5 uppercase tracking-wide text-[10px] opacity-75"><i class="fa-solid fa-list"></i>Tafsilot</span>
-                                <p class="mt-0.5 font-medium truncate" style="color: var(--color-text);">{{ report.desc }}</p>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                            {% for key, val in report.uzs_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}
+                            {% for key, val in report.usd_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}
+                            {% for key, val in report.rub_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}
+                            {% for key, val in report.eur_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-right whitespace-nowrap"><div class="finance-income-total money" style="color: var(--color-negative);">{% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}{% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}{% if report.total_rub %}<div>{{ report.total_rub|format_currency }} ₽</div>{% endif %}{% if report.total_eur %}<div>{{ report.total_eur|format_currency }} €</div>{% endif %}</div></td>
+                        <td class="px-4 py-3 text-sm">{% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}</td>
+                    </tr>
                     {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
                 {% else %}
-                <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="fa-solid fa-inbox text-xl"></i>
+                <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
+                    <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                        <i class="bx bx-inbox text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Bu sanada chiqimlar yo'q</p>
                 </div>

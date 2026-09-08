@@ -16,7 +16,7 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
      class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8"
      style="background: rgba(15, 23, 42, 0.55);"
      @keydown.escape.window="open = false">
-    <div class="w-full {{ modal_width|default:"max-w-2xl" }} my-auto rounded-2xl shadow-2xl"
+    <div class="finance-modal-panel w-full {{ modal_width|default:"max-w-2xl" }} my-auto rounded-lg shadow-2xl"
          style="background: var(--color-surface); border: 1px solid var(--color-border);"
          @click.outside="open = false"
          x-transition:enter="transition ease-out duration-150"
@@ -26,7 +26,7 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
             <span class="flex items-center justify-center w-12 h-12 rounded-md shrink-0"
                   style="background: {% if modal_tone == 'positive' %}var(--color-positive-bg){% elif modal_tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
                          color: {% if modal_tone == 'positive' %}var(--color-positive){% elif modal_tone == 'negative' %}var(--color-negative){% else %}var(--color-brand){% endif %};">
-                <i class="fa-solid text-xl {% if modal_icon == 'user' %}fa-user{% elif modal_icon == 'edit' %}fa-pen{% else %}fa-plus{% endif %}"></i>
+                <i class="bx text-xl {% if modal_icon == 'user' %}bx-user{% elif modal_icon == 'edit' %}bx-edit-alt{% else %}bx-plus{% endif %}"></i>
             </span>
             <div class="min-w-0 flex-1">
                 <h2 class="text-xl font-bold" style="color: var(--color-text);">{{ modal_title }}</h2>
@@ -35,10 +35,10 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
                 {% endif %}
             </div>
             <button type="button" @click="open = false"
-                    class="shrink-0 flex items-center justify-center w-9 h-9 rounded-md transition-colors"
+                    class="btn btn-icon btn-label-secondary shrink-0 flex items-center justify-center w-9 h-9 rounded-md transition-colors"
                     style="background: var(--color-surface-muted); color: var(--color-text-muted);"
                     aria-label="Yopish">
-                <i class="fa-solid fa-xmark text-lg"></i>
+                <i class="bx bx-x text-lg"></i>
             </button>
         </div>
-        <div class="px-6 py-5">
+        <div class="finance-modal-body px-6 py-5">

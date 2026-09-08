@@ -1,11 +1,12 @@
 {% load custom_filters %}
-<div class="rounded-lg p-5" style="background: var(--color-surface);">
+<div class="finance-stat-card card rounded-lg" style="background: var(--color-surface);">
+<div class="card-body p-5">
     <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-3">
             <span class="flex items-center justify-center w-9 h-9 rounded-md shrink-0"
                   style="background: {% if tone == 'positive' %}var(--color-positive-bg){% elif tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
                          color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text-muted){% endif %};">
-                <i class="fa-solid text-lg {% if tone == 'positive' %}fa-arrow-trend-up{% elif tone == 'negative' %}fa-arrow-trend-down{% else %}fa-wallet{% endif %}"></i>
+                <i class="bx text-lg {% if tone == 'positive' %}bx-trending-up{% elif tone == 'negative' %}bx-trending-down{% else %}bx-wallet{% endif %}"></i>
             </span>
             <p class="text-sm font-semibold" style="color: var(--color-text-muted);">{{ title }}</p>
         </div>
@@ -13,18 +14,18 @@
         {% include "partials/_status_badge.html" with status=status %}
         {% endif %}
     </div>
-    <div class="grid grid-cols-2 gap-2 money" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
-        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_uzs|default:0|format_currency }} so'm">{{ amounts.total_uzs|default:0|format_currency }} <span class="text-sm font-semibold">so'm</span></div>
-        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_usd|default:0|format_currency }} $">{{ amounts.total_usd|default:0|format_currency }} <span class="text-sm font-semibold">$</span></div>
-        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_rub|default:0|format_currency }} ₽">{{ amounts.total_rub|default:0|format_currency }} <span class="text-sm font-semibold">₽</span></div>
-        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_eur|default:0|format_currency }} €">{{ amounts.total_eur|default:0|format_currency }} <span class="text-sm font-semibold">€</span></div>
+    <div class="finance-stat-grid grid grid-cols-2 gap-2 money" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
+        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_uzs|default:0|format_currency }} so'm"><span class="finance-amount-value">{{ amounts.total_uzs|default:0|format_currency }}</span><span class="finance-amount-currency">so'm</span></div>
+        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_usd|default:0|format_currency }} $"><span class="finance-amount-value">{{ amounts.total_usd|default:0|format_currency }}</span><span class="finance-amount-currency">$</span></div>
+        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_rub|default:0|format_currency }} ₽"><span class="finance-amount-value">{{ amounts.total_rub|default:0|format_currency }}</span><span class="finance-amount-currency">₽</span></div>
+        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_eur|default:0|format_currency }} €"><span class="finance-amount-value">{{ amounts.total_eur|default:0|format_currency }}</span><span class="finance-amount-currency">€</span></div>
     </div>
     {% if pending_amounts %}
     {% with pending_line=pending_amounts|pending_summary %}
     <div class="mt-3 pt-3 border-t" style="border-color: var(--color-border);">
         {% if pending_line %}
         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-            <i class="fa-solid fa-clock shrink-0"></i>
+            <i class="bx bx-time shrink-0"></i>
             Kutilmoqda: {{ pending_line }}
         </span>
         {% else %}
@@ -33,4 +34,5 @@
     </div>
     {% endwith %}
     {% endif %}
+</div>
 </div>

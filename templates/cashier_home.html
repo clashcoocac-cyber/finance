@@ -18,11 +18,11 @@
             {% include "partials/_payment_card.html" with title="Naqd" icon="cash" amounts_uzs=total.cash.uzs amounts_usd=total.cash.usd amounts_rub=total.cash.rub amounts_eur=total.cash.eur %}
         </div>
 
-        <div class="rounded-lg" style="background: var(--color-surface);">
-            <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+        <div class="card rounded-lg" style="background: var(--color-surface);">
+            <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <div class="flex items-center gap-3">
                     <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                        <i class="fa-solid fa-receipt text-lg"></i>
+                        <i class="bx bx-receipt text-lg"></i>
                     </span>
                     <div>
                         <div class="text-lg font-bold" style="color: var(--color-text);">So'nggi hisobotlar</div>
@@ -38,20 +38,20 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="generatePDF()" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                        <i class="fa-solid fa-arrow-down"></i>
+                    <button type="button" onclick="generatePDF()" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
+                        <i class="bx bx-down-arrow-alt"></i>
                         PDF
                     </button>
                     <a href="{% url 'cashier_reports' %}" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                        <i class="fa-solid fa-receipt"></i>
+                        <i class="bx bx-receipt"></i>
                         Barcha hisobotlar
                     </a>
                 </div>
             </div>
-            <div class="p-5">
+            <div class="card-body p-5">
                 {% if recent_reports %}
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="table table-hover align-middle mb-0 w-full">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
@@ -89,9 +89,9 @@
                     </table>
                 </div>
                 {% else %}
-                <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="fa-solid fa-inbox text-xl"></i>
+                <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
+                    <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                        <i class="bx bx-inbox text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hozircha hisobotlar yo'q</p>
                 </div>

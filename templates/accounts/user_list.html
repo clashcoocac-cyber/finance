@@ -5,26 +5,26 @@
 
 {% block page_content %}
 <div class="max-w-5xl mx-auto space-y-6">
-    <div class="rounded-lg" style="background: var(--color-surface);" x-data="{ open: {% if form.errors %}true{% else %}false{% endif %}, editUser: {id: '', username: '', company: ''}, editOpen: false }">
-        <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+    <div class="card rounded-lg" style="background: var(--color-surface);" x-data="{ open: {% if form.errors %}true{% else %}false{% endif %}, editUser: {id: '', username: '', company: ''}, editOpen: false }">
+        <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                    <i class="fa-solid fa-users"></i>
+                    <i class="bx bx-group"></i>
                 </span>
                 <div>
                     <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha foydalanuvchilar</h2>
                 </div>
             </div>
-            <button type="button" @click="open = true" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                <i class="fa-solid fa-plus"></i>
+            <button type="button" @click="open = true" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                <i class="bx bx-plus"></i>
                 Yangi foydalanuvchi
             </button>
         </div>
 
-        <div class="p-5">
+        <div class="card-body p-5">
             {% if users %}
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="table table-hover align-middle mb-0 w-full">
                     <thead style="background: var(--color-surface-muted);">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">#</th>
@@ -42,7 +42,7 @@
                             <td class="px-4 py-3 text-sm font-medium" style="color: var(--color-text);">{{ user.username }}</td>
                             <td class="px-4 py-3 text-sm">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="{% if user.is_operator %}background: var(--color-positive-bg); color: var(--color-positive);{% elif user.is_cashier %}background: var(--color-pending-bg); color: var(--color-pending);{% else %}background: var(--color-surface-muted); color: var(--color-text);{% endif %}">
-                                    {{ user.get_role_display }}
+                                    {% if user.is_boss %}Boshliq{% elif user.is_operator %}Operator{% elif user.is_cashier %}Bosh kassir{% else %}Foydalanuvchi{% endif %}
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ user.company.name|default:"-" }}</td>
@@ -51,8 +51,8 @@
                                 {% if not user.is_boss %}
                                 <div class="relative" x-data="{ menuOpen: false, menuPos: {top: 0, left: 0} }">
                                     <button type="button" @click="const r = $el.getBoundingClientRect(); menuPos = {top: r.bottom + 4, left: r.right - 160}; menuOpen = !menuOpen"
-                                        class="w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Amallar">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        class="btn btn-icon btn-label-secondary w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Amallar">
+                                        <i class="bx bx-dots-vertical-rounded"></i>
                                     </button>
                                     <template x-teleport="body">
                                         <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
@@ -61,14 +61,14 @@
                                             style="background: var(--color-surface); border: 1px solid var(--color-border);">
                                             <button type="button"
                                                 @click="editUser = {id: {{ user.pk }}, username: '{{ user.username|escapejs }}', company: '{{ user.company.name|default:''|escapejs }}'}; editOpen = true; menuOpen = false"
-                                                class="w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">
-                                                <i class="fa-solid fa-pen w-4"></i>
+                                                class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">
+                                                <i class="bx bx-edit-alt w-4"></i>
                                                 Tahrirlash
                                             </button>
                                             <form method="post" action="{% url 'user_delete' user.pk %}" onsubmit="return confirm('Rostan o\'chirmoqchimisiz?')">
                                                 {% csrf_token %}
-                                                <button type="submit" class="w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-negative);">
-                                                    <i class="fa-solid fa-trash w-4"></i>
+                                                <button type="submit" class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-negative);">
+                                                    <i class="bx bx-trash w-4"></i>
                                                     O'chirish
                                                 </button>
                                             </form>
@@ -83,9 +83,9 @@
                 </table>
             </div>
             {% else %}
-            <div class="flex flex-col items-center justify-center py-10 text-center">
-                <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                    <i class="fa-solid fa-users text-xl"></i>
+            <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
+                <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                    <i class="bx bx-group text-xl"></i>
                 </span>
                 <p class="text-sm" style="color: var(--color-text-muted);">Foydalanuvchilar topilmadi</p>
             </div>
@@ -109,27 +109,27 @@
                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Username</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="fa-solid fa-user"></i>
+                            <i class="bx bx-user"></i>
                         </span>
-                        <input required type="text" name="username" placeholder="Username kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input required type="text" name="username" placeholder="Username kiriting" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Parol</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="fa-solid fa-lock"></i>
+                            <i class="bx bx-lock-alt"></i>
                         </span>
-                        <input required type="password" name="password" placeholder="Parol kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input required type="password" name="password" placeholder="Parol kiriting" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rol</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="fa-solid fa-users"></i>
+                            <i class="bx bx-group"></i>
                         </span>
-                        <select required name="role" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <select required name="role" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             <option value="">Rol tanlang</option>
                             <option value="operator">Operator</option>
                             <option value="cashier">Kassir</option>
@@ -140,13 +140,13 @@
                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="fa-solid fa-building"></i>
+                            <i class="bx bx-buildings"></i>
                         </span>
-                        <input type="text" name="company_name" placeholder="Kompaniya nomi" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input type="text" name="company_name" placeholder="Kompaniya nomi" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
-                <button type="submit" class="w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                    <i class="fa-solid fa-plus"></i>
+                <button type="submit" class="btn w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    <i class="bx bx-plus"></i>
                     Foydalanuvchi yaratish
                 </button>
             </form>
@@ -165,7 +165,7 @@
                  x-transition:enter-end="opacity-100 scale-100">
                 <div class="flex items-start gap-4 px-6 py-5" style="border-bottom: 1px solid var(--color-border);">
                     <span class="flex items-center justify-center w-12 h-12 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                        <i class="fa-solid fa-pen text-xl"></i>
+                        <i class="bx bx-edit-alt text-xl"></i>
                     </span>
                     <div class="min-w-0 flex-1">
                         <h2 class="text-xl font-bold" style="color: var(--color-text);">Foydalanuvchini tahrirlash</h2>
@@ -173,7 +173,7 @@
                     <button type="button" @click="editOpen = false"
                             class="shrink-0 flex items-center justify-center w-9 h-9 rounded-md"
                             style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Yopish">
-                        <i class="fa-solid fa-xmark text-lg"></i>
+                        <i class="bx bx-x text-lg"></i>
                     </button>
                 </div>
                 <div class="px-6 py-5">
@@ -184,18 +184,18 @@
                             <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Username</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                                    <i class="fa-solid fa-user"></i>
+                                    <i class="bx bx-user"></i>
                                 </span>
-                                <input type="text" name="username" x-model="editUser.username" required class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input type="text" name="username" x-model="editUser.username" required class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yangi parol</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                                    <i class="fa-solid fa-lock"></i>
+                                    <i class="bx bx-lock-alt"></i>
                                 </span>
-                                <input type="password" name="new_password" placeholder="" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input type="password" name="new_password" placeholder="" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                             <p class="text-xs mt-1" style="color: var(--color-text-muted);">Bo'sh qoldirsangiz, eski parol saqlanadi</p>
                         </div>
@@ -203,16 +203,16 @@
                             <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                                    <i class="fa-solid fa-building"></i>
+                                    <i class="bx bx-buildings"></i>
                                 </span>
-                                <input type="text" name="company_name" x-model="editUser.company" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input type="text" name="company_name" x-model="editUser.company" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                         </div>
                         <div class="flex gap-3 pt-2">
-                            <button type="submit" class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                            <button type="submit" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                                 Saqlash
                             </button>
-                            <button type="button" @click="editOpen = false" class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                            <button type="button" @click="editOpen = false" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
                                 Bekor qilish
                             </button>
                         </div>

@@ -86,7 +86,7 @@ class OperatorReportsView(OperatorRequiredMixin, ReportListBase):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        report_date = self.request.GET.get('report_date') or datetime.today().strftime('%Y-%m-%d')
+        report_date = self.request.GET.get('report_date') or context['to']
         context['report_date'] = report_date
         context['is_expired'] = (
             datetime.today().date() - datetime.strptime(report_date, '%Y-%m-%d').date()

@@ -7,75 +7,44 @@
 
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6">
-        <div class="rounded-lg p-5 flex flex-wrap items-center gap-3" style="background: var(--color-surface);">
-            <label for="reportDate" class="text-sm font-medium whitespace-nowrap" style="color: var(--color-text);">Kun tanlash</label>
-            <div class="relative">
-                <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                <input
-                    type="date"
-                    id="reportDate"
-                    value="{{ report_date }}"
-                    class="pl-10 pr-4 py-2.5 rounded-md border text-sm"
-                    style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"
-                    onchange="const params = new URLSearchParams(window.location.search); params.set('report_date', this.value); window.location.search = params.toString();"
-                >
-            </div>
-            {% if request.session.shift %}
-            <span class="px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                {{ request.session.shift }}-smena
-            </span>
-            {% endif %}
-        </div>
-
         {% if is_expired %}
         <div class="rounded-md border p-4 flex items-center gap-3 text-sm" style="background: var(--color-pending-bg); border-color: var(--color-pending); color: var(--color-pending);">
-            <i class="fa-solid fa-triangle-exclamation text-lg shrink-0"></i>
+            <i class="bx bx-error text-lg shrink-0"></i>
             Tanlangan sana 3 kundan eski &mdash; hisobot muddati o'tgan bo'lishi mumkin.
         </div>
         {% endif %}
 
-        <div class="flex flex-wrap items-center gap-3">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-                <i class="fa-solid fa-clock"></i>
-                Kutilmoqda: {{ pending_count }}
-            </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                <i class="fa-solid fa-check"></i>
-                Tasdiqlangan: {{ confirmed_count }}
-            </span>
-        </div>
-
-        <div class="rounded-lg p-3" style="background: var(--color-surface);">
-            <form method="get" class="flex flex-wrap items-end gap-2">
-                <div>
-                    {% include "partials/_date_range_input.html" with date_from=from date_to=to label="Sana oralig'i" %}
-                </div>
-                <button type="button"
-                    onclick="const p = new URLSearchParams(window.location.search); const t = new Date().toISOString().slice(0,10); p.set('from', t); p.set('to', t); window.location.search = p.toString();"
-                    class="px-3 py-2 rounded-md text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
-                    Bugun
-                </button>
-                <button type="submit" class="px-4 py-2 rounded-md text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    Qidirish
-                </button>
-            </form>
-        </div>
-
-        <div class="rounded-lg" style="background: var(--color-surface);">
-            <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+        <div class="card rounded-lg" style="background: var(--color-surface);">
+            <div class="card-header d-flex align-items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                    <i class="fa-solid fa-receipt text-lg"></i>
+                    <i class="bx bx-receipt text-lg"></i>
                 </span>
                 <div>
                     <div class="text-lg font-bold" style="color: var(--color-text);">Kunlik hisobotlar</div>
                     <p class="text-sm" style="color: var(--color-text-muted);">Kassani yopish orqali yaratiladi</p>
                 </div>
+                <div class="finance-report-heading-actions ms-auto">
+                    <form method="get" class="finance-report-date-form flex items-center gap-2">
+                        <div class="relative">
+                            <i class="bx bx-calendar absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                            <input type="date" id="reportFrom" name="from" value="{{ from }}" onchange="this.form.submit()" class="form-control finance-report-date-input pl-10 pr-10 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        </div>
+                        <span class="text-sm" style="color: var(--color-text-muted);">dan</span>
+                        <div class="relative">
+                            <i class="bx bx-calendar absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                            <input type="date" id="reportTo" name="to" value="{{ to }}" onchange="this.form.submit()" class="form-control finance-report-date-input pl-10 pr-10 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        </div>
+                    </form>
+                    <div class="finance-report-summary finance-report-summary-compact flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center gap-1 rounded-full text-xs font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);"><i class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}</span>
+                        <span class="inline-flex items-center gap-1 rounded-full text-xs font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);"><i class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="p-5">
+            <div class="card-body p-5">
                 {% if reports %}
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="table table-hover align-middle mb-0 w-full">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
@@ -122,9 +91,9 @@
                     </table>
                 </div>
                 {% else %}
-                <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="fa-solid fa-receipt text-xl"></i>
+                <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
+                    <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                        <i class="bx bx-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                 </div>

@@ -1,16 +1,16 @@
 <div x-data="{ mode: '{{ field.value|default_if_none:'' }}' === '__new__' ? 'new' : 'select' }">
     <select name="{{ field.html_name }}" x-ref="select" x-show="mode === 'select'"
         @change="mode = $event.target.value === '__new__' ? 'new' : 'select'"
-        class="w-full px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
+        class="form-select w-full px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
         {% for value, label in field.field.choices %}
         <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
     </select>
     <div x-show="mode === 'new'" class="flex gap-2">
         <input type="text" name="{{ new_field.html_name }}" value="{{ new_field.value|default_if_none:'' }}"
-            placeholder="{{ new_label }}" class="flex-1 px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
+            placeholder="{{ new_label }}" class="form-control flex-1 px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
         <button type="button" @click="mode = 'select'; $refs.select.selectedIndex = 0"
-            class="px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border);">
+            class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border);">
             Ro'yxatdan tanlash
         </button>
     </div>

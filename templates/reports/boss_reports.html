@@ -7,47 +7,47 @@
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
     <!-- Filter bar -->
-    <div class="rounded-lg p-5" style="background: var(--color-surface);">
+    <div class="card rounded-lg p-5" style="background: var(--color-surface);">
         {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options type_filter=True type_value=type %}
     </div>
 
     <!-- Summary chips -->
     <div class="flex flex-wrap gap-3">
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-            <i class="fa-solid fa-clock"></i>
+            <i class="bx bx-time"></i>
             Kutilmoqda: {{ pending_count }}
         </span>
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
-            <i class="fa-solid fa-check"></i>
+            <i class="bx bx-check"></i>
             Tasdiqlangan: {{ confirmed_count }}
         </span>
     </div>
 
     <!-- Reports table -->
-    <div class="rounded-lg" style="background: var(--color-surface);">
-        <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+    <div class="card rounded-lg" style="background: var(--color-surface);">
+        <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                    <i class="fa-solid fa-receipt"></i>
+                    <i class="bx bx-receipt"></i>
                 </span>
                 <div>
                     <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha hisobotlar</h2>
                     <p class="text-sm" style="color: var(--color-text-muted);">Chiqim va xarajat hisobotlarini belgilab tasdiqlang</p>
                 </div>
             </div>
-            <button type="button" onclick="generatePDF()" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                <i class="fa-solid fa-file-arrow-down"></i>
+            <button type="button" onclick="generatePDF()" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
+                <i class="bx bx-download"></i>
                 Yuklab olish
             </button>
         </div>
-        <div class="p-5">
+        <div class="card-body p-5">
             <form method="post" action="{% url 'bulk_confirm_reports' %}" x-data="bulkSelect()" class="space-y-3">
                 {% csrf_token %}
                 <input type="hidden" name="current_qs" value="{{ request.GET.urlencode }}">
                 {% include "partials/_bulk_action_bar.html" %}
                 {% if reports %}
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="table table-hover align-middle mb-0 w-full finance-boss-reports-table">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">
@@ -98,7 +98,7 @@
                         </tbody>
                         <tfoot>
                             <tr class="font-bold" style="background: var(--color-surface-muted);">
-                                <td class="px-4 py-3 text-sm" colspan="4" style="color: var(--color-text);">Jami</td>
+                                <td class="px-4 py-3 text-sm" colspan="5" style="color: var(--color-text);">Jami</td>
                                 <td class="px-4 py-3 text-sm money" style="color: var(--color-text);">
                                     {% if totals.total_uzs %}<div>{{ totals.total_uzs|format_currency }} so'm</div>{% endif %}
                                     {% if totals.total_usd %}<div>{{ totals.total_usd|format_currency }} $</div>{% endif %}
@@ -111,9 +111,9 @@
                     </table>
                 </div>
                 {% else %}
-                <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="fa-solid fa-receipt text-xl"></i>
+                <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
+                    <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                        <i class="bx bx-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                 </div>

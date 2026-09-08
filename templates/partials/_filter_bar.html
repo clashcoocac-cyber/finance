@@ -2,15 +2,15 @@
 Params: action, date_from, date_to, search, selected_categories, category_options.
 Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select (income/expense/xarajat).
 {% endcomment %}
-<form method="get" action="{{ action }}" class="space-y-3">
-    <div class="grid grid-cols-1 md:grid-cols-{% if type_filter %}4{% else %}3{% endif %} gap-3">
+<form method="get" action="{{ action }}" class="finance-filter-form space-y-3">
+    <div class="grid grid-cols-1 md:grid-cols-{% if type_filter %}5{% else %}4{% endif %} gap-3 items-end">
         <div>
             {% include "partials/_date_range_input.html" with date_from=date_from date_to=date_to label="Sana oralig'i" %}
         </div>
         {% if type_filter %}
         <div>
             <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Tranzaksiya turi</label>
-            <select name="type" class="w-full px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
+            <select name="type" class="form-select w-full px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
                 <option value="">Barchasi</option>
                 <option value="income" {% if type_value == 'income' %}selected{% endif %}>Kirimlar</option>
                 <option value="expense" {% if type_value == 'expense' %}selected{% endif %}>Chiqimlar</option>
@@ -20,7 +20,7 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
         {% endif %}
         <div class="relative" x-data="{ open: false, selectedCats: [{% for c in selected_categories %}'{{ c|escapejs }}'{% if not forloop.last %}, {% endif %}{% endfor %}] }">
             <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Kategoriya</label>
-            <button type="button" @click="open = !open" class="w-full px-3 py-2 border rounded-md text-sm text-left" style="border-color: var(--color-border);">
+            <button type="button" @click="open = !open" class="btn btn-outline-secondary w-full px-3 py-2 border rounded-md text-sm text-left" style="border-color: var(--color-border);">
                 <span x-text="selectedCats.length + ' tanlangan'"></span>
             </button>
             <div x-show="open" @click.outside="open = false" x-cloak
@@ -30,7 +30,7 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
                     :style="'color: var(--color-text);' + (selectedCats.includes('{{ cat.name|escapejs }}') ? ' background: var(--color-surface-muted);' : '')"
                     @click.prevent="selectedCats.includes('{{ cat.name|escapejs }}') ? selectedCats = selectedCats.filter(v => v !== '{{ cat.name|escapejs }}') : selectedCats.push('{{ cat.name|escapejs }}')">
                     <span>{{ cat.name }}</span>
-                    <i x-show="selectedCats.includes('{{ cat.name|escapejs }}')" x-cloak class="fa-solid fa-check shrink-0" style="color: var(--color-brand);"></i>
+                    <i x-show="selectedCats.includes('{{ cat.name|escapejs }}')" x-cloak class="bx bx-check shrink-0" style="color: var(--color-brand);"></i>
                     <input type="checkbox" name="category" value="{{ cat.name }}" class="sr-only" :checked="selectedCats.includes('{{ cat.name|escapejs }}')">
                 </label>
                 {% endfor %}
@@ -38,11 +38,13 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
         </div>
         <div>
             <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Qidiruv</label>
-            <input type="text" name="q" value="{{ search|default:'' }}" placeholder="Operator, kategoriya..." class="w-full px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
+            <input type="text" name="q" value="{{ search|default:'' }}" placeholder="Operator, kategoriya..." class="form-control w-full px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border);">
+        </div>
+        <div class="filter-submit">
+            <button type="submit" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                <i class="bx bx-filter-alt"></i>
+                Filtrlarni qo'llash
+            </button>
         </div>
     </div>
-    <button type="submit" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        Filtrlarni qo'llash
-    </button>
 </form>

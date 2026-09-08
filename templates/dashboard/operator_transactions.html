@@ -7,16 +7,17 @@
 
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6">
-        <div class="rounded-lg p-5 flex flex-wrap items-center justify-between gap-4" style="background: var(--color-surface);">
+        <div class="finance-transaction-panel card rounded-lg overflow-hidden" style="background: var(--color-surface);">
+            <div class="finance-toolbar-card finance-transaction-toolbar p-4 flex flex-wrap items-center justify-between gap-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex flex-wrap items-center gap-3">
                 <label for="reportDate" class="text-sm font-medium whitespace-nowrap" style="color: var(--color-text);">Kun tanlash</label>
                 <div class="relative">
-                    <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                    <i class="bx bx-calendar absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
                     <input
                         type="date"
                         id="reportDate"
                         value="{{ report_date }}"
-                        class="pl-10 pr-4 py-2.5 rounded-md border text-sm"
+                        class="form-control pl-10 pr-4 py-2.5 rounded-md border text-sm"
                         style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"
                         onchange="const params = new URLSearchParams(window.location.search); params.set('report_date', this.value); window.location.search = params.toString();"
                     >
@@ -24,7 +25,7 @@
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: {% if unreported_count %}var(--color-pending-bg){% else %}var(--color-surface-muted){% endif %}; color: {% if unreported_count %}var(--color-pending){% else %}var(--color-text-muted){% endif %};">
-                    <i class="fa-solid fa-clock"></i>
+                    <i class="bx bx-time"></i>
                     {{ unreported_count }} ta amaliyot hisobotga kiritilmagan
                 </span>
                 <form method="post" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
@@ -32,15 +33,15 @@
                     <button type="submit"
                         {% if not unreported_count %}disabled{% endif %}
                         onclick="return confirm('Rostan ham kassani yopmoqchimisiz?')"
-                        class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2 {% if not unreported_count %}opacity-50 cursor-not-allowed{% endif %}"
+                        class="btn btn-label-danger rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2 {% if not unreported_count %}opacity-50 cursor-not-allowed{% endif %}"
                         style="background: var(--color-negative-bg); color: var(--color-negative);">
-                        <i class="fa-solid fa-lock"></i>
+                        <i class="bx bx-lock-alt"></i>
                         Kassani yopish
                     </button>
                 </form>
                 <div x-data="{ open: {% if form.errors %}true{% else %}false{% endif %} }">
-                    <button type="button" @click="open = true" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                        <i class="fa-solid fa-plus"></i>
+                    <button type="button" @click="open = true" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive-bg); color: var(--color-positive);">
+                        <i class="bx bx-plus"></i>
                         Yangi amaliyot
                     </button>
                     {% include "partials/_modal_open.html" with modal_title="Amaliyot qo'shish" modal_subtitle="Kassaga tushgan mablag'ni kiriting" modal_tone="positive" modal_icon="plus" %}
@@ -48,7 +49,7 @@
                         {% csrf_token %}
                         <div>
                             <label class="block text-sm font-medium mb-1.5 inline-flex items-center gap-1.5" style="color: var(--color-text);">
-                                <i class="fa-solid fa-user text-xs" style="color: var(--color-text-muted);"></i>
+                                <i class="bx bx-user text-xs" style="color: var(--color-text-muted);"></i>
                                 Kimdan olindi
                             </label>
                             {% include "partials/_select_or_new_field.html" with field=form.counterparty new_field=form.other_counterparty new_label="Yangi shaxs nomi" %}
@@ -58,16 +59,16 @@
                             <div>
                                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
                                 <div class="relative">
-                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                    <input type="number" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                    <i class="bx bx-coin-stack absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 </div>
                                 {% if form.amount_uzs.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_uzs.errors|striptags }}</p>{% endif %}
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
                                 <div class="relative">
-                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                    <input type="number" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                    <i class="bx bx-coin-stack absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 </div>
                                 {% if form.amount_usd.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_usd.errors|striptags }}</p>{% endif %}
                             </div>
@@ -77,16 +78,16 @@
                             <div>
                                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
                                 <div class="relative">
-                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                    <input type="number" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                    <i class="bx bx-coin-stack absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 </div>
                                 {% if form.amount_rub.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_rub.errors|striptags }}</p>{% endif %}
                             </div>
                             <div>
                                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
                                 <div class="relative">
-                                    <i class="fa-solid fa-coins absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                    <input type="number" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                    <i class="bx bx-coin-stack absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                    <input type="number" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 </div>
                                 {% if form.amount_eur.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.amount_eur.errors|striptags }}</p>{% endif %}
                             </div>
@@ -94,18 +95,18 @@
 
                         <div>
                             <label class="block text-sm font-medium mb-1.5 inline-flex items-center gap-1.5" style="color: var(--color-text);">
-                                <i class="fa-solid fa-comment-dots text-xs" style="color: var(--color-text-muted);"></i>
+                                <i class="bx bx-comment-detail text-xs" style="color: var(--color-text-muted);"></i>
                                 Kurs haqida izoh (ixtiyoriy)
                             </label>
-                            <textarea name="comment" placeholder="Masalan: Dollar kursi 12,250 so'm, Yevro kursi 13,500 so'm..." class="w-full px-4 py-2.5 rounded-md border text-sm resize-none" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" rows="2">{{ form.comment.value|default_if_none:'' }}</textarea>
+                            <textarea name="comment" placeholder="Masalan: Dollar kursi 12,250 so'm, Yevro kursi 13,500 so'm..." class="form-control w-full px-4 py-2.5 rounded-md border text-sm resize-none" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" rows="2">{{ form.comment.value|default_if_none:'' }}</textarea>
                             {% if form.comment.errors %}<p class="text-xs mt-1" style="color: var(--color-negative);">{{ form.comment.errors|striptags }}</p>{% endif %}
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
                             <div class="relative">
-                                <i class="fa-solid fa-credit-card absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                <select required x-model="paymentType" name="payment_type" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <i class="bx bx-credit-card absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                     <option value="">To'lov turini tanlang</option>
                                     <option value="click">Click</option>
                                     <option value="cash">Naqd</option>
@@ -119,8 +120,8 @@
                         <div x-show="paymentType === 'click'" x-cloak>
                             <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Click kartani tanlang</label>
                             <div class="relative">
-                                <i class="fa-solid fa-right-left absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                <select name="click" :required="paymentType === 'click'" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <i class="bx bx-transfer-alt absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
+                                <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                     <option value="">---</option>
                                     {% for click in clicks %}
                                     <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
@@ -131,9 +132,9 @@
                         </div>
 
                         <div class="flex justify-end gap-2 pt-2">
-                            <button type="button" @click="open = false" class="rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">Bekor qilish</button>
-                            <button type="submit" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive); color: var(--color-brand-foreground);">
-                                <i class="fa-solid fa-check"></i>
+                            <button type="button" @click="open = false" class="btn rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">Bekor qilish</button>
+                            <button type="submit" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive); color: var(--color-brand-foreground);">
+                                <i class="bx bx-check"></i>
                                 Ma'lumot qo'shish
                             </button>
                         </div>
@@ -141,15 +142,13 @@
                     {% include "partials/_modal_close.html" %}
                 </div>
             </div>
-        </div>
 
-        <div class="rounded-lg" style="background: var(--color-surface);">
-            <div class="px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
-                <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div class="finance-transaction-filter px-5 py-3" style="border-bottom: 1px solid var(--color-border);">
+                <form method="get" class="finance-transaction-filter-form grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
                     <input type="hidden" name="report_date" value="{{ report_date }}">
                     <div>
                         <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Kimdan</label>
-                        <select name="counterparty" class="w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <select name="counterparty" class="form-select w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             <option value="">Barchasi</option>
                             {% for value, label in form.counterparty.field.choices %}
                             {% if value != '__new__' %}
@@ -160,7 +159,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">To'lov turi</label>
-                        <select name="payment_type" class="w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <select name="payment_type" class="form-select w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             <option value="">Barchasi</option>
                             <option value="click" {% if payment_type == 'click' %}selected{% endif %}>Click</option>
                             <option value="cash" {% if payment_type == 'cash' %}selected{% endif %}>Naqd</option>
@@ -168,23 +167,23 @@
                             <option value="bank" {% if payment_type == 'bank' %}selected{% endif %}>Bank</option>
                         </select>
                     </div>
-                    <div class="md:col-span-2">
+                    <div>
                         <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Qidiruv</label>
-                        <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Tavsif yoki shaxs..." class="w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Tavsif yoki shaxs..." class="form-control w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
-                    <div class="md:col-span-4 flex justify-end">
-                        <button type="submit" class="rounded-md px-4 py-2 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                            <i class="fa-solid fa-filter"></i>
+                    <div class="finance-transaction-filter-submit">
+                        <button type="submit" class="btn w-full rounded-md px-4 py-2 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                            <i class="bx bx-filter"></i>
                             Filtrlarni qo'llash
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div class="p-5">
+            <div class="finance-transaction-table-body card-body p-5">
                 {% if my_transactions %}
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="table table-hover align-middle mb-0 w-full">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Vaqt</th>
@@ -224,13 +223,14 @@
                     </table>
                 </div>
                 {% else %}
-                <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="fa-solid fa-receipt text-xl"></i>
+                <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
+                    <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                        <i class="bx bx-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Amaliyotlar topilmadi</p>
                 </div>
                 {% endif %}
+            </div>
             </div>
         </div>
 </div>

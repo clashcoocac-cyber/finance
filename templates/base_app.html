@@ -2,111 +2,62 @@
 
 {% block content %}
 {% with url_name=request.resolver_match.url_name %}
-<div class="flex min-h-screen" x-data="{ sidebarOpen: false }">
-
-    <!-- Backdrop (mobile only) -->
-    <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"
-         class="fixed inset-0 z-30 lg:hidden" style="background: rgba(15, 23, 42, 0.5);"></div>
-
-    <!-- Sidebar -->
-    <aside class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col transition-transform duration-200 lg:static lg:translate-x-0"
-           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-           style="background: var(--color-sidebar-bg); border-right: 1px solid var(--color-sidebar-border);">
-
-        <div class="flex items-center gap-3 px-5 py-5 shrink-0" style="border-bottom: 1px solid var(--color-sidebar-border);">
-            <span class="flex items-center justify-center w-9 h-9 rounded-md shrink-0" style="background: var(--color-brand);">
-                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand-foreground)" stroke-width="2" stroke-linejoin="round">
-                    <path d="M12 3l9 5-9 5-9-5 9-5z"></path>
-                    <path d="M3 13l9 5 9-5"></path>
-                </svg>
-            </span>
-            <span class="text-xl font-bold tracking-wide" style="color: #FFFFFF;">SFBMSSB</span>
-        </div>
-
-        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            <p class="px-4 mb-2 text-xs font-normal uppercase tracking-wide" style="color: var(--color-sidebar-text-muted);">Menyu</p>
-            {% if request.user.is_boss %}
-                {% url 'boss_dashboard' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="boss_dashboard" %}
-                {% url 'boss_reports' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Hisobotlar" icon="reports" current=url_name match="boss_reports" %}
-                {% url 'transaction_list' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Tranzaksiyalar" icon="transactions" current=url_name match="transaction_list" match2="transaction" %}
-                {% url 'users' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Foydalanuvchilar" icon="users" current=url_name match="users" %}
-            {% elif request.user.is_cashier %}
-                {% url 'cashier_dashboard' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="cashier_dashboard" %}
-                {% url 'cashier_reports' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Kunlik hisobotlar" icon="reports" current=url_name match="cashier_reports" %}
-                {% url 'incomes_list' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Kirimlar" icon="income" current=url_name match="incomes_list" %}
-                {% url 'expenses_list' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Chiqimlar" icon="expense" current=url_name match="expenses_list" %}
-            {% elif request.user.is_operator %}
-                {% url 'operator_dashboard' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="operator_dashboard" %}
-                {% url 'operator_transactions' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Tranzaksiyalar" icon="transactions" current=url_name match="operator_transactions" %}
-                {% url 'operator_reports' as nav_url %}
-                {% include "partials/_nav_item.html" with url=nav_url label="Kunlik hisobotlar" icon="reports" current=url_name match="operator_reports" %}
-            {% endif %}
-        </nav>
-
-        <div class="mx-3 mb-4 px-3 py-2.5 rounded-md text-xs" style="background: var(--color-sidebar-border); color: var(--color-sidebar-text-muted);">
-            Tizim v1.0.0
-        </div>
-    </aside>
-
-    <!-- Content column -->
-    <div class="flex flex-1 flex-col min-w-0">
-        <header class="flex items-center justify-between gap-4 h-16 px-4 sm:px-6 shrink-0"
-                style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
-            <div class="flex items-center gap-3 min-w-0">
-                <button type="button" @click="sidebarOpen = !sidebarOpen"
-                        class="flex items-center justify-center w-9 h-9 rounded-md shrink-0 lg:hidden"
-                        style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Menyu">
-                    <i class="bx bx-menu text-xl"></i>
-                </button>
-                <div class="min-w-0">
-                    <div class="text-lg sm:text-xl font-bold truncate" style="color: var(--color-text);">
-                        {% block page_title %}{% endblock %}
+<div class="layout-wrapper layout-content-navbar layout-menu-fixed" x-data="{ sidebarOpen: false }">
+    <div class="layout-container">
+        <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false" class="layout-overlay layout-menu-toggle d-xl-none"></div>
+        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme finance-sidebar" :class="sidebarOpen ? 'menu-open' : ''">
+            <div class="app-brand demo">
+                <a href="{% url 'home' %}" class="app-brand-link">
+                    <span class="app-brand-logo demo"><span class="d-inline-flex align-items-center justify-content-center rounded" style="width: 30px; height: 30px; background: #696cff; color: #fff;"><i class="bx bxs-wallet fs-4"></i></span></span>
+                    <span class="app-brand-text demo menu-text fw-bolder ms-2">SFBMSSB</span>
+                </a>
+                <button type="button" class="layout-menu-toggle menu-link text-large ms-auto border-0 bg-transparent d-xl-none" @click="sidebarOpen = false" aria-label="Menyuni yopish"><i class="bx bx-chevron-left bx-sm align-middle"></i></button>
+            </div>
+            <div class="menu-inner-shadow"></div>
+            <ul class="menu-inner py-1">
+                <li class="menu-header small text-uppercase"><span class="menu-header-text">Asosiy menyu</span></li>
+                {% if request.user.is_boss %}
+                    {% url 'boss_dashboard' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="boss_dashboard" %}
+                    {% url 'boss_reports' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Hisobotlar" icon="reports" current=url_name match="boss_reports" %}
+                    {% url 'transaction_list' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Tranzaksiyalar" icon="transactions" current=url_name match="transaction_list" match2="transaction" %}
+                    {% url 'users' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Foydalanuvchilar" icon="users" current=url_name match="users" %}
+                {% elif request.user.is_cashier %}
+                    {% url 'cashier_dashboard' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="cashier_dashboard" %}
+                    {% url 'cashier_reports' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Kunlik hisobotlar" icon="reports" current=url_name match="cashier_reports" %}
+                    {% url 'incomes_list' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Kirimlar" icon="income" current=url_name match="incomes_list" %}
+                    {% url 'expenses_list' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Chiqimlar" icon="expense" current=url_name match="expenses_list" %}
+                {% elif request.user.is_operator %}
+                    {% url 'operator_dashboard' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="operator_dashboard" %}
+                    {% url 'operator_transactions' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Tranzaksiyalar" icon="transactions" current=url_name match="operator_transactions" %}
+                    {% url 'operator_reports' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Kunlik hisobotlar" icon="reports" current=url_name match="operator_reports" %}
+                {% endif %}
+            </ul>
+            <div class="finance-sidebar-account">
+                <div class="finance-sidebar-user">
+                    <span class="finance-sidebar-avatar">{{ request.user.username|first|upper }}</span>
+                    <div class="min-w-0">
+                        <span class="finance-sidebar-username">{{ request.user.username }}</span>
+                        <small class="finance-sidebar-role">{{ request.user.get_role_display }}</small>
                     </div>
                 </div>
-            </div>
-
-            <div class="flex items-center gap-3 shrink-0">
-                <div class="hidden sm:flex items-center gap-2.5">
-                    <span class="flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold uppercase"
-                          style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                        {{ request.user.username|first }}
-                    </span>
-                    <span class="leading-tight">
-                        <span class="block text-sm font-semibold" style="color: var(--color-text);">{{ request.user.username }}</span>
-                        <span class="block text-xs" style="color: var(--color-text-muted);">{{ request.user.get_role_display }}</span>
-                    </span>
-                </div>
-                <a href="{% url 'logout' %}"
-                   class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                   style="background: var(--color-negative-bg); color: var(--color-negative);">
-                    Chiqish
+                <a href="{% url 'logout' %}" class="finance-sidebar-logout">
+                    <i class="bx bx-log-out"></i>
+                    <span>Chiqish</span>
                 </a>
             </div>
-        </header>
-
-        <main class="flex-1 p-4 sm:p-6 space-y-6">
-            {% if messages %}
-                {% for message in messages %}
-                <div class="rounded-lg px-4 py-3 text-sm font-medium"
-                     style="background: {% if message.tags == 'error' %}var(--color-negative-bg){% else %}var(--color-positive-bg){% endif %};
-                            color: {% if message.tags == 'error' %}var(--color-negative){% else %}var(--color-positive){% endif %};">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            {% endif %}
-
-            {% block page_content %}{% endblock %}
-        </main>
+        </aside>
+        <div class="layout-page">
+            <div class="content-wrapper">
+                <main class="finance-main container-xxl flex-grow-1 container-p-y">
+                    <button type="button" class="finance-mobile-menu finance-mobile-menu-fixed btn btn-icon d-xl-none" @click="sidebarOpen = true" aria-label="Menyuni ochish">
+                        <i class="bx bx-menu"></i>
+                    </button>
+                    {% if messages %}{% for message in messages %}<div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible mb-4" role="alert">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Yopish"></button></div>{% endfor %}{% endif %}
+                    {% block page_content %}{% endblock %}
+                </main>
+                <footer class="content-footer footer bg-footer-theme"><div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column"><div class="mb-2 mb-md-0">© {% now "Y" %} SFBMSSB</div><div>Moliyaviy boshqaruv tizimi</div></div></footer>
+            </div>
+        </div>
     </div>
 </div>
 {% endwith %}
