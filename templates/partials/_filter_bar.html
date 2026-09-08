@@ -35,7 +35,7 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
                     :style="'color: var(--color-text);' + (selectedCats.includes('{{ cat.name|escapejs }}') ? ' background: var(--color-surface-muted);' : '')"
                     @click.prevent="selectedCats.includes('{{ cat.name|escapejs }}') ? selectedCats = selectedCats.filter(v => v !== '{{ cat.name|escapejs }}') : selectedCats.push('{{ cat.name|escapejs }}')">
                     <span>{{ cat.name }}</span>
-                    <i x-show="selectedCats.includes('{{ cat.name|escapejs }}')" x-cloak class="bx bx-check shrink-0" style="color: var(--color-brand);"></i>
+                    <i x-show="selectedCats.includes('{{ cat.name|escapejs }}')" x-cloak class="fa-solid fa-check shrink-0" style="color: var(--color-brand);"></i>
                     <input type="checkbox" name="category" value="{{ cat.name }}" class="sr-only" :checked="selectedCats.includes('{{ cat.name|escapejs }}')">
                 </label>
                 {% endfor %}
@@ -47,7 +47,7 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
         </div>
     </div>
     <button type="submit" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-        <i class="bx bx-search"></i>
+        <i class="fa-solid fa-magnifying-glass"></i>
         Filtrlarni qo'llash
     </button>
 </form>

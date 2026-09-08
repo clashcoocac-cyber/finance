@@ -9,6 +9,6 @@ Sidebar nav link. Params:
 <a href="{{ url }}"
    class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if current == match or current == match2 %}font-semibold{% else %}font-medium{% endif %}"
    style="{% if current == match or current == match2 %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text); box-shadow: 0 2px 6px rgba(105, 108, 255, 0.4);{% else %}color: var(--color-sidebar-text);{% endif %}">
-    <i class="bx {% if icon == 'home' %}bx-home-alt{% elif icon == 'reports' %}bx-receipt{% elif icon == 'transactions' %}bx-transfer{% elif icon == 'users' %}bx-group{% elif icon == 'income' %}bx-trending-up{% elif icon == 'expense' %}bx-trending-down{% endif %} text-xl shrink-0"></i>
+    <i class="fa-solid {% if icon == 'home' %}fa-house{% elif icon == 'reports' %}fa-receipt{% elif icon == 'transactions' %}fa-right-left{% elif icon == 'users' %}fa-users{% elif icon == 'income' %}fa-arrow-trend-up{% elif icon == 'expense' %}fa-arrow-trend-down{% endif %} text-lg shrink-0" style="width: 1.25rem; text-align: center;"></i>
     <span>{{ label }}</span>
 </a>

@@ -26,7 +26,7 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
             <span class="flex items-center justify-center w-12 h-12 rounded-lg shrink-0"
                   style="background: {% if modal_tone == 'positive' %}var(--color-positive-bg){% elif modal_tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
                          color: {% if modal_tone == 'positive' %}var(--color-positive){% elif modal_tone == 'negative' %}var(--color-negative){% else %}var(--color-brand){% endif %};">
-                <i class="bx text-2xl {% if modal_icon == 'user' %}bx-user{% elif modal_icon == 'edit' %}bx-edit-alt{% else %}bx-plus{% endif %}"></i>
+                <i class="fa-solid text-xl {% if modal_icon == 'user' %}fa-user{% elif modal_icon == 'edit' %}fa-pen{% else %}fa-plus{% endif %}"></i>
             </span>
             <div class="min-w-0 flex-1">
                 <h2 class="text-xl font-bold" style="color: var(--color-text);">{{ modal_title }}</h2>
@@ -38,7 +38,7 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
                     class="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
                     style="background: var(--color-surface-muted); color: var(--color-text-muted);"
                     aria-label="Yopish">
-                <i class="bx bx-x text-xl"></i>
+                <i class="fa-solid fa-xmark text-lg"></i>
             </button>
         </div>
         <div class="px-6 py-5">
