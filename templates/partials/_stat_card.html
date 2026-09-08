@@ -1,7 +1,29 @@
 {% load custom_filters %}
 <div class="rounded-xl p-5 border" style="background: var(--color-surface); border-color: var(--color-border);">
     <div class="flex items-center justify-between mb-3">
-        <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
+        <div class="flex items-center gap-3">
+            <span class="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
+                  style="background: {% if tone == 'positive' %}var(--color-positive-bg){% elif tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
+                         color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text-muted){% endif %};">
+                {% if tone == 'positive' %}
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 17l6-6 4 4 8-8"></path>
+                    <path d="M15 7h6v6"></path>
+                </svg>
+                {% elif tone == 'negative' %}
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 7l6 6 4-4 8 8"></path>
+                    <path d="M15 17h6v-6"></path>
+                </svg>
+                {% else %}
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="9" r="5"></circle>
+                    <circle cx="15" cy="15" r="5"></circle>
+                </svg>
+                {% endif %}
+            </span>
+            <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
+        </div>
         {% include "partials/_status_badge.html" with status=status %}
     </div>
     <div class="space-y-1 money text-sm" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">

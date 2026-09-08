@@ -1,4 +1,5 @@
-<div class="flex items-center justify-between mb-3 px-4 py-2 rounded-lg" style="background: var(--color-surface-muted);">
+<div class="sticky bottom-0 z-10 flex items-center justify-between mb-3 px-4 py-3 rounded-lg border shadow-lg"
+     style="background: var(--color-surface); border-color: var(--color-border);">
     <span class="text-sm" style="color: var(--color-text-muted);" x-text="selected.length + ' ta belgilandi'"></span>
     <button type="submit" :disabled="selected.length === 0" :class="selected.length === 0 ? 'opacity-40 cursor-not-allowed' : ''"
         class="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--color-brand); color: var(--color-brand-foreground);">
