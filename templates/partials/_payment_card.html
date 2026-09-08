@@ -12,10 +12,10 @@
         </span>
         <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
     </div>
-    <div class="space-y-1 money text-sm" style="color: var(--color-text);">
+    <div class="space-y-1.5 money" style="color: var(--color-text);">
         <div class="text-lg font-semibold">{{ amounts_uzs|default:0|format_currency }} so'm</div>
-        <div>{{ amounts_usd|default:0|format_currency }} $</div>
-        <div>{{ amounts_rub|default:0|format_currency }} ₽</div>
-        <div>{{ amounts_eur|default:0|format_currency }} €</div>
+        <div class="text-lg font-semibold">{{ amounts_usd|default:0|format_currency }} $</div>
+        <div class="text-lg font-semibold">{{ amounts_rub|default:0|format_currency }} ₽</div>
+        <div class="text-lg font-semibold">{{ amounts_eur|default:0|format_currency }} €</div>
     </div>
 </div>

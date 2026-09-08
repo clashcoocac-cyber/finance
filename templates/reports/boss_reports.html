@@ -14,11 +14,11 @@
     <!-- Summary chips -->
     <div class="flex flex-wrap gap-3">
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+            <i class="fa-solid fa-clock"></i>
             Kutilmoqda: {{ pending_count }}
         </span>
         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"></path></svg>
+            <i class="fa-solid fa-check"></i>
             Tasdiqlangan: {{ confirmed_count }}
         </span>
     </div>
@@ -28,7 +28,7 @@
         <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path><path d="M9 13h6M9 17h4"></path></svg>
+                    <i class="fa-solid fa-receipt"></i>
                 </span>
                 <div>
                     <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha hisobotlar</h2>
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <button type="button" onclick="generatePDF()" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg>
+                <i class="fa-solid fa-file-arrow-down"></i>
                 Yuklab olish
             </button>
         </div>
@@ -96,12 +96,24 @@
                             </tr>
                             {% endfor %}
                         </tbody>
+                        <tfoot>
+                            <tr class="font-bold" style="background: var(--color-surface-muted);">
+                                <td class="px-4 py-3 text-sm" colspan="4" style="color: var(--color-text);">Jami</td>
+                                <td class="px-4 py-3 text-sm money" style="color: var(--color-text);">
+                                    {% if totals.total_uzs %}<div>{{ totals.total_uzs|format_currency }} so'm</div>{% endif %}
+                                    {% if totals.total_usd %}<div>{{ totals.total_usd|format_currency }} $</div>{% endif %}
+                                    {% if totals.total_rub %}<div>{{ totals.total_rub|format_currency }} ₽</div>{% endif %}
+                                    {% if totals.total_eur %}<div>{{ totals.total_eur|format_currency }} €</div>{% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm"></td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
                     <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg>
+                        <i class="fa-solid fa-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                 </div>

@@ -13,11 +13,11 @@
         {% include "partials/_status_badge.html" with status=status %}
         {% endif %}
     </div>
-    <div class="space-y-1 money text-sm" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
+    <div class="space-y-1.5 money" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
         <div class="text-lg font-semibold">{{ amounts.total_uzs|default:0|format_currency }} so'm</div>
-        <div>{{ amounts.total_usd|default:0|format_currency }} $</div>
-        <div>{{ amounts.total_rub|default:0|format_currency }} ₽</div>
-        <div>{{ amounts.total_eur|default:0|format_currency }} €</div>
+        <div class="text-lg font-semibold">{{ amounts.total_usd|default:0|format_currency }} $</div>
+        <div class="text-lg font-semibold">{{ amounts.total_rub|default:0|format_currency }} ₽</div>
+        <div class="text-lg font-semibold">{{ amounts.total_eur|default:0|format_currency }} €</div>
     </div>
     {% if pending_amounts %}
     {% with pending_line=pending_amounts|pending_summary %}

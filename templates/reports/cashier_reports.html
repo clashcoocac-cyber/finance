@@ -8,16 +8,11 @@
 <div class="max-w-7xl mx-auto space-y-6">
         <div class="flex flex-wrap items-center gap-3">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M12 7v5l3 3"></path>
-                </svg>
+                <i class="fa-solid fa-clock shrink-0"></i>
                 Kutilmoqda: {{ pending_count }}
             </span>
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 6L9 17l-5-5"></path>
-                </svg>
+                <i class="fa-solid fa-check shrink-0"></i>
                 Tasdiqlangan: {{ confirmed_count }}
             </span>
         </div>
@@ -29,10 +24,7 @@
         <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
             <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
-                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                    </svg>
+                    <i class="fa-solid fa-arrow-trend-up text-lg"></i>
                 </span>
                 <div>
                     <div class="text-lg font-bold" style="color: var(--color-text);">Kirim hisobotlari</div>
@@ -126,15 +118,26 @@
                                 </tr>
                                 {% endfor %}
                             </tbody>
+                            <tfoot>
+                                <tr class="font-bold" style="background: var(--color-surface-muted); border-top: 2px solid var(--color-border);">
+                                    <td class="px-4 py-3 text-sm" colspan="5" style="color: var(--color-text);">Jami:</td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <div class="space-y-1 money" style="color: var(--color-text);">
+                                            {% if totals.total_uzs %}<div>{{ totals.total_uzs|format_currency }} so'm</div>{% endif %}
+                                            {% if totals.total_usd %}<div>{{ totals.total_usd|format_currency }} $</div>{% endif %}
+                                            {% if totals.total_rub %}<div>{{ totals.total_rub|format_currency }} ₽</div>{% endif %}
+                                            {% if totals.total_eur %}<div>{{ totals.total_eur|format_currency }} €</div>{% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-sm"></td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
                     {% else %}
                     <div class="flex flex-col items-center justify-center py-10 text-center">
                         <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
-                                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
-                            </svg>
+                            <i class="fa-solid fa-inbox text-xl"></i>
                         </span>
                         <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                     </div>

@@ -211,21 +211,21 @@
                 {% if reports %}
                 <div class="-mx-2">
                     {% for report in reports %}
-                    <div class="flex items-center justify-between gap-4 px-2 py-3 rounded-lg transition-colors hover:bg-[var(--color-surface-muted)]" style="border-bottom: 1px solid var(--color-border);">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                            </span>
-                            <div class="min-w-0">
-                                <p class="font-semibold truncate" style="color: var(--color-text);">{{ report.category }}</p>
-                                <p class="text-xs truncate" style="color: var(--color-text-muted);">
-                                    {{ report.date|date:"d/m/Y" }}
-                                    {% if report.uzs_detail %}
-                                    &middot;
+                    <div class="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-2 py-3 rounded-lg transition-colors hover:bg-[var(--color-surface-muted)]" style="border-bottom: 1px solid var(--color-border);">
+                        <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                        </span>
+                        <div class="min-w-0">
+                            <p class="font-semibold truncate" style="color: var(--color-text);">{{ report.category }}</p>
+                            <p class="text-xs flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5" style="color: var(--color-text-muted);">
+                                <span class="inline-flex items-center gap-1"><i class="fa-solid fa-calendar-days"></i>{{ report.date|date:"d/m/Y" }}</span>
+                                {% if report.uzs_detail %}
+                                <span class="inline-flex items-center gap-1">
+                                    <i class="fa-solid fa-credit-card"></i>
                                     {% for key, val in report.uzs_detail.items %}{% if val %}{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}
-                                    {% endif %}
-                                </p>
-                            </div>
+                                </span>
+                                {% endif %}
+                            </p>
                         </div>
                         <div class="flex items-center gap-3 shrink-0">
                             <div class="text-right space-y-0.5 money" style="color: var(--color-positive);">

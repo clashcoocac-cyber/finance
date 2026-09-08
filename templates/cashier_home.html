@@ -7,9 +7,9 @@
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {% include "partials/_stat_card.html" with title="Kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
-            {% include "partials/_stat_card.html" with title="Chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
-            {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
+            {% include "partials/_stat_card.html" with title="Kirim" amounts=stats.combined.income pending_amounts=stats.pending.income tone="positive" %}
+            {% include "partials/_stat_card.html" with title="Chiqim" amounts=stats.combined.expense pending_amounts=stats.pending.expense tone="negative" %}
+            {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.combined.diff pending_amounts=stats.pending.diff tone="neutral" %}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -22,12 +22,7 @@
             <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <div class="flex items-center gap-3">
                     <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
+                        <i class="fa-solid fa-receipt text-lg"></i>
                     </span>
                     <div>
                         <div class="text-lg font-bold" style="color: var(--color-text);">So'nggi hisobotlar</div>
@@ -44,18 +39,11 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="generatePDF()" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
+                        <i class="fa-solid fa-arrow-down"></i>
                         PDF
                     </button>
                     <a href="{% url 'cashier_reports' %}" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                        </svg>
+                        <i class="fa-solid fa-receipt"></i>
                         Barcha hisobotlar
                     </a>
                 </div>
@@ -103,10 +91,7 @@
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
                     <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                        </svg>
+                        <i class="fa-solid fa-inbox text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hozircha hisobotlar yo'q</p>
                 </div>
