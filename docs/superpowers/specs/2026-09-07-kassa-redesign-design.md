@@ -179,6 +179,8 @@ Komron 5 ta referens screenshot yubordi (zamonaviy admin dashboard: chap tomonda
 - Login sahifasi **o'zgarmaydi** — u hali autentifikatsiyadan oldingi ekran, sidebar tegishli emas (referens screenshotlarda ham login yo'q).
 - Haqiqiy sahifalash (pagination, "Jami N ta natija / 10/sahifa") referensda ko'rinadi, lekin bu backend queryset'ga `Paginator` qo'shishni talab qiladi — **hozircha qo'shilmaydi** (ishlamaydigan dekorativ pagination yasash noto'g'ri bo'lardi); alohida keyingi task sifatida taklif qilinadi, hozirgi plan doirasidan tashqarida.
 
+**Qo'shimcha forma andozasi (2026-09-08, 6-screenshot):** har bir forma kartasi: yuqorida rangli doira ichida icon + Title + subtitle (masalan "Kirim Qo'shish" / "Kirim ma'lumotlarini to'ldiring va tizimga kiriting"), har bir input/select ichida chapda kichik icon (valyuta belgisi, karta icon va h.k.), pastda to'liq enli, icon+matnli tugma (masalan yashil "→ Qo'shish"). **Bu naqsh barcha formalarga tegishli** — login, kirim/chiqim qo'shish, foydalanuvchi yaratish va h.k., faqat yangi quriladigan sahifalarga emas, balki **allaqachon tayyor bo'lgan login va expenses_page'ga ham** keyingi retrofit orqali qo'llanadi.
+
 **Ijro tartibi:** yangi "App shell" task (partial + `base.html`/yangi `base_app.html` qatlami) → allaqachon qurilgan sahifalarni (boss/cashier/operator/expenses) shu shell'ga ko'chirish (bitta batch task, bir xil turdagi o'zgarish) → qolgan sahifalar (incomes/transactions/edit_tran/user_list) to'g'ridan-to'g'ri yangi shell asosida qurilib davom etadi.
 
 ## 8. Xavf / cheklovlar
