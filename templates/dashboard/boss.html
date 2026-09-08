@@ -139,42 +139,58 @@
     </div>
 
     <!-- Edit Daily Stats Modal -->
-    {% include "partials/_modal_open.html" with modal_title="Statistikani tahrirlash" modal_tone="brand" modal_icon="edit" %}
-        <p class="text-sm font-semibold mb-4" style="color: var(--color-text);" x-text="titles[statType]"></p>
-        <form method="POST" action="{% url 'change_stat' %}" class="space-y-4">
+    {% include "partials/_modal_open.html" with modal_title="Statistikani tahrirlash" modal_subtitle="Kirim, chiqim yoki qoldiq summalarini yangilang" modal_tone="brand" modal_icon="edit" modal_class="finance-stat-edit-modal" %}
+        <div class="finance-stat-edit-heading">
+            <span class="finance-stat-edit-kicker">Tanlangan bo‘lim</span>
+            <strong x-text="titles[statType]"></strong>
+        </div>
+        <form method="POST" action="{% url 'change_stat' %}" class="finance-stat-edit-form space-y-4">
             {% csrf_token %}
             <input type="hidden" name="stat_type" :value="statType">
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm miqdori</label>
-                    <input type="number" name="total_uzs" x-model.number="uzs" placeholder="So'm miqdorini kiriting" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+            <div class="finance-stat-edit-grid grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="finance-stat-edit-field">
+                    <label for="statTotalUzs">So'm <span>UZS</span></label>
+                    <div class="finance-stat-edit-input">
+                        <input id="statTotalUzs" type="number" name="total_uzs" x-model.number="uzs" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <span>so'm</span>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar miqdori</label>
-                    <input type="number" name="total_usd" x-model.number="usd" placeholder="Dollar miqdorini kiriting" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <div class="finance-stat-edit-field">
+                    <label for="statTotalUsd">Dollar <span>USD</span></label>
+                    <div class="finance-stat-edit-input">
+                        <input id="statTotalUsd" type="number" name="total_usd" x-model.number="usd" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <span>$</span>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl miqdori</label>
-                    <input type="number" name="total_rub" x-model.number="rub" placeholder="Rubl miqdorini kiriting" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <div class="finance-stat-edit-field">
+                    <label for="statTotalRub">Rubl <span>RUB</span></label>
+                    <div class="finance-stat-edit-input">
+                        <input id="statTotalRub" type="number" name="total_rub" x-model.number="rub" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <span>₽</span>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro miqdori</label>
-                    <input type="number" name="total_eur" x-model.number="eur" placeholder="Yevro miqdorini kiriting" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <div class="finance-stat-edit-field">
+                    <label for="statTotalEur">Yevro <span>EUR</span></label>
+                    <div class="finance-stat-edit-input">
+                        <input id="statTotalEur" type="number" name="total_eur" x-model.number="eur" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <span>€</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="rounded-md p-3 border" style="background: var(--color-pending-bg); border-color: var(--color-pending);">
-                <p class="text-sm font-medium mb-1" style="color: var(--color-pending);">Diqqat!</p>
-                <p class="text-sm" style="color: var(--color-pending);">Bu o'zgarishlar kunlik hisobotga ta'sir qiladi. Faqat zarur hollarda o'zgartiring.</p>
+            <div class="finance-stat-edit-notice" role="note">
+                <i class="bx bx-info-circle"></i>
+                <p>O'zgarishlar kunlik hisobot hisobiga ta'sir qiladi. Faqat zarur bo'lsa saqlang.</p>
             </div>
 
             <div class="flex gap-3 pt-2">
-                <button type="submit" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                    Saqlash
-                </button>
                 <button type="button" @click="open = false" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
                     Bekor qilish
+                </button>
+                <button type="submit" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    <i class="bx bx-check"></i>
+                    Saqlash
                 </button>
             </div>
         </form>

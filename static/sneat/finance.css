@@ -671,6 +671,104 @@ body {
   margin-top: 0 !important;
 }
 
+.finance-stat-edit-modal {
+  max-width: 46rem !important;
+}
+
+.finance-stat-edit-modal .finance-modal-body {
+  padding: 1.5rem 1.75rem 1.75rem !important;
+}
+
+.finance-stat-edit-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.finance-stat-edit-kicker {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.finance-stat-edit-heading strong {
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.finance-stat-edit-field label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.finance-stat-edit-field label span {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.finance-stat-edit-input {
+  position: relative;
+}
+
+.finance-stat-edit-input input {
+  padding-right: 3.75rem !important;
+  font-size: 1rem !important;
+  font-weight: 600;
+}
+
+.finance-stat-edit-input > span {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.finance-stat-edit-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid color-mix(in srgb, var(--color-pending) 28%, transparent);
+  border-radius: 0.5rem;
+  background: var(--color-pending-bg);
+  color: var(--color-pending);
+}
+
+.finance-stat-edit-notice i {
+  flex: 0 0 auto;
+  margin-top: 0.05rem;
+  font-size: 1.1rem;
+}
+
+.finance-stat-edit-notice p {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.finance-stat-edit-modal form > .flex button {
+  justify-content: center;
+  gap: 0.4rem;
+}
+
 @media (max-width: 767.98px) {
   .finance-main {
     padding: 1rem !important;
@@ -743,6 +841,16 @@ body {
 
   .finance-modal-panel {
     max-height: calc(100vh - 1rem);
+  }
+
+  .finance-stat-edit-modal .finance-modal-body {
+    padding: 1.25rem !important;
+  }
+
+  .finance-stat-edit-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 
   .finance-total-strip {
