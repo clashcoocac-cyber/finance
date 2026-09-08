@@ -24,7 +24,7 @@
         </div>
 
         <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-            <p class="px-4 mb-2 text-xs font-semibold uppercase tracking-wide" style="color: var(--color-sidebar-text-muted);">Menyu</p>
+            <p class="px-4 mb-2 text-xs font-normal uppercase tracking-wide" style="color: var(--color-sidebar-text-muted);">Menyu</p>
             {% if request.user.is_boss %}
                 {% url 'boss_dashboard' as nav_url %}
                 {% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="boss_dashboard" %}
