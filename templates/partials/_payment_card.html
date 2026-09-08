@@ -1,22 +1,14 @@
 {% load custom_filters %}
 {% comment %}Neutral running-balance card (Click / Naqd channels) — same visual language as _stat_card.html,
-   but a plain amounts shape (uzs/usd/rub/eur, no "total_" prefix, no confirmed/pending split).{% endcomment %}
+   but a plain amounts shape (uzs/usd/rub/eur, no "total_" prefix, no confirmed/pending split).
+   icon: "cash" gets a positive-tinted badge, anything else (click channels) gets a brand-tinted badge —
+   so the cash channel reads visually distinct from the card channels.{% endcomment %}
 <div class="rounded-xl p-5 border" style="background: var(--color-surface); border-color: var(--color-border);">
     <div class="flex items-center gap-3 mb-3">
         <span class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
-              style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-            {% if icon == "cash" %}
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M6 9v.01M18 15v.01"></path>
-            </svg>
-            {% else %}
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                <path d="M2 10h20"></path>
-            </svg>
-            {% endif %}
+              style="background: {% if icon == 'cash' %}var(--color-positive-bg){% else %}var(--color-surface-muted){% endif %};
+                     color: {% if icon == 'cash' %}var(--color-positive){% else %}var(--color-brand){% endif %};">
+            <i class="bx text-lg {% if icon == 'cash' %}bx-money{% else %}bx-credit-card{% endif %}"></i>
         </span>
         <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
     </div>

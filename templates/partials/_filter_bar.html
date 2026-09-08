@@ -35,7 +35,7 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
                     :style="'color: var(--color-text);' + (selectedCats.includes('{{ cat.name|escapejs }}') ? ' background: var(--color-surface-muted);' : '')"
                     @click.prevent="selectedCats.includes('{{ cat.name|escapejs }}') ? selectedCats = selectedCats.filter(v => v !== '{{ cat.name|escapejs }}') : selectedCats.push('{{ cat.name|escapejs }}')">
                     <span>{{ cat.name }}</span>
-                    <svg x-show="selectedCats.includes('{{ cat.name|escapejs }}')" x-cloak class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+                    <i x-show="selectedCats.includes('{{ cat.name|escapejs }}')" x-cloak class="bx bx-check shrink-0" style="color: var(--color-brand);"></i>
                     <input type="checkbox" name="category" value="{{ cat.name }}" class="sr-only" :checked="selectedCats.includes('{{ cat.name|escapejs }}')">
                 </label>
                 {% endfor %}
@@ -47,7 +47,7 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
         </div>
     </div>
     <button type="submit" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
+        <i class="bx bx-search"></i>
         Filtrlarni qo'llash
     </button>
 </form>

@@ -5,22 +5,7 @@
             <span class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
                   style="background: {% if tone == 'positive' %}var(--color-positive-bg){% elif tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
                          color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text-muted){% endif %};">
-                {% if tone == 'positive' %}
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 17l6-6 4 4 8-8"></path>
-                    <path d="M15 7h6v6"></path>
-                </svg>
-                {% elif tone == 'negative' %}
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 7l6 6 4-4 8 8"></path>
-                    <path d="M15 17h6v-6"></path>
-                </svg>
-                {% else %}
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="9" cy="9" r="5"></circle>
-                    <circle cx="15" cy="15" r="5"></circle>
-                </svg>
-                {% endif %}
+                <i class="bx text-lg {% if tone == 'positive' %}bx-trending-up{% elif tone == 'negative' %}bx-trending-down{% else %}bx-wallet{% endif %}"></i>
             </span>
             <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
         </div>
@@ -39,10 +24,7 @@
     <div class="mt-3 pt-3 border-t" style="border-color: var(--color-border);">
         {% if pending_line %}
         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-            <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="9"></circle>
-                <path d="M12 7v5l3 3"></path>
-            </svg>
+            <i class="bx bx-time-five shrink-0"></i>
             Kutilmoqda: {{ pending_line }}
         </span>
         {% else %}
