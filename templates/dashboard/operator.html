@@ -8,7 +8,12 @@
 {% block page_content %}
 <div id="operatorDashboard" class="min-h-screen">
     <div class="max-w-7xl mx-auto p-6">
-        <div class="flex justify-end mb-4">
+        <div class="flex items-center justify-end gap-2 mb-4">
+            {% if request.session.shift %}
+            <span class="px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                {{ request.session.shift }}-smena
+            </span>
+            {% endif %}
             <form method="POST" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
                 {% csrf_token %}
                 <button type="submit"
