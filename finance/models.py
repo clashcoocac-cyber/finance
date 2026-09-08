@@ -12,6 +12,20 @@ class User(AbstractUser):
     company = models.ForeignKey('Company', on_delete=models.CASCADE, null=True)
     created = models.DateField(auto_now_add=True)
 
+    @property
+    def is_boss(self):
+        # A superuser created via createsuperuser has no role set; treat it as boss
+        # so it never gets locked out of its own admin screens.
+        return self.role == 'boss' or self.is_superuser
+
+    @property
+    def is_cashier(self):
+        return self.role == 'cashier'
+
+    @property
+    def is_operator(self):
+        return self.role == 'operator'
+
 
 class Company(models.Model):
     name = models.CharField(max_length=255)

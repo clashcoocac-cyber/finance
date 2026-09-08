@@ -8,50 +8,7 @@
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
     <!-- Filter bar -->
     <div class="rounded-xl border p-5" style="background: var(--color-surface); border-color: var(--color-border);">
-        <form method="get" x-data="{ categoriesOpen: false }" class="space-y-3">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <div>
-                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Boshlanish sanasi</label>
-                    <input type="date" name="from" value="{{ from }}" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Tugash sanasi</label>
-                    <input type="date" name="to" value="{{ to }}" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Tranzaksiya turi</label>
-                    <select name="type" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
-                        <option value="">Barchasi</option>
-                        <option value="income" {% if type == 'income' %}selected{% endif %}>Kirimlar</option>
-                        <option value="expense" {% if type == 'expense' %}selected{% endif %}>Chiqimlar</option>
-                        <option value="xarajat" {% if type == 'xarajat' %}selected{% endif %}>Xarajatlar</option>
-                    </select>
-                </div>
-                <div class="relative">
-                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Kategoriya</label>
-                    <button type="button" @click="categoriesOpen = !categoriesOpen" class="w-full px-3 py-2 border rounded-lg text-sm text-left" style="border-color: var(--color-border);">
-                        {{ categories|length|default:0 }} tanlangan
-                    </button>
-                    <div x-show="categoriesOpen" @click.outside="categoriesOpen = false" x-cloak
-                        class="absolute z-10 mt-1 w-full rounded-lg border shadow-lg p-2 max-h-56 overflow-y-auto" style="background: var(--color-surface); border-color: var(--color-border);">
-                        {% for cat in category_options %}
-                        <label class="flex items-center gap-2 px-2 py-1 text-sm rounded">
-                            <input type="checkbox" name="category" value="{{ cat.name }}" {% if cat.name in categories %}checked{% endif %}>
-                            {{ cat.name }}
-                        </label>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Qidiruv</label>
-                    <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Operator, kategoriya..." class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
-                </div>
-            </div>
-            <button type="submit" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-                Filtrlarni qo'llash
-            </button>
-        </form>
+        {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options type_filter=True type_value=type %}
     </div>
 
     <!-- Summary chips -->
@@ -90,7 +47,7 @@
                 {% include "partials/_bulk_action_bar.html" %}
                 {% if reports %}
                 <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
+                    <table class="w-full">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">
@@ -143,7 +100,9 @@
                 </div>
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <svg class="w-10 h-10 mb-3" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg>
+                    <span class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg>
+                    </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                 </div>
                 {% endif %}

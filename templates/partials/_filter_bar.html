@@ -1,5 +1,9 @@
+{% comment %}
+Params: action, date_from, date_to, search, selected_categories, category_options.
+Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select (income/expense/xarajat).
+{% endcomment %}
 <form method="get" action="{{ action }}" x-data="{ categoriesOpen: false }" class="space-y-3">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+    <div class="grid grid-cols-1 md:grid-cols-{% if type_filter %}5{% else %}4{% endif %} gap-3">
         <div>
             <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Boshlanish sanasi</label>
             <input type="date" name="from" value="{{ date_from }}" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
@@ -8,6 +12,17 @@
             <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Tugash sanasi</label>
             <input type="date" name="to" value="{{ date_to }}" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
         </div>
+        {% if type_filter %}
+        <div>
+            <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Tranzaksiya turi</label>
+            <select name="type" class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
+                <option value="">Barchasi</option>
+                <option value="income" {% if type_value == 'income' %}selected{% endif %}>Kirimlar</option>
+                <option value="expense" {% if type_value == 'expense' %}selected{% endif %}>Chiqimlar</option>
+                <option value="xarajat" {% if type_value == 'xarajat' %}selected{% endif %}>Xarajatlar</option>
+            </select>
+        </div>
+        {% endif %}
         <div class="relative">
             <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Kategoriya</label>
             <button type="button" @click="categoriesOpen = !categoriesOpen" class="w-full px-3 py-2 border rounded-lg text-sm text-left" style="border-color: var(--color-border);">
@@ -28,7 +43,8 @@
             <input type="text" name="q" value="{{ search|default:'' }}" placeholder="Operator, kategoriya..." class="w-full px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border);">
         </div>
     </div>
-    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+    <button type="submit" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
         Filtrlarni qo'llash
     </button>
 </form>

@@ -240,12 +240,12 @@ class UserDeleteView(LoginRequiredMixin, BossRequiredMixin, View):
 class HomeView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            if request.user.role == 'boss':
-                return redirect('boss_dashboard')
-            elif request.user.role == 'cashier':
+            if request.user.is_cashier:
                 return redirect('cashier_dashboard')
-            elif request.user.role == 'operator':
+            elif request.user.is_operator:
                 return redirect('operator_dashboard')
+            elif request.user.is_boss:
+                return redirect('boss_dashboard')
         return redirect('login')
     
 

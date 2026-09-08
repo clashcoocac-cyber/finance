@@ -6,8 +6,7 @@
 {% block page_title %}Operator{% endblock %}
 
 {% block page_content %}
-<div class="min-h-screen">
-    <div class="max-w-7xl mx-auto p-6 space-y-6">
+<div class="max-w-7xl mx-auto space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2">
                 {% if request.session.shift %}
@@ -96,6 +95,5 @@
                 {% endif %}
             </div>
         </div>
-    </div>
 </div>
 {% endblock %}

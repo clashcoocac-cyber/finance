@@ -5,17 +5,14 @@
 {% block page_title %}Kassa{% endblock %}
 
 {% block page_content %}
-<div id="kassirDashboard" class="min-h-screen">
-    <div class="max-w-7xl mx-auto p-6" id="invoice">
-        <div class="space-y-3 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {% include "partials/_stat_card.html" with title="Kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
-                {% include "partials/_stat_card.html" with title="Chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
-                {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
-            </div>
+<div class="max-w-7xl mx-auto space-y-6" id="invoice">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% include "partials/_stat_card.html" with title="Kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
+            {% include "partials/_stat_card.html" with title="Chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
+            {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {% include "partials/_payment_card.html" with title="Click "|add:clicks.0.1 icon="card" amounts_uzs=total.click1.uzs amounts_usd=total.click1.usd amounts_rub=total.click1.rub amounts_eur=total.click1.eur %}
             {% include "partials/_payment_card.html" with title="Click "|add:clicks.1.1 icon="card" amounts_uzs=total.click2.uzs amounts_usd=total.click2.usd amounts_rub=total.click2.rub amounts_eur=total.click2.eur %}
             {% include "partials/_payment_card.html" with title="Naqd" icon="cash" amounts_uzs=total.cash.uzs amounts_usd=total.cash.usd amounts_rub=total.cash.rub amounts_eur=total.cash.eur %}
@@ -117,7 +114,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
 

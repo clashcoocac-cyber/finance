@@ -41,7 +41,7 @@
         <div class="p-5">
             {% if transactions %}
             <div class="overflow-x-auto">
-                <table class="w-full table-auto">
+                <table class="w-full">
                     <thead style="background: var(--color-surface-muted);">
                         <tr>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Vaqt</th>
@@ -102,7 +102,9 @@
             </div>
             {% else %}
             <div class="flex flex-col items-center justify-center py-10 text-center">
-                <svg class="w-10 h-10 mb-3" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10M7 7l3-3M7 7l3 3"></path><path d="M17 17H7M17 17l-3-3M17 17l-3 3"></path></svg>
+                <span class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10M7 7l3-3M7 7l3 3"></path><path d="M17 17H7M17 17l-3-3M17 17l-3 3"></path></svg>
+                </span>
                 <p class="text-sm" style="color: var(--color-text-muted);">Tranzaksiyalar topilmadi</p>
             </div>
             {% endif %}

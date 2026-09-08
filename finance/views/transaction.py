@@ -44,6 +44,13 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
         context = {
             'form': form or TransactionFrom(),
             'my_transactions': my_transactions.select_related('report').order_by('-date'),
+            # Transactions not yet bundled into a daily report: exactly what
+            # "Kassani yopish" will send to the cashier for this date.
+            'unreported_count': Transaction.objects.filter(
+                operator=request.user,
+                report__isnull=True,
+                date__date=datetime.strptime(report_date, '%Y-%m-%d').date(),
+            ).count(),
             'report_date': report_date,
             'from': date_from,
             'to': date_to,
@@ -74,11 +81,10 @@ class BulkConfirmReportsView(LoginRequiredMixin, View):
     success_url_cashier = reverse_lazy('cashier_reports')
 
     def post(self, request, *args, **kwargs):
-        role = request.user.role
-        if role == 'boss':
+        if request.user.is_boss:
             allowed_types = ['expense', 'xarajat']
             success_url = str(self.success_url_boss)
-        elif role == 'cashier':
+        elif request.user.is_cashier:
             allowed_types = ['income']
             success_url = str(self.success_url_cashier)
         else:
