@@ -16,19 +16,19 @@
     <!-- Stat cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="relative group">
-            <button type="button" @click="editStat('income', {{ stats.confirmed.income.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.income.total_usd|default:0|unlocalize }}, {{ stats.confirmed.income.total_rub|default:0|unlocalize }}, {{ stats.confirmed.income.total_eur|default:0|unlocalize }})" class="btn absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('income', {{ stats.confirmed.income.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.income.total_usd|default:0|unlocalize }}, {{ stats.confirmed.income.total_rub|default:0|unlocalize }}, {{ stats.confirmed.income.total_eur|default:0|unlocalize }})" class="finance-stat-edit btn absolute top-3 right-3 z-10 w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Kirimni tahrirlash" title="Kirimni tahrirlash">
                 <i class="bx bx-edit-alt"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
         </div>
         <div class="relative group">
-            <button type="button" @click="editStat('expense', {{ stats.confirmed.expense.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.expense.total_usd|default:0|unlocalize }}, {{ stats.confirmed.expense.total_rub|default:0|unlocalize }}, {{ stats.confirmed.expense.total_eur|default:0|unlocalize }})" class="btn absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('expense', {{ stats.confirmed.expense.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.expense.total_usd|default:0|unlocalize }}, {{ stats.confirmed.expense.total_rub|default:0|unlocalize }}, {{ stats.confirmed.expense.total_eur|default:0|unlocalize }})" class="finance-stat-edit btn absolute top-3 right-3 z-10 w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Chiqimni tahrirlash" title="Chiqimni tahrirlash">
                 <i class="bx bx-edit-alt"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
         </div>
         <div class="relative group">
-            <button type="button" @click="editStat('diff', {{ stats.confirmed.diff.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.diff.total_usd|default:0|unlocalize }}, {{ stats.confirmed.diff.total_rub|default:0|unlocalize }}, {{ stats.confirmed.diff.total_eur|default:0|unlocalize }})" class="btn absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('diff', {{ stats.confirmed.diff.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.diff.total_usd|default:0|unlocalize }}, {{ stats.confirmed.diff.total_rub|default:0|unlocalize }}, {{ stats.confirmed.diff.total_eur|default:0|unlocalize }})" class="finance-stat-edit btn absolute top-3 right-3 z-10 w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Qoldiqni tahrirlash" title="Qoldiqni tahrirlash">
                 <i class="bx bx-edit-alt"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
