@@ -48,12 +48,7 @@
         <div class="rounded-xl border p-3" style="background: var(--color-surface); border-color: var(--color-border);">
             <form method="get" class="flex flex-wrap items-end gap-2">
                 <div>
-                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Sanadan</label>
-                    <input type="date" name="from" value="{{ from }}" class="px-3 py-2 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                </div>
-                <div>
-                    <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Sanagacha</label>
-                    <input type="date" name="to" value="{{ to }}" class="px-3 py-2 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                    {% include "partials/_date_range_input.html" with date_from=from date_to=to label="Sana oralig'i" %}
                 </div>
                 <button type="button"
                     onclick="const p = new URLSearchParams(window.location.search); const t = new Date().toISOString().slice(0,10); p.set('from', t); p.set('to', t); window.location.search = p.toString();"

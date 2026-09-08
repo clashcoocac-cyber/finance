@@ -9,7 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Public+Sans:wght@500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"
           integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" rel="stylesheet"
+          integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"
+        integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6"
+        crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"
         integrity="sha384-l8f0VcPi/M1iHPv8egOnY/15TDwqgbOR1anMIJWvU6nLRgZVLTLSaNqi/TOoT5Fh"
         crossorigin="anonymous" defer></script>
@@ -72,6 +77,14 @@
         .fade-in { animation: fadeIn 0.2s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         [x-cloak] { display: none !important; }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange,
+        .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange,
+        .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus,
+        .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover {
+            background: var(--color-brand); border-color: var(--color-brand);
+        }
+        .flatpickr-day.inRange { background: var(--color-surface-muted); border-color: var(--color-surface-muted); box-shadow: -5px 0 0 var(--color-surface-muted), 5px 0 0 var(--color-surface-muted); }
+        .flatpickr-day.today { border-color: var(--color-brand); }
         /* Sneat-style soft elevation on every surface card (border + surface-bg combo). */
         [class*="rounded-xl"][style*="var(--color-surface)"]:not([style*="var(--color-surface-muted)"]) { box-shadow: var(--shadow-card); }
     </style>

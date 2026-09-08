@@ -49,28 +49,31 @@
                             <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ user.created|date:"d/m/Y" }}</td>
                             <td class="px-4 py-3 text-sm">
                                 {% if not user.is_boss %}
-                                <div class="relative" x-data="{ menuOpen: false }">
-                                    <button type="button" @click="menuOpen = !menuOpen"
+                                <div class="relative" x-data="{ menuOpen: false, menuPos: {top: 0, left: 0} }">
+                                    <button type="button" @click="const r = $el.getBoundingClientRect(); menuPos = {top: r.bottom + 4, left: r.right - 160}; menuOpen = !menuOpen"
                                         class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Amallar">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
-                                    <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
-                                        class="absolute right-0 mt-1 w-40 rounded-lg shadow-lg z-10 overflow-hidden"
-                                        style="background: var(--color-surface); border: 1px solid var(--color-border);">
-                                        <button type="button"
-                                            @click="editUser = {id: {{ user.pk }}, username: '{{ user.username|escapejs }}', company: '{{ user.company.name|default:''|escapejs }}'}; editOpen = true; menuOpen = false"
-                                            class="w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">
-                                            <i class="fa-solid fa-pen w-4"></i>
-                                            Tahrirlash
-                                        </button>
-                                        <form method="post" action="{% url 'user_delete' user.pk %}" onsubmit="return confirm('Rostan o\'chirmoqchimisiz?')">
-                                            {% csrf_token %}
-                                            <button type="submit" class="w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-negative);">
-                                                <i class="fa-solid fa-trash w-4"></i>
-                                                O'chirish
+                                    <template x-teleport="body">
+                                        <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
+                                            class="fixed w-40 rounded-lg shadow-lg z-50 overflow-hidden"
+                                            :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px'"
+                                            style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                                            <button type="button"
+                                                @click="editUser = {id: {{ user.pk }}, username: '{{ user.username|escapejs }}', company: '{{ user.company.name|default:''|escapejs }}'}; editOpen = true; menuOpen = false"
+                                                class="w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">
+                                                <i class="fa-solid fa-pen w-4"></i>
+                                                Tahrirlash
                                             </button>
-                                        </form>
-                                    </div>
+                                            <form method="post" action="{% url 'user_delete' user.pk %}" onsubmit="return confirm('Rostan o\'chirmoqchimisiz?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-negative);">
+                                                    <i class="fa-solid fa-trash w-4"></i>
+                                                    O'chirish
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </template>
                                 </div>
                                 {% endif %}
                             </td>

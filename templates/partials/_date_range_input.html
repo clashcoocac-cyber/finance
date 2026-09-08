@@ -1,0 +1,33 @@
+{% comment %}
+Single-input date-range picker (flatpickr). Renders one visible text input showing
+"YYYY-MM-DD - YYYY-MM-DD" and two hidden inputs (name="from"/name="to" by default) that
+carry the actual GET params, so existing backend `request.GET.get('from'/'to')` code
+needs no changes. Params: date_from, date_to, from_name (default "from"), to_name (default "to"), label.
+{% endcomment %}
+<div x-data="{
+        from: '{{ date_from|default:''|escapejs }}',
+        to: '{{ date_to|default:''|escapejs }}',
+        init() {
+            flatpickr(this.$refs.rangeInput, {
+                mode: 'range',
+                dateFormat: 'Y-m-d',
+                defaultDate: [this.from, this.to].filter(Boolean),
+                onChange: (dates, str, instance) => {
+                    if (dates.length === 2) {
+                        this.from = instance.formatDate(dates[0], 'Y-m-d');
+                        this.to = instance.formatDate(dates[1], 'Y-m-d');
+                    }
+                },
+            });
+        },
+     }">
+    {% if label %}<label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">{{ label }}</label>{% endif %}
+    <div class="relative">
+        <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);"></i>
+        <input type="text" x-ref="rangeInput" readonly placeholder="Sana oralig'ini tanlang"
+               class="w-full pl-10 pr-3 py-2 border rounded-lg text-sm cursor-pointer"
+               style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+    </div>
+    <input type="hidden" name="{{ from_name|default:'from' }}" :value="from">
+    <input type="hidden" name="{{ to_name|default:'to' }}" :value="to">
+</div>
