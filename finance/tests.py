@@ -147,9 +147,9 @@ class MultiCategoryFilterTests(TestCase):
         self.r2 = DailyReport.objects.create(operator=self.operator, type='expense', category='jasur un', date=today, is_closed=True)
         self.r3 = DailyReport.objects.create(operator=self.operator, type='expense', category='ravshan $', date=today, is_closed=True)
 
-    def test_boss_dashboard_filters_multiple_categories(self):
+    def test_boss_reports_filters_multiple_categories(self):
         self.client.force_login(self.boss)
-        response = self.client.get(reverse('boss_dashboard'), {'category': ['chikako zavod', 'jasur un']})
+        response = self.client.get(reverse('boss_reports'), {'category': ['chikako zavod', 'jasur un']})
         reports = list(response.context['reports'])
         self.assertIn(self.r1, reports)
         self.assertIn(self.r2, reports)

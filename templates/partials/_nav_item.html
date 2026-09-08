@@ -1,0 +1,29 @@
+{% comment %}
+Sidebar nav link. Params:
+  url    — target href
+  label  — visible text
+  icon   — one of: home | reports | transactions | users | income | expense
+  current — request.resolver_match.url_name
+  match / match2 — url name(s) that light this item up
+{% endcomment %}
+<a href="{{ url }}"
+   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if current == match or current == match2 %}font-semibold{% else %}font-medium{% endif %}"
+   style="{% if current == match or current == match2 %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
+    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        {% if icon == 'home' %}
+            <path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path><path d="M9 20v-6h6v6"></path>
+        {% elif icon == 'reports' %}
+            <path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path><path d="M9 13h6M9 17h4"></path>
+        {% elif icon == 'transactions' %}
+            <path d="M7 7h10M7 7l3-3M7 7l3 3"></path><path d="M17 17H7M17 17l-3-3M17 17l-3 3"></path>
+        {% elif icon == 'users' %}
+            <circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path>
+            <circle cx="17" cy="9" r="2.5"></circle><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path>
+        {% elif icon == 'income' %}
+            <path d="M12 4v10"></path><path d="M8 10l4 4 4-4"></path><path d="M4 18h16"></path>
+        {% elif icon == 'expense' %}
+            <path d="M12 14V4"></path><path d="M8 8l4-4 4 4"></path><path d="M4 18h16"></path>
+        {% endif %}
+    </svg>
+    <span>{{ label }}</span>
+</a>

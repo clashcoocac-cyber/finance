@@ -1,0 +1,148 @@
+{% extends "../base_app.html" %}
+{% load custom_filters %}
+{% block title %}Kunlik hisobotlar{% endblock %}
+
+{% block page_title %}Kunlik hisobotlar{% endblock %}
+
+{% block page_content %}
+<div class="min-h-screen">
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+        <div class="flex flex-wrap items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <path d="M12 7v5l3 3"></path>
+                </svg>
+                Kutilmoqda: {{ pending_count }}
+            </span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+                Tasdiqlangan: {{ confirmed_count }}
+            </span>
+        </div>
+
+        <div class="rounded-xl border p-5" style="background: var(--color-surface); border-color: var(--color-border);">
+            {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options %}
+        </div>
+
+        <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
+            <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+                <span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
+                        <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                    </svg>
+                </span>
+                <div>
+                    <div class="text-lg font-bold" style="color: var(--color-text);">Kirim hisobotlari</div>
+                    <p class="text-sm" style="color: var(--color-text-muted);">Tasdiqlash uchun belgilang va yuboring</p>
+                </div>
+            </div>
+            <div class="p-5">
+                <form method="post" action="{% url 'bulk_confirm_reports' %}" x-data="bulkSelect()">
+                    {% csrf_token %}
+                    <input type="hidden" name="current_qs" value="{{ request.GET.urlencode }}">
+                    {% include "partials/_bulk_action_bar.html" %}
+                    {% if reports %}
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead style="background: var(--color-surface-muted);">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">
+                                        <input type="checkbox" x-model="allSelected" @change="toggleAll($event)">
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov kanallari</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Umumiy</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in reports %}
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <td class="px-4 py-3 text-sm">
+                                        {% if not report.is_closed %}
+                                        <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected">
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.date|date:"d/m/Y" }}</td>
+                                    <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                        {{ report.operator.username }}
+                                        {% if report.operator_shift %}
+                                        <div class="text-xs" style="color: var(--color-text-muted);">{{ report.operator_shift }}-smena</div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.operator.company.name }}</td>
+                                    <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                        <div class="space-y-0.5 text-xs">
+                                            {% for key, val in report.uzs_detail.items %}
+                                                {% if val %}
+                                                <div>
+                                                    {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
+                                                    <span class="font-medium money">{{ val|format_currency }} so'm</span>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% for key, val in report.usd_detail.items %}
+                                                {% if val %}
+                                                <div>
+                                                    {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
+                                                    <span class="font-medium money">{{ val|format_currency }} $</span>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% for key, val in report.rub_detail.items %}
+                                                {% if val %}
+                                                <div>
+                                                    {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
+                                                    <span class="font-medium money">{{ val|format_currency }} ₽</span>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% for key, val in report.eur_detail.items %}
+                                                {% if val %}
+                                                <div>
+                                                    {% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}:
+                                                    <span class="font-medium money">{{ val|format_currency }} €</span>
+                                                </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <div class="space-y-1 font-semibold money" style="color: var(--color-positive);">
+                                            {% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}
+                                            {% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}
+                                            {% if report.total_rub %}<div>{{ report.total_rub|format_currency }} ₽</div>{% endif %}
+                                            {% if report.total_eur %}<div>{{ report.total_eur|format_currency }} €</div>{% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 text-sm">
+                                        {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="flex flex-col items-center justify-center py-10 text-center">
+                        <span class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-6l-2 3h-4l-2-3H2"></path>
+                                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path>
+                            </svg>
+                        </span>
+                        <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

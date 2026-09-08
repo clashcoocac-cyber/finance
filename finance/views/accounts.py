@@ -20,40 +20,18 @@ from finance.views.helpers import compute_money_stats
 
 # --- DASHBOARDS ---
 
-class BossDashboardView(TemplateView):
+class BossDashboardView(LoginRequiredMixin, BossRequiredMixin, TemplateView):
     template_name = 'dashboard/boss.html'
     login_url = reverse_lazy('login')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['from'] = self.request.GET.get('from', None) or (datetime.today() - timedelta(days=7)).strftime('%Y-%m-%d')
-        context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
-        context['type'] = self.request.GET.get('type', None)
-        context['q'] = self.request.GET.get('q', None)
-        reports = DailyReport.objects.all()
-        if context['from']:
-            date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
-            reports = reports.filter(date__gte=date_from)
-        if context['to']:
-            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
-            reports = reports.filter(date__lte=date_to)
-        if context['type']:
-            reports = reports.filter(type=context['type'])
-        if context['q']:
-            reports = reports.filter(
-                Q(operator__username__icontains=context['q']) |
-                Q(operator__company__name__icontains=context['q']) |
-                Q(category__icontains=context['q'])
-            )
-        context['categories'] = self.request.GET.getlist('category')
-        if context['categories']:
-            reports = reports.filter(category__in=context['categories'])
-        context['category_options'] = Category.objects.filter(is_active=True)
-
-        context['reports'] = reports.order_by('-date')
-
         context['stats'] = compute_money_stats()
-
+        context['operator_count'] = User.objects.filter(role='operator').count()
+        context['cashier_count'] = User.objects.filter(role='cashier').count()
+        context['transaction_count'] = Transaction.objects.count()
+        context['pending_reports_count'] = DailyReport.objects.filter(is_closed=False).count()
+        context['recent_reports'] = DailyReport.objects.select_related('operator').order_by('-date')[:5]
         return context
 
 
@@ -64,33 +42,13 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         context = super().get_context_data(**kwargs)
         context['from'] = self.request.GET.get('from', None) or (datetime.today()- timedelta(days=7)).strftime('%Y-%m-%d')
         context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
-        context['q'] = self.request.GET.get('q', None)
-        context['q'] = context['q'].casefold() if context['q'] else None
 
-        reports = DailyReport.objects.filter(type='income')
-        if context['from']:
-            date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
-            reports = reports.filter(date__gte=date_from)
-        if context['to']:
-            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
-            reports = reports.filter(date__lte=date_to)
-        if context['q']:
-            q = context['q'].lower()
-            reports = reports.annotate(
-                op_username_l=Lower('operator__username'),
-                company_name_l=Lower('operator__company__name'),
-                category_l=Lower('category'),
-            ).filter(
-                Q(op_username_l__icontains=q) |
-                Q(company_name_l__icontains=q) |
-                Q(category_l__icontains=q)
-            )
-        context['categories'] = self.request.GET.getlist('category')
-        if context['categories']:
-            reports = reports.filter(category__in=context['categories'])
-        context['category_options'] = Category.objects.filter(is_active=True)
-
-        context['reports'] = reports.order_by('-date')
+        context['pending_reports_count'] = DailyReport.objects.filter(
+            type='income', is_closed=False
+        ).count()
+        context['recent_reports'] = DailyReport.objects.filter(
+            type='income'
+        ).select_related('operator').order_by('-date')[:5]
 
         # parse date range for consistent filtering
         date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
@@ -164,22 +122,14 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
         context['is_expired'] = datetime.today().date() - datetime.strptime(report_date, '%Y-%m-%d').date() > timedelta(days=3)
 
         user = self.request.user
-        my_transactions = Transaction.objects.filter(operator=user)
-        if context['from']:
-            date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
-            my_transactions = my_transactions.filter(date__gte=date_from)
-        if context['to']:
-            date_to = datetime.strptime(context['to'], '%Y-%m-%d').date() + timedelta(days=1)
-            my_transactions = my_transactions.filter(date__lte=date_to)
-        if context['q']:
-            my_transactions = my_transactions.filter(
-                Q(counterparty__icontains=context['q']) |
-                Q(description__icontains=context['q'])
-            )
-        context['my_transactions'] = my_transactions.order_by('-date')
-        context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:3]
-        context['counterparties'] = Counterparty.objects.filter(is_active=True, group='person')
-        context['form'] = TransactionFrom()
+        context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:5]
+        context['today_transaction_count'] = Transaction.objects.filter(
+            operator=user, date__date=datetime.strptime(report_date, '%Y-%m-%d').date()
+        ).count()
+        context['unreported_count'] = Transaction.objects.filter(
+            operator=user, report__isnull=True,
+            date__date=datetime.strptime(report_date, '%Y-%m-%d').date(),
+        ).count()
 
         queryset = Transaction.objects.filter(
             operator=self.request.user, date__date__range=(context['from'], context['to'])

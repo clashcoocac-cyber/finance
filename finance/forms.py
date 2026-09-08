@@ -89,7 +89,9 @@ class TransactionFrom(forms.ModelForm):
     def save(self, commit=True, operator=None, date=None):
         transaction = super().save(commit=False)
         counterparty = self.cleaned_data['counterparty']
-        Counterparty.objects.get_or_create(name__iexact=counterparty, defaults={'name': counterparty, 'group': 'person'})
+        Counterparty.objects.get_or_create(
+            name__iexact=counterparty, group='person', defaults={'name': counterparty}
+        )
         transaction.counterparty = counterparty
         transaction.operator = operator
         transaction.type = 'income'
@@ -139,7 +141,9 @@ class IncomeForm(forms.ModelForm):
         # build transaction instance (don't save yet)
         transaction = super().save(commit=False)
         counterparty = self.cleaned_data['counterparty']
-        Counterparty.objects.get_or_create(name__iexact=counterparty, defaults={'name': counterparty, 'group': 'income'})
+        Counterparty.objects.get_or_create(
+            name__iexact=counterparty, group='income', defaults={'name': counterparty}
+        )
         transaction.counterparty = counterparty
         transaction.operator = operator
 

@@ -35,7 +35,7 @@ class Category(models.Model):
 class Counterparty(models.Model):
     GROUPS = [('person', 'Shaxs'), ('income', 'Kirim turi')]
 
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     group = models.CharField(max_length=10, choices=GROUPS, default='person')
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -43,6 +43,11 @@ class Counterparty(models.Model):
     class Meta:
         ordering = ['name']
         verbose_name_plural = 'counterparties'
+        # A name is unique inside its own pool only: "Almashdi" can be both an
+        # income category and a real person without the two colliding.
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'group'], name='unique_counterparty_name_per_group'),
+        ]
 
     def __str__(self):
         return self.name

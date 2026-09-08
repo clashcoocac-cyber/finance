@@ -18,32 +18,60 @@ from finance.models import Transaction, Stat
 from finance.views.helpers import preserve_filters, raw_confirmed_totals
 
 
+class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
+    """Operator's own transaction list, with the add-transaction modal form."""
+
+    template_name = 'dashboard/operator_transactions.html'
+
+    def get(self, request, *args, **kwargs):
+        return self._render(request)
+
+    def _render(self, request, form=None):
+        report_date = request.GET.get('report_date') or datetime.today().strftime('%Y-%m-%d')
+        date_from = request.GET.get('from') or report_date
+        date_to = request.GET.get('to') or report_date
+        q = request.GET.get('q') or ''
+
+        my_transactions = Transaction.objects.filter(operator=request.user).filter(
+            date__date__gte=datetime.strptime(date_from, '%Y-%m-%d').date(),
+            date__date__lte=datetime.strptime(date_to, '%Y-%m-%d').date(),
+        )
+        if q:
+            my_transactions = my_transactions.filter(
+                Q(counterparty__icontains=q) | Q(description__icontains=q)
+            )
+
+        context = {
+            'form': form or TransactionFrom(),
+            'my_transactions': my_transactions.select_related('report').order_by('-date'),
+            'report_date': report_date,
+            'from': date_from,
+            'to': date_to,
+            'q': q,
+            'clicks': CLICKS,
+        }
+        return render(request, self.template_name, context)
+
+
 class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
-    template_name = 'dashboard/operator.html'
-    success_url = reverse_lazy('operator_dashboard')
-    
+    success_url = reverse_lazy('operator_transactions')
+
     def post(self, request, *args, **kwargs):
         form = TransactionFrom(request.POST)
         date_param = request.GET.get('report_date', None) or datetime.today().date().strftime('%Y-%m-%d')
 
         if form.is_valid():
             form.save(operator=request.user, date=date_param)
-            return redirect(self.success_url + '?report_date=' + date_param)
-        
-        users = User.objects.exclude(role='boss').order_by('role')
-        context = {
-            'form': form,
-            'users': users,
-            'operator_count': User.objects.filter(role='operator').count(),
-            'cashier_count': User.objects.filter(role='cashier').count(),
-            'report_date': date_param
-        }
-        return render(request, self.template_name, context)
+            messages.success(request, "Tranzaksiya qo'shildi.")
+            return redirect(str(self.success_url) + '?report_date=' + date_param)
+
+        messages.error(request, "Formani tekshiring.")
+        return OperatorTransactionsView()._render(request, form=form)
 
 
 class BulkConfirmReportsView(LoginRequiredMixin, View):
-    success_url_boss = reverse_lazy('boss_dashboard')
-    success_url_cashier = reverse_lazy('cashier_dashboard')
+    success_url_boss = reverse_lazy('boss_reports')
+    success_url_cashier = reverse_lazy('cashier_reports')
 
     def post(self, request, *args, **kwargs):
         role = request.user.role
@@ -65,8 +93,7 @@ class BulkConfirmReportsView(LoginRequiredMixin, View):
 
 
 class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
-    template_name = 'dashboard/operator.html'
-    success_url = reverse_lazy('operator_dashboard')
+    success_url = reverse_lazy('operator_reports')
 
     def post(self, request, *args, **kwargs):
         user = request.user

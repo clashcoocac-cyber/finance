@@ -7,9 +7,10 @@ from .views.accounts import (
 )
 from .views.accounts import TransactionDeleteView
 from .views.transaction import (
-    TransactionCreateView, BulkConfirmReportsView, CloseCashRegister,
+    TransactionCreateView, OperatorTransactionsView, BulkConfirmReportsView, CloseCashRegister,
     ExpensesPageView, IncomesPageView, TransactionList, ChangeStatView
 )
+from .views.reports import BossReportsView, CashierReportsView, OperatorReportsView
 
 urlpatterns = [
     # Home
@@ -35,6 +36,13 @@ urlpatterns = [
     path('transactions/<int:pk>', TransactionView.as_view(), name='transaction'),
     path('transactions/<int:pk>/delete/', TransactionDeleteView.as_view(), name='transaction_delete'),
     path('transactions/create/', TransactionCreateView.as_view(), name='transaction_create'),
+
+    # Daily reports (one page per role)
+    path('reports/boss/', BossReportsView.as_view(), name='boss_reports'),
+    path('reports/cashier/', CashierReportsView.as_view(), name='cashier_reports'),
+    path('reports/operator/', OperatorReportsView.as_view(), name='operator_reports'),
+
+    path('my-transactions/', OperatorTransactionsView.as_view(), name='operator_transactions'),
 
     path('reports/bulk-confirm/', BulkConfirmReportsView.as_view(), name='bulk_confirm_reports'),
     path('cash-register/close/', CloseCashRegister.as_view(), name='close_cash_register'),

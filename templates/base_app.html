@@ -1,13 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="flex min-h-screen">
-    <aside class="flex flex-col shrink-0 w-64" style="background: var(--color-sidebar-bg); border-right: 1px solid var(--color-sidebar-border);">
+{% with url_name=request.resolver_match.url_name %}
+<div class="flex min-h-screen" x-data="{ sidebarOpen: false }">
+
+    <!-- Backdrop (mobile only) -->
+    <div x-show="sidebarOpen" x-cloak @click="sidebarOpen = false"
+         class="fixed inset-0 z-30 lg:hidden" style="background: rgba(15, 23, 42, 0.5);"></div>
+
+    <!-- Sidebar -->
+    <aside class="fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col transition-transform duration-200 lg:static lg:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+           style="background: var(--color-sidebar-bg); border-right: 1px solid var(--color-sidebar-border);">
+
         <div class="flex items-center gap-3 px-5 py-5 shrink-0" style="border-bottom: 1px solid var(--color-sidebar-border);">
             <span class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style="background: var(--color-sidebar-active-bg);">
-                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--color-sidebar-active-text)" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="4" stroke="var(--color-sidebar-active-text)"></rect>
-                    <path d="M8 12h8M12 8v8"></path>
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--color-sidebar-active-text)" stroke-width="2" stroke-linejoin="round">
+                    <path d="M12 3l9 5-9 5-9-5 9-5z"></path>
+                    <path d="M3 13l9 5 9-5"></path>
                 </svg>
             </span>
             <span class="text-xl font-bold tracking-wide" style="color: var(--color-sidebar-active-text);">SFBMSSB</span>
@@ -15,104 +25,90 @@
 
         <nav class="flex-1 px-3 py-4 space-y-2 overflow-y-auto">
             {% if request.user.role == 'boss' %}
-                <a href="{% url 'boss_dashboard' %}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if request.resolver_match.url_name == 'boss_dashboard' %}font-semibold{% else %}font-medium{% endif %}"
-                   style="{% if request.resolver_match.url_name == 'boss_dashboard' %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
-                    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 11l9-8 9 8"></path>
-                        <path d="M5 10v10h14V10"></path>
-                        <path d="M9 20v-6h6v6"></path>
-                    </svg>
-                    <span>Bosh sahifa</span>
-                </a>
-                <a href="{% url 'transaction_list' %}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if request.resolver_match.url_name == 'transaction_list' %}font-semibold{% else %}font-medium{% endif %}"
-                   style="{% if request.resolver_match.url_name == 'transaction_list' %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
-                    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M7 7h10M7 7l3-3M7 7l3 3"></path>
-                        <path d="M17 17H7M17 17l-3-3M17 17l-3 3"></path>
-                    </svg>
-                    <span>Tranzaksiyalar</span>
-                </a>
-                <a href="{% url 'users' %}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if request.resolver_match.url_name == 'users' %}font-semibold{% else %}font-medium{% endif %}"
-                   style="{% if request.resolver_match.url_name == 'users' %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
-                    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="9" cy="8" r="3"></circle>
-                        <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path>
-                        <circle cx="17" cy="9" r="2.5"></circle>
-                        <path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path>
-                    </svg>
-                    <span>Foydalanuvchilar</span>
-                </a>
+                {% url 'boss_dashboard' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="boss_dashboard" %}
+                {% url 'boss_reports' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Hisobotlar" icon="reports" current=url_name match="boss_reports" %}
+                {% url 'transaction_list' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Tranzaksiyalar" icon="transactions" current=url_name match="transaction_list" match2="transaction" %}
+                {% url 'users' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Foydalanuvchilar" icon="users" current=url_name match="users" %}
             {% elif request.user.role == 'cashier' %}
-                <a href="{% url 'cashier_dashboard' %}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if request.resolver_match.url_name == 'cashier_dashboard' %}font-semibold{% else %}font-medium{% endif %}"
-                   style="{% if request.resolver_match.url_name == 'cashier_dashboard' %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
-                    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 11l9-8 9 8"></path>
-                        <path d="M5 10v10h14V10"></path>
-                        <path d="M9 20v-6h6v6"></path>
-                    </svg>
-                    <span>Bosh sahifa</span>
-                </a>
-                <a href="{% url 'incomes_list' %}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if request.resolver_match.url_name == 'incomes_list' %}font-semibold{% else %}font-medium{% endif %}"
-                   style="{% if request.resolver_match.url_name == 'incomes_list' %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
-                    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 3v5h5"></path>
-                        <path d="M6 3h8l5 5v13H6z"></path>
-                        <path d="M9 13h6M9 17h6"></path>
-                    </svg>
-                    <span>Kirimlar</span>
-                </a>
-                <a href="{% url 'expenses_list' %}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if request.resolver_match.url_name == 'expenses_list' %}font-semibold{% else %}font-medium{% endif %}"
-                   style="{% if request.resolver_match.url_name == 'expenses_list' %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
-                    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 3v5h5"></path>
-                        <path d="M6 3h8l5 5v13H6z"></path>
-                        <path d="M9 13h6M9 17h6"></path>
-                    </svg>
-                    <span>Chiqimlar</span>
-                </a>
+                {% url 'cashier_dashboard' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="cashier_dashboard" %}
+                {% url 'cashier_reports' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Kunlik hisobotlar" icon="reports" current=url_name match="cashier_reports" %}
+                {% url 'incomes_list' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Kirimlar" icon="income" current=url_name match="incomes_list" %}
+                {% url 'expenses_list' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Chiqimlar" icon="expense" current=url_name match="expenses_list" %}
             {% elif request.user.role == 'operator' %}
-                <a href="{% url 'operator_dashboard' %}"
-                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors {% if request.resolver_match.url_name == 'operator_dashboard' %}font-semibold{% else %}font-medium{% endif %}"
-                   style="{% if request.resolver_match.url_name == 'operator_dashboard' %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
-                    <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 11l9-8 9 8"></path>
-                        <path d="M5 10v10h14V10"></path>
-                        <path d="M9 20v-6h6v6"></path>
-                    </svg>
-                    <span>Bosh sahifa</span>
-                </a>
+                {% url 'operator_dashboard' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="operator_dashboard" %}
+                {% url 'operator_transactions' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Tranzaksiyalar" icon="transactions" current=url_name match="operator_transactions" %}
+                {% url 'operator_reports' as nav_url %}
+                {% include "partials/_nav_item.html" with url=nav_url label="Kunlik hisobotlar" icon="reports" current=url_name match="operator_reports" %}
             {% endif %}
         </nav>
 
-        <div class="mx-3 mb-4 px-3 py-2 rounded-lg text-xs" style="background: var(--color-sidebar-border); color: var(--color-sidebar-text-muted);">
+        <div class="mx-3 mb-4 px-3 py-2.5 rounded-lg text-xs" style="background: var(--color-sidebar-border); color: var(--color-sidebar-text-muted);">
             Tizim v1.0.0
         </div>
     </aside>
 
-    <div class="flex-1 flex flex-col min-w-0">
-        <header class="flex items-center justify-between h-16 px-6 shrink-0" style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
-            <div class="text-lg font-semibold" style="color: var(--color-text);">
-                {% block page_title %}{% endblock %}
+    <!-- Content column -->
+    <div class="flex flex-1 flex-col min-w-0">
+        <header class="sticky top-0 z-20 flex items-center justify-between gap-4 h-16 px-4 sm:px-6 shrink-0"
+                style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
+            <div class="flex items-center gap-3 min-w-0">
+                <button type="button" @click="sidebarOpen = !sidebarOpen"
+                        class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0 lg:hidden"
+                        style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Menyu">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M4 7h16M4 12h16M4 17h16"></path>
+                    </svg>
+                </button>
+                <div class="min-w-0">
+                    <div class="text-base sm:text-lg font-semibold truncate" style="color: var(--color-text);">
+                        {% block page_title %}{% endblock %}
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span class="text-sm font-medium" style="color: var(--color-text-muted);">{{ request.user.username }}</span>
+
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="hidden sm:flex items-center gap-2.5">
+                    <span class="flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold uppercase"
+                          style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                        {{ request.user.username|first }}
+                    </span>
+                    <span class="leading-tight">
+                        <span class="block text-sm font-semibold" style="color: var(--color-text);">{{ request.user.username }}</span>
+                        <span class="block text-xs" style="color: var(--color-text-muted);">{{ request.user.get_role_display }}</span>
+                    </span>
+                </div>
                 <a href="{% url 'logout' %}"
-                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                    style="background: var(--color-negative-bg); color: var(--color-negative);">
                     Chiqish
                 </a>
             </div>
         </header>
 
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-4 sm:p-6 space-y-6">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="rounded-xl px-4 py-3 text-sm font-medium"
+                     style="background: {% if message.tags == 'error' %}var(--color-negative-bg){% else %}var(--color-positive-bg){% endif %};
+                            color: {% if message.tags == 'error' %}var(--color-negative){% else %}var(--color-positive){% endif %};">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
             {% block page_content %}{% endblock %}
         </main>
     </div>
 </div>
+{% endwith %}
 {% endblock %}

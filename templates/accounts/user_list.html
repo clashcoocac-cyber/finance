@@ -1,225 +1,212 @@
-{% extends "base.html" %}
-{% block title %}Фойдаланувчилар{% endblock %}
+{% extends "../base_app.html" %}
+{% block title %}Foydalanuvchilar{% endblock %}
 
-{% block content %}
-<div id="userManagement" class="min-h-screen">
-        <nav class="bg-white shadow-lg border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <span class="text-2xl">👥</span>
-                        <h1 class="ml-3 text-xl font-bold text-gray-800">Foydalanuvchilar Boshqaruvi</h1>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <a href="{% url 'home' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            ← Orqaga
-                        </a>
-                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            Chiqish
-                        </a>
-                    </div>
+{% block page_title %}Foydalanuvchilar{% endblock %}
+
+{% block page_content %}
+<div class="max-w-5xl mx-auto space-y-6">
+    <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);" x-data="{ open: {% if form.errors %}true{% else %}false{% endif %}, editUser: {id: '', username: '', company: ''}, editOpen: false }">
+        <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+            <div class="flex items-center gap-3">
+                <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><circle cx="17" cy="9" r="2.5"></circle><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path></svg>
+                </span>
+                <div>
+                    <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha foydalanuvchilar</h2>
                 </div>
             </div>
-        </nav>
+            <button type="button" @click="open = true" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                Yangi foydalanuvchi
+            </button>
+        </div>
 
-        <div class="max-w-7xl mx-auto p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <!-- Create User Form -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Yangi Foydalanuvchi Yaratish</h2>
-                    {% if form.errors %}
-                        <div class="django-errors bg-red-50 border border-red-200 rounded-lg p-4 mb-6 fade-in">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                    </svg>
+        <div class="p-5">
+            {% if users %}
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead style="background: var(--color-surface-muted);">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">#</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Username</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Rol</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Yaratilgan</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr style="border-bottom: 1px solid var(--color-border);">
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text-muted);">{{ forloop.counter }}</td>
+                            <td class="px-4 py-3 text-sm font-medium" style="color: var(--color-text);">{{ user.username }}</td>
+                            <td class="px-4 py-3 text-sm">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="{% if user.role == 'operator' %}background: var(--color-positive-bg); color: var(--color-positive);{% elif user.role == 'cashier' %}background: var(--color-pending-bg); color: var(--color-pending);{% else %}background: var(--color-surface-muted); color: var(--color-text);{% endif %}">
+                                    {{ user.get_role_display }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ user.company.name|default:"-" }}</td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ user.created|date:"d/m/Y" }}</td>
+                            <td class="px-4 py-3 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <button type="button"
+                                        @click="editUser = {id: {{ user.pk }}, username: '{{ user.username|escapejs }}', company: '{{ user.company.name|default:''|escapejs }}'}; editOpen = true"
+                                        class="rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-surface-muted); color: var(--color-text);">
+                                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
+                                        Tahrirlash
+                                    </button>
+                                    {% if user.role != 'boss' %}
+                                    <form method="post" action="{% url 'user_delete' user.pk %}" onsubmit="return confirm('Rostan o\'chirmoqchimisiz?')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-negative-bg); color: var(--color-negative);">
+                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M6 6l1 14h10l1-14"></path></svg>
+                                            O'chirish
+                                        </button>
+                                    </form>
+                                    {% endif %}
                                 </div>
-                                <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">Quyidagi xatolarni tuzating:</h3>
-                                    <div class="mt-2 text-sm text-red-700">
-                                        <ul class="list-disc pl-5 space-y-1">
-                                            {% if form.errors %}
-                                            {% for field, errors in form.errors.items %}
-                                                <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
-                                            {% endfor %}
-                                            {% else %}
-                                                <li>Ma'lumotlarni to'ldiring</li>
-                                            {% endif %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                    <form action="{% url 'users' %}" method="POST" class="space-y-4">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="flex flex-col items-center justify-center py-10 text-center">
+                <svg class="w-10 h-10 mb-3" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path></svg>
+                <p class="text-sm" style="color: var(--color-text-muted);">Foydalanuvchilar topilmadi</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Create user modal -->
+        {% include "partials/_modal_open.html" with modal_title="Yangi foydalanuvchi" modal_subtitle="Operator yoki kassir uchun hisob yarating" modal_tone="brand" modal_icon="user" %}
+            {% if form.errors %}
+            <div class="rounded-lg p-4 mb-4 border" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
+                <ul class="list-disc pl-5 space-y-1 text-sm" style="color: var(--color-negative);">
+                    {% for field, errors in form.errors.items %}
+                    <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <form action="{% url 'users' %}" method="POST" class="space-y-4">
                 {% csrf_token %}
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
-                            <input required type="text" name="username" placeholder="Username kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Parol</label>
-                            <input required type="password" name="password" placeholder="Parol kiriting" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
-                                <select required name="role" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    <option value="">Rol tanlang</option>
-                                    <option value="operator">Operator</option>
-                                    <option value="cashier">Kassir</option>
-                                </select>
-                            </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Kompaniya</label>
-                            <input type="text" name="company_name" placeholder="Kompaniya nomi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-                        
-                        <button onclick="createUser()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                            Foydalanuvchi Yaratish
-                        </button>
-                    </form>
-                </div>
-
-                <!-- User Statistics -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Tizim Statistikasi</h2>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
-                            <div class="flex items-center">
-                                <span class="text-2xl mr-3">👨‍💻</span>
-                                <span class="font-medium text-gray-700">Operatorlar</span>
-                            </div>
-                            <span class="text-2xl font-bolder text-blue-600" id="operatorCount">{{ operator_count }}</span>
-                        </div>
-                        
-                        <div class="flex justify-between items-center p-4 bg-green-50 rounded-lg">
-                            <div class="flex items-center">
-                                <span class="text-2xl mr-3">💰</span>
-                                <span class="font-medium text-gray-700">Kassirlar</span>
-                            </div>
-                            <span class="text-2xl font-bolder text-green-600" id="kassirCount">{{ cashier_count }}</span>
-                        </div>
-                        
-                        <div class="flex justify-between items-center p-4 bg-purple-50 rounded-lg">
-                            <div class="flex items-center">
-                                <span class="text-2xl mr-3">📊</span>
-                                <span class="font-medium text-gray-700">Jami Tranzaksiyalar</span>
-                            </div>
-                            <span class="text-2xl font-bolder text-purple-600" id="transactionCount"> {{ transaction_count }}</span>
-                        </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Username</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"></path></svg>
+                        </span>
+                        <input required type="text" name="username" placeholder="Username kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
-            </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Parol</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+                        </span>
+                        <input required type="password" name="password" placeholder="Parol kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rol</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path></svg>
+                        </span>
+                        <select required name="role" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                            <option value="">Rol tanlang</option>
+                            <option value="operator">Operator</option>
+                            <option value="cashier">Kassir</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="1"></rect><path d="M8 7V4h8v3"></path></svg>
+                        </span>
+                        <input type="text" name="company_name" placeholder="Kompaniya nomi" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                    </div>
+                </div>
+                <button type="submit" class="w-full rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    Foydalanuvchi yaratish
+                </button>
+            </form>
+        {% include "partials/_modal_close.html" %}
 
-            <!-- Users List -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Barcha Foydalanuvchilar</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Rol</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Yaratilgan</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amallar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTable" class="divide-y divide-gray-200">
-                            {% for user in users %}
-                            <tr>
-                                <td class="px-4 py-3 text-sm text-gray-900">{{ user.username }}</td>
-                        <td class="px-4 py-3 text-sm">
-                            <span class="px-2 py-1 text-xs rounded-full {% if user.role == 'operator' %} bg-blue-100 text-blue-800 {% elif user.role == 'cashier' %} bg-green-100 text-green-800 {% else %} bg-red-100 text-red-800 {% endif %}">
-                                {% if user.role == 'operator' %} Operator {% elif user.role == 'cashier' %} Kassir {% else %} Admin {% endif %}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-900">{{ user.company.name | default:"-" }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-900">{{ user.created | date:"d/m/Y" }}</td>
-                        <td class="px-4 py-3 text-sm">
-                            <div class="flex space-x-2">
-                                <button onclick="editUser('{{user.username}}', '{{user.company.name| default:""}}', '{{ user.id }}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                    Tahrirlash
-                                </button>
-                                {% if user.role != 'boss' %}
-                                <a href="{% url 'user_delete' user.pk %}" onclick='return confirm("Rostan ochirmoqchimisiz?")' class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                    O'chirish
-                                </a>
-                                {% endif %}
+        <!-- Edit user modal -->
+        <div x-show="editOpen" x-cloak
+             class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8"
+             style="background: rgba(15, 23, 42, 0.55);"
+             @keydown.escape.window="editOpen = false">
+            <div class="w-full max-w-2xl my-auto rounded-2xl shadow-2xl"
+                 style="background: var(--color-surface); border: 1px solid var(--color-border);"
+                 @click.outside="editOpen = false"
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100">
+                <div class="flex items-start gap-4 px-6 py-5" style="border-bottom: 1px solid var(--color-border);">
+                    <span class="flex items-center justify-center w-12 h-12 rounded-full shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <h2 class="text-xl font-bold" style="color: var(--color-text);">Foydalanuvchini tahrirlash</h2>
+                    </div>
+                    <button type="button" @click="editOpen = false"
+                            class="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg"
+                            style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Yopish">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+                    </button>
+                </div>
+                <div class="px-6 py-5">
+                    <form action="{% url 'user_update' %}" method="POST" class="space-y-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" :value="editUser.id">
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Username</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"></path></svg>
+                                </span>
+                                <input type="text" name="username" x-model="editUser.username" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
-                        </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yangi parol</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+                                </span>
+                                <input type="password" name="new_password" placeholder="" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                            </div>
+                            <p class="text-xs mt-1" style="color: var(--color-text-muted);">Bo'sh qoldirsangiz, eski parol saqlanadi</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="14" rx="1"></rect><path d="M8 7V4h8v3"></path></svg>
+                                </span>
+                                <input type="text" name="company_name" x-model="editUser.company" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                            </div>
+                        </div>
+                        <div class="flex gap-3 pt-2">
+                            <button type="submit" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                                Saqlash
+                            </button>
+                            <button type="button" @click="editOpen = false" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                                Bekor qilish
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-
-
-<!-- Edit User Modal -->
-    <div id="editUserModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <form action="{% url 'user_update' %}" method="POST" class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
-            {% csrf_token %}
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Foydalanuvchini Tahrirlash</h2>
-                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
-            </div>
-            
-            <div class="space-y-4">
-                <input type="number" name="user_id" id="userID" class="w-full px-4 py-3 border border-gray-300 rounded-lg hidden" required>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
-                    <input type="text" name="username" id="editUsername" class="w-full px-4 py-3 border border-gray-300 rounded-lg" required>
-                </div>
-                
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Yangi Parol</label>
-                        <input type="password" name="new_password" id="editPassword" placeholder="" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <p class="text-xs text-gray-500 mt-1">Bo'sh qoldirsangiz, eski parol saqlanadi</p>
-                    </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Kompaniya</label>
-                    <input type="text" id="editCompany" name="company_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg">
-                </div>
-                
-                <div class="flex space-x-4 pt-4">
-                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                        💾 Saqlash
-                    </button>
-                    <button onclick="closeEditModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors">
-                        ❌ Bekor qilish
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <script>
-        function editUser(username, company_name, user_id) {
-            // Fill modal with user data
-            document.getElementById('editUsername').value = username;
-            document.getElementById('editPassword').value = '';
-            document.getElementById('editCompany').value = company_name;
-            document.getElementById('userID').value = user_id;
-            
-            // Show modal
-            document.getElementById('editUserModal').classList.remove('hidden');
-        }
-        
-        // Close edit modal
-        function closeEditModal() {
-            document.getElementById('editUserModal').classList.add('hidden');
-            clearErrorMessages();
-        }
-    </script>
-
+</div>
 {% endblock %}

@@ -21,161 +21,78 @@
             {% include "partials/_payment_card.html" with title="Naqd" icon="cash" amounts_uzs=total.cash.uzs amounts_usd=total.cash.usd amounts_rub=total.cash.rub amounts_eur=total.cash.eur %}
         </div>
 
-        <div class="rounded-xl shadow-lg p-6 space-y-6" style="background: var(--color-surface);">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold" style="color: var(--color-text);">Kunlik Hisobotlar</h2>
-                <button onclick="generatePDF()" class="px-6 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                    📊 Kunlik Hisobot Yuklab Olish
-                </button>
+        <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
+            <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </span>
+                    <div>
+                        <div class="text-lg font-bold" style="color: var(--color-text);">So'nggi hisobotlar</div>
+                        {% if pending_reports_count %}
+                        <p class="text-sm" style="color: var(--color-text-muted);">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium" style="background: var(--color-pending-bg); color: var(--color-pending);">
+                                {{ pending_reports_count }} ta kutilmoqda
+                            </span>
+                        </p>
+                        {% else %}
+                        <p class="text-sm" style="color: var(--color-text-muted);">Barchasi tasdiqlangan</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="generatePDF()" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        PDF
+                    </button>
+                    <a href="{% url 'cashier_reports' %}" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Barcha hisobotlar
+                    </a>
+                </div>
             </div>
-
-            {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options %}
-
-            <form method="post" action="{% url 'bulk_confirm_reports' %}" x-data="bulkSelect()" class="space-y-3">
-                {% csrf_token %}
-                <input type="hidden" name="current_qs" value="{{ request.GET.urlencode }}">
-                {% include "partials/_bulk_action_bar.html" %}
+            <div class="p-5">
+                {% if recent_reports %}
                 <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
+                    <table class="w-full">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">
-                                    <input type="checkbox" x-model="allSelected" @change="toggleAll($event)">
-                                </th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Sana</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Username</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Kompaniya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Naqd</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Click {{ clicks.0.1 }}</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Click {{ clicks.1.1 }}</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Terminal</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Bank</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Umumiy</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium" style="color: var(--color-text-muted);">Holat</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Umumiy</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
                             </tr>
                         </thead>
-                        <tbody id="kassirReportsTable" class="divide-y" style="border-color: var(--color-border);">
-                            {% for report in reports %}
-                            <tr>
-                                <td class="px-4 py-3 text-sm">
-                                    {% if not report.is_closed %}
-                                    <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected">
+                        <tbody>
+                            {% for report in recent_reports %}
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.date|date:"d/m/Y" }}</td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                    {{ report.operator.username }}
+                                    {% if report.operator_shift %}
+                                    <div class="text-xs" style="color: var(--color-text-muted);">{{ report.operator_shift }}-smena</div>
                                     {% endif %}
                                 </td>
-                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
-                                    <div class="space-y-1">
-                                        <div>{{ report.date | date:"d/m" }}</div>
-                                        <div>{{ report.date | date:"Y" }}</div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
-                                    <div class="space-y-1">
-                                        <div>{{ report.operator.username }}</div>
-                                        {% if report.operator_shift %}
-                                        <div class="text-xs" style="color: var(--color-text-muted);">{{ report.operator_shift }}-smena</div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
-                                    {{ report.operator.company.name }}
-                                </td>
-                                <td class="px-4 py-3 text-sm">
-                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
-                                        {% if report.uzs_detail.cash > 0 %}
-                                        <div>{{ report.uzs_detail.cash | format_currency }} so'm</div>
-                                        {% endif %}
-                                        {% if report.usd_detail.cash > 0 %}
-                                        <div>{{ report.usd_detail.cash | format_currency }} $</div>
-                                        {% endif %}
-                                        {% if report.rub_detail.cash > 0 %}
-                                        <div>{{ report.rub_detail.cash | format_currency }} ₽</div>
-                                        {% endif %}
-                                        {% if report.eur_detail.cash > 0 %}
-                                        <div>{{ report.eur_detail.cash | format_currency }} €</div>
-                                        {% endif %}
-                                        {% if report.comment %}
-                                        <div class="text-xs italic" style="color: var(--color-text-muted);">{{ report.comment }}</div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm">
-                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
-                                        {% if report.uzs_detail.click1 > 0 %}
-                                        <div>{{ report.uzs_detail.click1 | format_currency }} so'm</div>
-                                        {% endif %}
-                                        {% if report.usd_detail.click1 > 0 %}
-                                        <div>{{ report.usd_detail.click1 | format_currency }} $</div>
-                                        {% endif %}
-                                        {% if report.rub_detail.click1 > 0 %}
-                                        <div>{{ report.rub_detail.click1 | format_currency }} ₽</div>
-                                        {% endif %}
-                                        {% if report.eur_detail.click1 > 0 %}
-                                        <div>{{ report.eur_detail.click1 | format_currency }} €</div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm">
-                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
-                                        {% if report.uzs_detail.click2 > 0 %}
-                                        <div>{{ report.uzs_detail.click2 | format_currency }} so'm</div>
-                                        {% endif %}
-                                        {% if report.usd_detail.click2 > 0 %}
-                                        <div>{{ report.usd_detail.click2 | format_currency }} $</div>
-                                        {% endif %}
-                                        {% if report.rub_detail.click2 > 0 %}
-                                        <div>{{ report.rub_detail.click2 | format_currency }} ₽</div>
-                                        {% endif %}
-                                        {% if report.eur_detail.click2 > 0 %}
-                                        <div>{{ report.eur_detail.click2 | format_currency }} €</div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm">
-                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
-                                        {% if report.uzs_detail.terminal > 0 %}
-                                        <div>{{ report.uzs_detail.terminal | format_currency }} so'm</div>
-                                        {% endif %}
-                                        {% if report.usd_detail.terminal > 0 %}
-                                        <div>{{ report.usd_detail.terminal | format_currency }} $</div>
-                                        {% endif %}
-                                        {% if report.rub_detail.terminal > 0 %}
-                                        <div>{{ report.rub_detail.terminal | format_currency }} ₽</div>
-                                        {% endif %}
-                                        {% if report.eur_detail.terminal > 0 %}
-                                        <div>{{ report.eur_detail.terminal | format_currency }} €</div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-sm">
-                                    <div class="space-y-1 font-medium money" style="color: var(--color-positive);">
-                                        {% if report.uzs_detail.bank > 0 %}
-                                        <div>{{ report.uzs_detail.bank | format_currency }} so'm</div>
-                                        {% endif %}
-                                        {% if report.usd_detail.bank > 0 %}
-                                        <div>{{ report.usd_detail.bank | format_currency }} $</div>
-                                        {% endif %}
-                                        {% if report.rub_detail.bank > 0 %}
-                                        <div>{{ report.rub_detail.bank | format_currency }} ₽</div>
-                                        {% endif %}
-                                        {% if report.eur_detail.bank > 0 %}
-                                        <div>{{ report.eur_detail.bank | format_currency }} €</div>
-                                        {% endif %}
-                                    </div>
-                                </td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.operator.company.name }}</td>
                                 <td class="px-4 py-3 text-sm">
                                     <div class="space-y-1 font-semibold money" style="color: var(--color-positive);">
-                                        {% if report.total_uzs %}
-                                        <div>{{ report.total_uzs | format_currency }} so'm</div>
-                                        {% endif %}
-                                        {% if report.total_usd %}
-                                        <div>{{ report.total_usd | format_currency }} $</div>
-                                        {% endif %}
-                                        {% if report.total_rub %}
-                                        <div>{{ report.total_rub | format_currency }} ₽</div>
-                                        {% endif %}
-                                        {% if report.total_eur %}
-                                        <div>{{ report.total_eur | format_currency }} €</div>
-                                        {% endif %}
+                                        {% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}
+                                        {% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}
+                                        {% if report.total_rub %}<div>{{ report.total_rub|format_currency }} ₽</div>{% endif %}
+                                        {% if report.total_eur %}<div>{{ report.total_eur|format_currency }} €</div>{% endif %}
                                     </div>
                                 </td>
                                 <td class="px-4 py-3 text-sm">
@@ -186,7 +103,18 @@
                         </tbody>
                     </table>
                 </div>
-            </form>
+                {% else %}
+                <div class="flex flex-col items-center justify-center py-10 text-center">
+                    <span class="w-12 h-12 rounded-full flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </span>
+                    <p class="text-sm" style="color: var(--color-text-muted);">Hozircha hisobotlar yo'q</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

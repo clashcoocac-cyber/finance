@@ -1,241 +1,112 @@
-{% extends "base.html" %}
+{% extends "base_app.html" %}
 {% load custom_filters %}
 
-{% block title %}Operator Dashboard{% endblock %}
+{% block title %}Tranzaksiyalar{% endblock %}
 
-{% block content %}
-<div id="operatorDashboard" class="min-h-screen">
-        <nav class="bg-white shadow-lg border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-wrap justify-between items-center gap-2 py-3">
-            <!-- Chap tomon: Icon, Title, Company, Smena -->
-            <div class="flex flex-wrap items-center gap-2">
-                <h1 class="text-xl font-bold text-gray-800">SFBMSSB</h1>
-                <span class="ms-3 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" id="operatorCompanyName">
-                    {{ request.user.username }}
-                </span>
-                {% if request.session.shift %}
-                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                        {{ request.session.shift }}-smena
-                    </span>
-                {% endif %}
-            </div>
+{% block page_title %}Tranzaksiyalar{% endblock %}
 
-            <!-- O'ng tomon: Tugmalar -->
-            <div class="flex flex-wrap gap-2 justify-end w-full sm:w-auto">
-                <a href="{% url 'home' %}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors text-sm">
-                            ← Orqaga
-                        </a>
-                <a href="{% url 'logout' %}"
-                   class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm">
-                    Chiqish
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
+{% block page_content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options %}
 
-
-        <div class="max-w-7xl mx-auto p-6">
-
-            <!-- Transactions Table -->
-            <div class="bg-white rounded-xl shadow-lg p-6" id="div2">
-                <h2 class="text-xl text-blue-600 font-bold mb-4">Tranzaksiyalar</h2>
-                
-                <!-- Qidiruv va filterlar -->
-    <div class="space-y-4 mb-5">
-        <!-- Qidiruv input -->
-        
-
-        <!-- Filterlar -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 my-7 mt-5 justify-">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Boshlanish sanasi</label>
-                <input type="date" value="{{from}}" id="filterStartDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tugash sanasi</label>
-                <input type="date" value="{{to}}"  id="filterEndDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" onchange="applyTransactionFilters()">
-            </div>
-        <div class="md:col-span-2 justify-end">
-                            <label class="block text-sm font-medium text-gray-700 mb-1"> Qidiruv</label>
-
-            <input 
-                type="text" 
-                id="filterSearch" 
-                value="{{ request.GET.q }}" 
-                placeholder="Tavsif yoki operator..." 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-            >
+    <!-- Totals strip -->
+    <div class="rounded-xl border p-5 flex flex-wrap gap-6" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div>
+            <p class="text-xs font-medium uppercase tracking-wide mb-1" style="color: var(--color-text-muted);">Jami so'm</p>
+            <p class="text-lg font-bold money" style="color: var(--color-text);">{{ total_uzs|format_currency }}</p>
         </div>
         <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">.</label>
-
-            <button
-                id="applyFiltersButton" 
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-                onclick="applyTransactionFilters()"
-            > 
-                Filtrlarni qo'llash
-        </button>
+            <p class="text-xs font-medium uppercase tracking-wide mb-1" style="color: var(--color-text-muted);">Jami dollar</p>
+            <p class="text-lg font-bold money" style="color: var(--color-text);">{{ total_usd|format_currency }}</p>
         </div>
+        <div>
+            <p class="text-xs font-medium uppercase tracking-wide mb-1" style="color: var(--color-text-muted);">Jami rubl</p>
+            <p class="text-lg font-bold money" style="color: var(--color-text);">{{ total_rub|format_currency }}</p>
+        </div>
+        <div>
+            <p class="text-xs font-medium uppercase tracking-wide mb-1" style="color: var(--color-text-muted);">Jami yevro</p>
+            <p class="text-lg font-bold money" style="color: var(--color-text);">{{ total_eur|format_currency }}</p>
         </div>
     </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full table-auto">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Vaqt</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Operator</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kompaniya / Kategoriya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kimdan</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Miqdor</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Kommentariya</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">To'lov turi</th>
-                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Amallar</th>
-                            </tr>
-                        </thead>
-                        <tbody id="operatorTransactionsTable" class="divide-y divide-gray-200">
-                            {% for transaction in transactions %}
-                            <tr>
-        
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.date | date:"d.m.Y" }}<br> {{ transaction.date | time:"H:i" }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.operator.username }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                            {% if transaction.report.category %}
-                                {{ transaction.report.category }}
-                            {% else %}
-                                {{ transaction.operator.company.name }}
-                            {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        {% if not transaction.report.category %}
-                        {{ transaction.get_counterparty_display }}
-                        {% endif %}
-                    </td>
-                    <td class="px-4 py-3 text-sm {% if transaction.type == 'income' %}text-green-600{% else %}text-red-600{% endif %}">
-                        <div class="space-y-1">
-                            {% if transaction.amount_uzs  %}
-                                <div class="font-semibold">{{ transaction.amount_uzs | format_currency }} so'm</div>
-                            {% endif %}
-                            {% if transaction.amount_usd %}
-                                <div class="font-semibold">{{ transaction.amount_usd | format_currency }} $</div>
-                            {% endif %}
-                            {% if transaction.amount_rub %}
-                                <div class="font-semibold">{{ transaction.amount_rub | format_currency }} ₽</div>
-                            {% endif %}
-                            {% if transaction.amount_eur %}
-                                <div class="font-semibold">{{ transaction.amount_eur | format_currency }} €</div>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-900">{{ transaction.comment | default:"" }}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">
-                        {{ transaction.get_payment_type_display }}
-                        {% if transaction.payment_type == 'click' %}
-                            <span class="font-medium"> {{ transaction.get_click_display }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                    <div class="flex space-x-2">
-                                <a href="{% url 'transaction' transaction.pk %}" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                    Tahrirlash
-                                </a>
-                                <a href="{% url 'transaction_delete' transaction.pk %}" onclick="return confirm('Tranzaksiyani o\'chirilsinmi?')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-colors">
-                                    O'chirish
-                                </a>
-                            </div>
-                            </td>
-                </tr>
-                {% endfor %}
-    </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="flex justify-center my-6">
-                <button onclick="generatePDF()" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
-                    📊 Kunlik Hisobot Yuklab Olish
-                </button>
+    <div class="rounded-xl border" style="background: var(--color-surface); border-color: var(--color-border);">
+        <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
+            <span class="flex items-center justify-center w-10 h-10 rounded-full shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10M7 7l3-3M7 7l3 3"></path><path d="M17 17H7M17 17l-3-3M17 17l-3 3"></path></svg>
+            </span>
+            <div>
+                <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha tranzaksiyalar</h2>
             </div>
         </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-<script>
-    function generatePDF() {
-    const container = document.createElement("div");
-    container.classList.add('max-w-7xl', 'mx-auto', 'p-6')
-
-    const div1 = document.getElementById("div1").cloneNode(true);
-    const div2 = document.getElementById("div2").cloneNode(true);
-
-    container.appendChild(div1);
-    container.appendChild(div2);
-
-    const opt = {
-        margin:       0,
-        filename:     'document.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  {
-            scale: 2,
-            useCORS: true, // agar rasm bo'lsa
-            logging: true,
-            scrollY: 0, // skrollni hisobga olmasin
-            windowWidth: document.body.scrollWidth,
-            windowHeight: document.body.scrollHeight,
-        },
-        jsPDF:        {
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'landscape' // <-- bu albom ko‘rinish uchun
-        }
-    };
-
-    html2pdf().set(opt).from(container).save();
-}
-
-        function changePaymentType() {
-            const paymentType = document.getElementById('incomePaymentType');
-            const customDescriptionDiv = document.getElementById('click');
-            const firstSelect = customDescriptionDiv.querySelector('select');
-
-            if (paymentType.value === 'click') {
-                customDescriptionDiv.classList.remove('hidden');
-                firstSelect.setAttribute('required', true);
-            } else {
-                customDescriptionDiv.classList.add('hidden');
-                firstSelect.removeAttribute('required');
-            }
-        }
-
-        function seeWho() {
-            const counterpartySelect = document.getElementById('counterparty');
-            const otherCounterpartyDiv = document.getElementById('otherCounterparty');
-            const firstInput = otherCounterpartyDiv.querySelector('input');
-
-            if (counterpartySelect.value === 'other') {
-                otherCounterpartyDiv.classList.remove('hidden');
-                firstInput.setAttribute('required', true);
-            } else {
-                otherCounterpartyDiv.classList.add('hidden');
-                firstInput.removeAttribute('required');
-            }
-        }
-
-        function applyTransactionFilters() {
-    const from = document.getElementById('filterStartDate').value;
-    const to = document.getElementById('filterEndDate').value;
-    const q = document.getElementById('filterSearch').value;
-
-    const urlParams = new URLSearchParams(window.location.search);
-    urlParams.set('from', from);
-    urlParams.set('to', to);
-    urlParams.set('q', q);
-
-    window.location.search = urlParams.toString();
-}
-</script>
-
+        <div class="p-5">
+            {% if transactions %}
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead style="background: var(--color-surface-muted);">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Vaqt</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya / Kategoriya</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kimdan</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Komentariya</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr style="border-bottom: 1px solid var(--color-border);">
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.date|date:"d.m.Y" }}<br>{{ transaction.date|time:"H:i" }}</td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.operator.username }}</td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                                {% if transaction.report.category %}
+                                    {{ transaction.report.category }}
+                                {% else %}
+                                    {{ transaction.operator.company.name }}
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.counterparty }}</td>
+                            <td class="px-4 py-3 text-sm money font-medium" style="color: {% if transaction.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
+                                {% if transaction.amount_uzs %}<div>{{ transaction.amount_uzs|format_currency }} so'm</div>{% endif %}
+                                {% if transaction.amount_usd %}<div>{{ transaction.amount_usd|format_currency }} $</div>{% endif %}
+                                {% if transaction.amount_rub %}<div>{{ transaction.amount_rub|format_currency }} ₽</div>{% endif %}
+                                {% if transaction.amount_eur %}<div>{{ transaction.amount_eur|format_currency }} €</div>{% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.comment|default:"" }}</td>
+                            <td class="px-4 py-3 text-sm">
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                                    {{ transaction.get_payment_type_display }}
+                                    {% if transaction.payment_type == 'click' %} &middot; {{ transaction.get_click_display }}{% endif %}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <a href="{% url 'transaction' transaction.pk %}" class="rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-surface-muted); color: var(--color-text);">
+                                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
+                                        Tahrirlash
+                                    </a>
+                                    <form method="post" action="{% url 'transaction_delete' transaction.pk %}" onsubmit="return confirm('O\'chirilsinmi?')">
+                                        {% csrf_token %}
+                                        <button type="submit" class="rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-negative-bg); color: var(--color-negative);">
+                                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M6 6l1 14h10l1-14"></path></svg>
+                                            O'chirish
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="flex flex-col items-center justify-center py-10 text-center">
+                <svg class="w-10 h-10 mb-3" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10M7 7l3-3M7 7l3 3"></path><path d="M17 17H7M17 17l-3-3M17 17l-3 3"></path></svg>
+                <p class="text-sm" style="color: var(--color-text-muted);">Tranzaksiyalar topilmadi</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}
