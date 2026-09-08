@@ -14,7 +14,7 @@
            style="background: var(--color-sidebar-bg); border-right: 1px solid var(--color-sidebar-border);">
 
         <div class="flex items-center gap-3 px-5 py-5 shrink-0" style="border-bottom: 1px solid var(--color-sidebar-border);">
-            <span class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style="background: var(--color-sidebar-active-bg);">
+            <span class="flex items-center justify-center w-9 h-9 rounded-md shrink-0" style="background: var(--color-sidebar-active-bg);">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--color-sidebar-active-text)" stroke-width="2" stroke-linejoin="round">
                     <path d="M12 3l9 5-9 5-9-5 9-5z"></path>
                     <path d="M3 13l9 5 9-5"></path>
@@ -52,7 +52,7 @@
             {% endif %}
         </nav>
 
-        <div class="mx-3 mb-4 px-3 py-2.5 rounded-lg text-xs" style="background: var(--color-sidebar-border); color: var(--color-sidebar-text-muted);">
+        <div class="mx-3 mb-4 px-3 py-2.5 rounded-md text-xs" style="background: var(--color-sidebar-border); color: var(--color-sidebar-text-muted);">
             Tizim v1.0.0
         </div>
     </aside>
@@ -63,7 +63,7 @@
                 style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3 min-w-0">
                 <button type="button" @click="sidebarOpen = !sidebarOpen"
-                        class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0 lg:hidden"
+                        class="flex items-center justify-center w-9 h-9 rounded-md shrink-0 lg:hidden"
                         style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Menyu">
                     <i class="fa-solid fa-bars text-lg"></i>
                 </button>
@@ -86,7 +86,7 @@
                     </span>
                 </div>
                 <a href="{% url 'logout' %}"
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                   class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
                    style="background: var(--color-negative-bg); color: var(--color-negative);">
                     Chiqish
                 </a>
@@ -96,7 +96,7 @@
         <main class="flex-1 p-4 sm:p-6 space-y-6">
             {% if messages %}
                 {% for message in messages %}
-                <div class="rounded-xl px-4 py-3 text-sm font-medium"
+                <div class="rounded-lg px-4 py-3 text-sm font-medium"
                      style="background: {% if message.tags == 'error' %}var(--color-negative-bg){% else %}var(--color-positive-bg){% endif %};
                             color: {% if message.tags == 'error' %}var(--color-negative){% else %}var(--color-positive){% endif %};">
                     {{ message }}

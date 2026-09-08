@@ -7,7 +7,7 @@
 {% block page_content %}
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
     <!-- Filter bar -->
-    <div class="rounded-xl p-5" style="background: var(--color-surface);">
+    <div class="rounded-lg p-5" style="background: var(--color-surface);">
         {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options type_filter=True type_value=type %}
     </div>
 
@@ -24,10 +24,10 @@
     </div>
 
     <!-- Reports table -->
-    <div class="rounded-xl" style="background: var(--color-surface);">
+    <div class="rounded-lg" style="background: var(--color-surface);">
         <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
-                <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                     <i class="fa-solid fa-receipt"></i>
                 </span>
                 <div>
@@ -35,7 +35,7 @@
                     <p class="text-sm" style="color: var(--color-text-muted);">Chiqim va xarajat hisobotlarini belgilab tasdiqlang</p>
                 </div>
             </div>
-            <button type="button" onclick="generatePDF()" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
+            <button type="button" onclick="generatePDF()" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
                 <i class="fa-solid fa-file-arrow-down"></i>
                 Yuklab olish
             </button>
@@ -112,7 +112,7 @@
                 </div>
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
-                    <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                    <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
                         <i class="fa-solid fa-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>

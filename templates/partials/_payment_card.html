@@ -3,9 +3,9 @@
    but a plain amounts shape (uzs/usd/rub/eur, no "total_" prefix, no confirmed/pending split).
    icon: "cash" gets a positive-tinted badge, anything else (click channels) gets a brand-tinted badge —
    so the cash channel reads visually distinct from the card channels.{% endcomment %}
-<div class="rounded-xl p-5" style="background: var(--color-surface);">
+<div class="rounded-lg p-5" style="background: var(--color-surface);">
     <div class="flex items-center gap-3 mb-3">
-        <span class="flex items-center justify-center w-9 h-9 rounded-lg shrink-0"
+        <span class="flex items-center justify-center w-9 h-9 rounded-md shrink-0"
               style="background: {% if icon == 'cash' %}var(--color-positive-bg){% else %}var(--color-surface-muted){% endif %};
                      color: {% if icon == 'cash' %}var(--color-positive){% else %}var(--color-brand){% endif %};">
             <i class="fa-solid text-lg {% if icon == 'cash' %}fa-money-bill-wave{% else %}fa-credit-card{% endif %}"></i>
@@ -13,9 +13,9 @@
         <p class="text-sm font-semibold" style="color: var(--color-text-muted);">{{ title }}</p>
     </div>
     <div class="grid grid-cols-2 gap-2 money" style="color: var(--color-text);">
-        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_uzs|default:0|format_currency }} so'm">{{ amounts_uzs|default:0|format_currency }} <span class="text-sm font-semibold">so'm</span></div>
-        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_usd|default:0|format_currency }} $">{{ amounts_usd|default:0|format_currency }} <span class="text-sm font-semibold">$</span></div>
-        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_rub|default:0|format_currency }} ₽">{{ amounts_rub|default:0|format_currency }} <span class="text-sm font-semibold">₽</span></div>
-        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_eur|default:0|format_currency }} €">{{ amounts_eur|default:0|format_currency }} <span class="text-sm font-semibold">€</span></div>
+        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_uzs|default:0|format_currency }} so'm">{{ amounts_uzs|default:0|format_currency }} <span class="text-sm font-semibold">so'm</span></div>
+        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_usd|default:0|format_currency }} $">{{ amounts_usd|default:0|format_currency }} <span class="text-sm font-semibold">$</span></div>
+        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_rub|default:0|format_currency }} ₽">{{ amounts_rub|default:0|format_currency }} <span class="text-sm font-semibold">₽</span></div>
+        <div class="rounded-md px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-bg);" title="{{ amounts_eur|default:0|format_currency }} €">{{ amounts_eur|default:0|format_currency }} <span class="text-sm font-semibold">€</span></div>
     </div>
 </div>

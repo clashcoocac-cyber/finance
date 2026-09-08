@@ -5,17 +5,17 @@
 
 {% block page_content %}
 <div class="max-w-5xl mx-auto space-y-6">
-    <div class="rounded-xl" style="background: var(--color-surface);" x-data="{ open: {% if form.errors %}true{% else %}false{% endif %}, editUser: {id: '', username: '', company: ''}, editOpen: false }">
+    <div class="rounded-lg" style="background: var(--color-surface);" x-data="{ open: {% if form.errors %}true{% else %}false{% endif %}, editUser: {id: '', username: '', company: ''}, editOpen: false }">
         <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
-                <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                     <i class="fa-solid fa-users"></i>
                 </span>
                 <div>
                     <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha foydalanuvchilar</h2>
                 </div>
             </div>
-            <button type="button" @click="open = true" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+            <button type="button" @click="open = true" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                 <i class="fa-solid fa-plus"></i>
                 Yangi foydalanuvchi
             </button>
@@ -51,12 +51,12 @@
                                 {% if not user.is_boss %}
                                 <div class="relative" x-data="{ menuOpen: false, menuPos: {top: 0, left: 0} }">
                                     <button type="button" @click="const r = $el.getBoundingClientRect(); menuPos = {top: r.bottom + 4, left: r.right - 160}; menuOpen = !menuOpen"
-                                        class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Amallar">
+                                        class="w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Amallar">
                                         <i class="fa-solid fa-ellipsis-vertical"></i>
                                     </button>
                                     <template x-teleport="body">
                                         <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
-                                            class="fixed w-40 rounded-lg shadow-lg z-50 overflow-hidden"
+                                            class="fixed w-40 rounded-md shadow-lg z-50 overflow-hidden"
                                             :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px'"
                                             style="background: var(--color-surface); border: 1px solid var(--color-border);">
                                             <button type="button"
@@ -84,7 +84,7 @@
             </div>
             {% else %}
             <div class="flex flex-col items-center justify-center py-10 text-center">
-                <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
                     <i class="fa-solid fa-users text-xl"></i>
                 </span>
                 <p class="text-sm" style="color: var(--color-text-muted);">Foydalanuvchilar topilmadi</p>
@@ -95,7 +95,7 @@
         <!-- Create user modal -->
         {% include "partials/_modal_open.html" with modal_title="Yangi foydalanuvchi" modal_subtitle="Operator yoki kassir uchun hisob yarating" modal_tone="brand" modal_icon="user" modal_width="max-w-md" %}
             {% if form.errors %}
-            <div class="rounded-lg p-4 mb-4 border" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
+            <div class="rounded-md p-4 mb-4 border" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
                 <ul class="list-disc pl-5 space-y-1 text-sm" style="color: var(--color-negative);">
                     {% for field, errors in form.errors.items %}
                     <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
@@ -111,7 +111,7 @@
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                             <i class="fa-solid fa-user"></i>
                         </span>
-                        <input required type="text" name="username" placeholder="Username kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input required type="text" name="username" placeholder="Username kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
                 <div>
@@ -120,7 +120,7 @@
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                             <i class="fa-solid fa-lock"></i>
                         </span>
-                        <input required type="password" name="password" placeholder="Parol kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input required type="password" name="password" placeholder="Parol kiriting" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
                 <div>
@@ -129,7 +129,7 @@
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                             <i class="fa-solid fa-users"></i>
                         </span>
-                        <select required name="role" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <select required name="role" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             <option value="">Rol tanlang</option>
                             <option value="operator">Operator</option>
                             <option value="cashier">Kassir</option>
@@ -142,10 +142,10 @@
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                             <i class="fa-solid fa-building"></i>
                         </span>
-                        <input type="text" name="company_name" placeholder="Kompaniya nomi" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input type="text" name="company_name" placeholder="Kompaniya nomi" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
-                <button type="submit" class="w-full rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                <button type="submit" class="w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                     <i class="fa-solid fa-plus"></i>
                     Foydalanuvchi yaratish
                 </button>
@@ -164,14 +164,14 @@
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100">
                 <div class="flex items-start gap-4 px-6 py-5" style="border-bottom: 1px solid var(--color-border);">
-                    <span class="flex items-center justify-center w-12 h-12 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                    <span class="flex items-center justify-center w-12 h-12 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                         <i class="fa-solid fa-pen text-xl"></i>
                     </span>
                     <div class="min-w-0 flex-1">
                         <h2 class="text-xl font-bold" style="color: var(--color-text);">Foydalanuvchini tahrirlash</h2>
                     </div>
                     <button type="button" @click="editOpen = false"
-                            class="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg"
+                            class="shrink-0 flex items-center justify-center w-9 h-9 rounded-md"
                             style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Yopish">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
@@ -186,7 +186,7 @@
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                                     <i class="fa-solid fa-user"></i>
                                 </span>
-                                <input type="text" name="username" x-model="editUser.username" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input type="text" name="username" x-model="editUser.username" required class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                         </div>
                         <div>
@@ -195,7 +195,7 @@
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                                     <i class="fa-solid fa-lock"></i>
                                 </span>
-                                <input type="password" name="new_password" placeholder="" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input type="password" name="new_password" placeholder="" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                             <p class="text-xs mt-1" style="color: var(--color-text-muted);">Bo'sh qoldirsangiz, eski parol saqlanadi</p>
                         </div>
@@ -205,14 +205,14 @@
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                                     <i class="fa-solid fa-building"></i>
                                 </span>
-                                <input type="text" name="company_name" x-model="editUser.company" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input type="text" name="company_name" x-model="editUser.company" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                         </div>
                         <div class="flex gap-3 pt-2">
-                            <button type="submit" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                            <button type="submit" class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                                 Saqlash
                             </button>
-                            <button type="button" @click="editOpen = false" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                            <button type="button" @click="editOpen = false" class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
                                 Bekor qilish
                             </button>
                         </div>

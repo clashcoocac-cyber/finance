@@ -16,19 +16,19 @@
     <!-- Stat cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="relative group">
-            <button type="button" @click="editStat('income', {{ stats.confirmed.income.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.income.total_usd|default:0|unlocalize }}, {{ stats.confirmed.income.total_rub|default:0|unlocalize }}, {{ stats.confirmed.income.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('income', {{ stats.confirmed.income.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.income.total_usd|default:0|unlocalize }}, {{ stats.confirmed.income.total_rub|default:0|unlocalize }}, {{ stats.confirmed.income.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
                 <i class="fa-solid fa-pen"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
         </div>
         <div class="relative group">
-            <button type="button" @click="editStat('expense', {{ stats.confirmed.expense.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.expense.total_usd|default:0|unlocalize }}, {{ stats.confirmed.expense.total_rub|default:0|unlocalize }}, {{ stats.confirmed.expense.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('expense', {{ stats.confirmed.expense.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.expense.total_usd|default:0|unlocalize }}, {{ stats.confirmed.expense.total_rub|default:0|unlocalize }}, {{ stats.confirmed.expense.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
                 <i class="fa-solid fa-pen"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
         </div>
         <div class="relative group">
-            <button type="button" @click="editStat('diff', {{ stats.confirmed.diff.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.diff.total_usd|default:0|unlocalize }}, {{ stats.confirmed.diff.total_rub|default:0|unlocalize }}, {{ stats.confirmed.diff.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
+            <button type="button" @click="editStat('diff', {{ stats.confirmed.diff.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.diff.total_usd|default:0|unlocalize }}, {{ stats.confirmed.diff.total_rub|default:0|unlocalize }}, {{ stats.confirmed.diff.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
                 <i class="fa-solid fa-pen"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
@@ -37,8 +37,8 @@
 
     <!-- System stats -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="rounded-xl p-4 flex items-center gap-3" style="background: var(--color-surface);">
-            <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+        <div class="rounded-lg p-4 flex items-center gap-3" style="background: var(--color-surface);">
+            <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                 <i class="fa-solid fa-users"></i>
             </span>
             <div class="min-w-0">
@@ -46,8 +46,8 @@
                 <p class="text-xl font-bold money" style="color: var(--color-text);">{{ operator_count }}</p>
             </div>
         </div>
-        <div class="rounded-xl p-4 flex items-center gap-3" style="background: var(--color-surface);">
-            <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+        <div class="rounded-lg p-4 flex items-center gap-3" style="background: var(--color-surface);">
+            <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                 <i class="fa-solid fa-users"></i>
             </span>
             <div class="min-w-0">
@@ -55,8 +55,8 @@
                 <p class="text-xl font-bold money" style="color: var(--color-text);">{{ cashier_count }}</p>
             </div>
         </div>
-        <div class="rounded-xl p-4 flex items-center gap-3" style="background: var(--color-surface);">
-            <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+        <div class="rounded-lg p-4 flex items-center gap-3" style="background: var(--color-surface);">
+            <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                 <i class="fa-solid fa-right-left"></i>
             </span>
             <div class="min-w-0">
@@ -64,8 +64,8 @@
                 <p class="text-xl font-bold money" style="color: var(--color-text);">{{ transaction_count }}</p>
             </div>
         </div>
-        <div class="rounded-xl p-4 flex items-center gap-3" style="background: var(--color-surface);">
-            <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-pending-bg); color: var(--color-pending);">
+        <div class="rounded-lg p-4 flex items-center gap-3" style="background: var(--color-surface);">
+            <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-pending-bg); color: var(--color-pending);">
                 <i class="fa-solid fa-clock"></i>
             </span>
             <div class="min-w-0">
@@ -76,10 +76,10 @@
     </div>
 
     <!-- Recent reports -->
-    <div class="rounded-xl" style="background: var(--color-surface);">
+    <div class="rounded-lg" style="background: var(--color-surface);">
         <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
-                <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+                <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                     <i class="fa-solid fa-receipt"></i>
                 </span>
                 <div>
@@ -87,7 +87,7 @@
                     <p class="text-sm" style="color: var(--color-text-muted);">Oxirgi 5 ta kunlik hisobot</p>
                 </div>
             </div>
-            <a href="{% url 'boss_reports' %}" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+            <a href="{% url 'boss_reports' %}" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                 <i class="fa-solid fa-receipt"></i>
                 Hisobotlarni ko'rish
             </a>
@@ -129,7 +129,7 @@
             </div>
             {% else %}
             <div class="flex flex-col items-center justify-center py-10 text-center">
-                <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
                     <i class="fa-solid fa-receipt text-xl"></i>
                 </span>
                 <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
@@ -147,34 +147,34 @@
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm miqdori</label>
-                <input type="number" name="total_uzs" x-model.number="uzs" placeholder="So'm miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_uzs" x-model.number="uzs" placeholder="So'm miqdorini kiriting" class="w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar miqdori</label>
-                <input type="number" name="total_usd" x-model.number="usd" placeholder="Dollar miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_usd" x-model.number="usd" placeholder="Dollar miqdorini kiriting" class="w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl miqdori</label>
-                <input type="number" name="total_rub" x-model.number="rub" placeholder="Rubl miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_rub" x-model.number="rub" placeholder="Rubl miqdorini kiriting" class="w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro miqdori</label>
-                <input type="number" name="total_eur" x-model.number="eur" placeholder="Yevro miqdorini kiriting" class="w-full px-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                <input type="number" name="total_eur" x-model.number="eur" placeholder="Yevro miqdorini kiriting" class="w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
             </div>
 
-            <div class="rounded-lg p-3 border" style="background: var(--color-pending-bg); border-color: var(--color-pending);">
+            <div class="rounded-md p-3 border" style="background: var(--color-pending-bg); border-color: var(--color-pending);">
                 <p class="text-sm font-medium mb-1" style="color: var(--color-pending);">Diqqat!</p>
                 <p class="text-sm" style="color: var(--color-pending);">Bu o'zgarishlar kunlik hisobotga ta'sir qiladi. Faqat zarur hollarda o'zgartiring.</p>
             </div>
 
             <div class="flex gap-3 pt-2">
-                <button type="submit" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                <button type="submit" class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
                     Saqlash
                 </button>
-                <button type="button" @click="open = false" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
+                <button type="button" @click="open = false" class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
                     Bekor qilish
                 </button>
             </div>

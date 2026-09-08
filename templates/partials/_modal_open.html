@@ -23,7 +23,7 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100">
         <div class="flex items-start gap-4 px-6 py-5" style="border-bottom: 1px solid var(--color-border);">
-            <span class="flex items-center justify-center w-12 h-12 rounded-lg shrink-0"
+            <span class="flex items-center justify-center w-12 h-12 rounded-md shrink-0"
                   style="background: {% if modal_tone == 'positive' %}var(--color-positive-bg){% elif modal_tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
                          color: {% if modal_tone == 'positive' %}var(--color-positive){% elif modal_tone == 'negative' %}var(--color-negative){% else %}var(--color-brand){% endif %};">
                 <i class="fa-solid text-xl {% if modal_icon == 'user' %}fa-user{% elif modal_icon == 'edit' %}fa-pen{% else %}fa-plus{% endif %}"></i>
@@ -35,7 +35,7 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
                 {% endif %}
             </div>
             <button type="button" @click="open = false"
-                    class="shrink-0 flex items-center justify-center w-9 h-9 rounded-lg transition-colors"
+                    class="shrink-0 flex items-center justify-center w-9 h-9 rounded-md transition-colors"
                     style="background: var(--color-surface-muted); color: var(--color-text-muted);"
                     aria-label="Yopish">
                 <i class="fa-solid fa-xmark text-lg"></i>

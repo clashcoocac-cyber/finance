@@ -25,7 +25,7 @@ needs no changes. Params: date_from, date_to, from_name (default "from"), to_nam
     <div class="relative">
         <i class="fa-solid fa-calendar-days absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);"></i>
         <input type="text" x-ref="rangeInput" readonly placeholder="Sana oralig'ini tanlang"
-               class="w-full pl-10 pr-3 py-2 border rounded-lg text-sm cursor-pointer"
+               class="w-full pl-10 pr-3 py-2 border rounded-md text-sm cursor-pointer"
                style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
     </div>
     <input type="hidden" name="{{ from_name|default:'from' }}" :value="from">

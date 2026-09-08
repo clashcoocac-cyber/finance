@@ -10,7 +10,7 @@
     {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options %}
 
     <!-- Totals strip -->
-    <div class="rounded-xl p-5 flex flex-wrap gap-6" style="background: var(--color-surface);">
+    <div class="rounded-lg p-5 flex flex-wrap gap-6" style="background: var(--color-surface);">
         <div>
             <p class="text-xs font-medium uppercase tracking-wide mb-1" style="color: var(--color-text-muted);">Jami so'm</p>
             <p class="text-lg font-bold money" style="color: var(--color-text);">{{ total_uzs|format_currency }}</p>
@@ -29,9 +29,9 @@
         </div>
     </div>
 
-    <div class="rounded-xl" style="background: var(--color-surface);">
+    <div class="rounded-lg" style="background: var(--color-surface);">
         <div class="flex items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
-            <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
+            <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
                 <i class="fa-solid fa-right-left"></i>
             </span>
             <div>
@@ -82,13 +82,13 @@
                             </td>
                             <td class="px-4 py-3 text-sm">
                                 <div class="flex items-center gap-2">
-                                    <a href="{% url 'transaction' transaction.pk %}" class="rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-surface-muted); color: var(--color-text);">
+                                    <a href="{% url 'transaction' transaction.pk %}" class="rounded-md px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-surface-muted); color: var(--color-text);">
                                         <i class="fa-solid fa-pen"></i>
                                         Tahrirlash
                                     </a>
                                     <form method="post" action="{% url 'transaction_delete' transaction.pk %}" onsubmit="return confirm('O\'chirilsinmi?')">
                                         {% csrf_token %}
-                                        <button type="submit" class="rounded-lg px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-negative-bg); color: var(--color-negative);">
+                                        <button type="submit" class="rounded-md px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-negative-bg); color: var(--color-negative);">
                                             <i class="fa-solid fa-trash"></i>
                                             O'chirish
                                         </button>
@@ -102,7 +102,7 @@
             </div>
             {% else %}
             <div class="flex flex-col items-center justify-center py-10 text-center">
-                <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+                <span class="w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
                     <i class="fa-solid fa-right-left text-xl"></i>
                 </span>
                 <p class="text-sm" style="color: var(--color-text-muted);">Tranzaksiyalar topilmadi</p>
