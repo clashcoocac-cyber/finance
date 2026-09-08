@@ -1,44 +1,23 @@
-{% extends "base.html" %}
+{% extends "../base_app.html" %}
 {% load custom_filters %}
 
 {% block title %}Operator Dashboard{% endblock %}
 
-{% block content %}
+{% block page_title %}Operator{% endblock %}
+
+{% block page_content %}
 <div id="operatorDashboard" class="min-h-screen">
-    <nav class="border-b" style="background: var(--color-surface); border-color: var(--color-border);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap justify-between items-center gap-2 py-3">
-                <div class="flex flex-wrap items-center gap-2">
-                    <h1 class="text-xl font-bold" style="color: var(--color-text);">SFBMSSB</h1>
-                    <span class="ms-3 px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);" id="operatorCompanyName">
-                        {{ request.user.username }}
-                    </span>
-                    {% if request.session.shift %}
-                    <span class="px-3 py-1 rounded-full text-sm" style="background: var(--color-pending-bg); color: var(--color-pending);">
-                        {{ request.session.shift }}-smena
-                    </span>
-                    {% endif %}
-                </div>
-
-                <div class="flex flex-wrap gap-2 justify-end w-full sm:w-auto">
-                    <form method="POST" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
-                        {% csrf_token %}
-                        <button type="submit"
-                            onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')"
-                            class="px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm font-medium" style="background: var(--color-pending); color: var(--color-brand-foreground);">
-                            🔒 Kassani Yopish
-                        </button>
-                    </form>
-                    <a href="{% url 'logout' %}"
-                       class="px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm font-medium" style="background: var(--color-negative); color: var(--color-brand-foreground);">
-                        Chiqish
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
     <div class="max-w-7xl mx-auto p-6">
+        <div class="flex justify-end mb-4">
+            <form method="POST" action="{% url 'close_cash_register' %}?report_date={{ report_date }}">
+                {% csrf_token %}
+                <button type="submit"
+                    onclick="return confirm('Rostan ham kassni yopmoqchimisiz?')"
+                    class="px-4 py-2 rounded-lg transition-colors min-w-[140px] whitespace-nowrap text-sm font-medium" style="background: var(--color-pending); color: var(--color-brand-foreground);">
+                    🔒 Kassani Yopish
+                </button>
+            </form>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 {% if 'OPT' in request.user.username %}lg:grid-cols-2{% else %}lg:grid-cols-3{% endif %} gap-4 mb-8" id="div1">
             {% if not 'OPT' in request.user.username %}
             <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
