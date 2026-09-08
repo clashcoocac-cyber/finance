@@ -13,36 +13,47 @@
         crossorigin="anonymous" defer></script>
     <style>
         :root {
-            --color-bg: #F8FAFC;
+            /* Sneat-inspired palette: soft lavender page background, white cards,
+               violet brand accent, light sidebar. */
+            --color-bg: #F8F7FA;
             --color-surface: #FFFFFF;
-            --color-surface-muted: #F1F5F9;
-            --color-border: #E2E8F0;
-            --color-text: #0F172A;
-            --color-text-muted: #64748B;
-            --color-brand: #1E3A8A;
+            --color-surface-muted: #F5F5F9;
+            --color-border: #E7E7EF;
+            --color-text: #32475C;
+            --color-text-muted: #6B7A90;
+            --color-brand: #696CFF;
             --color-brand-foreground: #FFFFFF;
-            --color-positive: #16A34A;
-            --color-positive-bg: #F0FDF4;
-            --color-negative: #DC2626;
-            --color-negative-bg: #FEF2F2;
-            --color-pending: #D97706;
-            --color-pending-bg: #FFFBEB;
+            --color-positive: #56CA00;
+            --color-positive-bg: #E8FBDD;
+            --color-negative: #FF4C51;
+            --color-negative-bg: #FFE0E1;
+            --color-pending: #FFB400;
+            --color-pending-bg: #FFF3D9;
 
-            --color-sidebar-bg: #0F172A;
-            --color-sidebar-border: #1E293B;
-            --color-sidebar-text: #CBD5E1;
-            --color-sidebar-text-muted: #64748B;
-            --color-sidebar-active-bg: #2563EB;
+            --color-sidebar-bg: #FFFFFF;
+            --color-sidebar-border: #E7E7EF;
+            --color-sidebar-text: #6B7A90;
+            --color-sidebar-text-muted: #A7B4C2;
+            --color-sidebar-active-bg: #696CFF;
             --color-sidebar-active-text: #FFFFFF;
+
+            --shadow-card: 0 2px 10px rgba(105, 108, 255, 0.08);
         }
         @media (prefers-color-scheme: dark) {
-            :root {
-                --color-bg: #0F172A;
-                --color-surface: #1B2336;
-                --color-surface-muted: #1A1E2F;
-                --color-border: #334155;
-                --color-text: #F8FAFC;
-                --color-text-muted: #94A3B8;
+            :root:not([data-theme="light"]) {
+                --color-bg: #25293C;
+                --color-surface: #2F3349;
+                --color-surface-muted: #383C55;
+                --color-border: #434968;
+                --color-text: #E7E3FC;
+                --color-text-muted: #A7A3C0;
+
+                --color-sidebar-bg: #2F3349;
+                --color-sidebar-border: #434968;
+                --color-sidebar-text: #A7A3C0;
+                --color-sidebar-text-muted: #6B7290;
+
+                --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.3);
             }
         }
         body {
@@ -59,6 +70,8 @@
         .fade-in { animation: fadeIn 0.2s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         [x-cloak] { display: none !important; }
+        /* Sneat-style soft elevation on every surface card (border + surface-bg combo). */
+        [class*="rounded-xl"][style*="var(--color-surface)"]:not([style*="var(--color-surface-muted)"]) { box-shadow: var(--shadow-card); }
     </style>
 </head>
 <body class="min-h-screen">
