@@ -27,9 +27,9 @@
         {% include "partials/_status_badge.html" with status=status %}
     </div>
     <div class="space-y-1 money text-sm" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
-        {% if amounts.total_uzs %}<div class="text-lg font-semibold">{{ amounts.total_uzs|format_currency }} so'm</div>{% endif %}
-        {% if amounts.total_usd %}<div>{{ amounts.total_usd|format_currency }} $</div>{% endif %}
-        {% if amounts.total_rub %}<div>{{ amounts.total_rub|format_currency }} ₽</div>{% endif %}
-        {% if amounts.total_eur %}<div>{{ amounts.total_eur|format_currency }} €</div>{% endif %}
+        <div class="text-lg font-semibold">{{ amounts.total_uzs|default:0|format_currency }} so'm</div>
+        <div>{{ amounts.total_usd|default:0|format_currency }} $</div>
+        <div>{{ amounts.total_rub|default:0|format_currency }} ₽</div>
+        <div>{{ amounts.total_eur|default:0|format_currency }} €</div>
     </div>
 </div>
