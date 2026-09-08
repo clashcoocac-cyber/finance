@@ -6,7 +6,7 @@
     <title>{% block title %}Moliyaviy Boshqaruv Tizimi{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Public+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"
           integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.4/css/boxicons.min.css" rel="stylesheet"
@@ -39,12 +39,15 @@
             --color-pending: #FFB400;
             --color-pending-bg: #FFF3D9;
 
-            --color-sidebar-bg: #FFFFFF;
-            --color-sidebar-border: #E7E7EF;
-            --color-sidebar-text: #384551;
-            --color-sidebar-text-muted: #8F9BAA;
-            --color-sidebar-active-bg: rgba(105, 108, 255, 0.12);
-            --color-sidebar-active-text: #696CFF;
+            /* Semi-dark sidebar skin (Sneat's "Menu Color: Dark" option) — fixed dark
+               palette, independent of the page's own light/dark theme. */
+            --color-sidebar-bg: #282A42;
+            --color-sidebar-border: rgba(255, 255, 255, 0.07);
+            --color-sidebar-surface: rgba(255, 255, 255, 0.06);
+            --color-sidebar-text: #B4B7C9;
+            --color-sidebar-text-muted: #696E82;
+            --color-sidebar-active-bg: rgba(105, 108, 255, 0.16);
+            --color-sidebar-active-text: #8B8DFF;
 
             --shadow-card: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
         }
@@ -56,11 +59,6 @@
                 --color-border: #434968;
                 --color-text: #E7E3FC;
                 --color-text-muted: #A7A3C0;
-
-                --color-sidebar-bg: #2F3349;
-                --color-sidebar-border: #434968;
-                --color-sidebar-text: #A7A3C0;
-                --color-sidebar-text-muted: #6B7290;
 
                 --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.32);
             }
