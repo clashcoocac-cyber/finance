@@ -1,0 +1,29 @@
+{% load custom_filters %}
+{# Neutral running-balance card (Click / Naqd channels) — same visual language as _stat_card.html,
+   but a plain amounts shape (uzs/usd/rub/eur, no "total_" prefix, no confirmed/pending split). #}
+<div class="rounded-xl p-5 border" style="background: var(--color-surface); border-color: var(--color-border);">
+    <div class="flex items-center gap-3 mb-3">
+        <span class="flex items-center justify-center w-9 h-9 rounded-full shrink-0"
+              style="background: var(--color-surface-muted); color: var(--color-text-muted);">
+            {% if icon == "cash" %}
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M6 9v.01M18 15v.01"></path>
+            </svg>
+            {% else %}
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                <path d="M2 10h20"></path>
+            </svg>
+            {% endif %}
+        </span>
+        <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
+    </div>
+    <div class="space-y-1 money text-sm" style="color: var(--color-text);">
+        <div class="text-lg font-semibold">{{ amounts_uzs|default:0|format_currency }} so'm</div>
+        <div>{{ amounts_usd|default:0|format_currency }} $</div>
+        <div>{{ amounts_rub|default:0|format_currency }} ₽</div>
+        <div>{{ amounts_eur|default:0|format_currency }} €</div>
+    </div>
+</div>

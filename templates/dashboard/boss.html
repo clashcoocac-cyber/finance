@@ -8,29 +8,19 @@
 <div id="boshliqDashboard" class="min-h-screen">
     <div class="max-w-7xl mx-auto p-6" id="invoice">
         <div class="space-y-3 mb-8">
-            <h2 class="text-sm font-semibold" style="color: var(--color-text-muted);">Tasdiqlangan</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="relative group">
                     <button type="button" onclick="editDailyStats('income')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded" style="background: var(--color-surface-muted);">✏️</button>
-                    {% include "partials/_stat_card.html" with title="Tasdiqlangan kirim" amounts=stats.confirmed.income status="confirmed" tone="positive" %}
+                    {% include "partials/_stat_card.html" with title="Kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
                 </div>
                 <div class="relative group">
                     <button type="button" onclick="editDailyStats('expense')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded" style="background: var(--color-surface-muted);">✏️</button>
-                    {% include "partials/_stat_card.html" with title="Tasdiqlangan chiqim" amounts=stats.confirmed.expense status="confirmed" tone="negative" %}
+                    {% include "partials/_stat_card.html" with title="Chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
                 </div>
                 <div class="relative group">
                     <button type="button" onclick="editDailyStats('diff')" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-xs px-2 py-1 rounded" style="background: var(--color-surface-muted);">✏️</button>
-                    {% include "partials/_stat_card.html" with title="Tasdiqlangan qoldiq" amounts=stats.confirmed.diff status="confirmed" tone="neutral" %}
+                    {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
                 </div>
-            </div>
-        </div>
-
-        <div class="space-y-3 mb-8">
-            <h2 class="text-sm font-semibold" style="color: var(--color-text-muted);">Kutilmoqda</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {% include "partials/_stat_card.html" with title="Kutilayotgan kirim" amounts=stats.pending.income status="pending" tone="positive" %}
-                {% include "partials/_stat_card.html" with title="Kutilayotgan chiqim" amounts=stats.pending.expense status="pending" tone="negative" %}
-                {% include "partials/_stat_card.html" with title="Kutilayotgan qoldiq" amounts=stats.pending.diff status="pending" tone="neutral" %}
             </div>
         </div>
 

@@ -25,37 +25,10 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 {% if 'OPT' in request.user.username %}lg:grid-cols-2{% else %}lg:grid-cols-3{% endif %} gap-4 mb-8" id="div1">
             {% if not 'OPT' in request.user.username %}
-            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
-                <div class="text-2xl mb-2">💳</div>
-                <p class="text-sm" style="color: var(--color-text-muted);">Click {{ clicks.0.1 }}</p>
-                <div class="space-y-1 money" style="color: var(--color-positive);">
-                    <p class="text-sm font-bold">{{ total.click1.uzs | default:0 | format_currency }} so'm</p>
-                    <p class="text-xs font-semibold">{{ total.click1.usd | default:0 | format_currency }} $</p>
-                    <p class="text-xs font-semibold">{{ total.click1.rub | default:0 | format_currency }} ₽</p>
-                    <p class="text-xs font-semibold">{{ total.click1.eur | default:0 | format_currency }} €</p>
-                </div>
-            </div>
+            {% include "partials/_payment_card.html" with title="Click "|add:clicks.0.1 icon="card" amounts_uzs=total.click1.uzs amounts_usd=total.click1.usd amounts_rub=total.click1.rub amounts_eur=total.click1.eur %}
             {% endif %}
-            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
-                <div class="text-2xl mb-2">💳</div>
-                <p class="text-sm" style="color: var(--color-text-muted);">Click {{ clicks.1.1 }}</p>
-                <div class="space-y-1 money" style="color: var(--color-positive);">
-                    <p class="text-sm font-bold">{{ total.click2.uzs | default:0 | format_currency }} so'm</p>
-                    <p class="text-xs font-semibold">{{ total.click2.usd | default:0 | format_currency }} $</p>
-                    <p class="text-xs font-semibold">{{ total.click2.rub | default:0 | format_currency }} ₽</p>
-                    <p class="text-xs font-semibold">{{ total.click2.eur | default:0 | format_currency }} €</p>
-                </div>
-            </div>
-            <div class="rounded-xl shadow-lg p-4 text-center" style="background: var(--color-surface);">
-                <div class="text-2xl mb-2">💵</div>
-                <p class="text-sm" style="color: var(--color-text-muted);">Naqd</p>
-                <div class="space-y-1 money" style="color: var(--color-positive);">
-                    <p class="text-sm font-bold">{{ total.cash.uzs | default:0 | format_currency }} so'm</p>
-                    <p class="text-xs font-semibold">{{ total.cash.usd | default:0 | format_currency }} $</p>
-                    <p class="text-xs font-semibold">{{ total.cash.rub | default:0 | format_currency }} ₽</p>
-                    <p class="text-xs font-semibold">{{ total.cash.eur | default:0 | format_currency }} €</p>
-                </div>
-            </div>
+            {% include "partials/_payment_card.html" with title="Click "|add:clicks.1.1 icon="card" amounts_uzs=total.click2.uzs amounts_usd=total.click2.usd amounts_rub=total.click2.rub amounts_eur=total.click2.eur %}
+            {% include "partials/_payment_card.html" with title="Naqd" icon="cash" amounts_uzs=total.cash.uzs amounts_usd=total.cash.usd amounts_rub=total.cash.rub amounts_eur=total.cash.eur %}
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
