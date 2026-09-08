@@ -17,19 +17,19 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="relative group">
             <button type="button" @click="editStat('income', {{ stats.confirmed.income.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.income.total_usd|default:0|unlocalize }}, {{ stats.confirmed.income.total_rub|default:0|unlocalize }}, {{ stats.confirmed.income.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
+                <i class="fa-solid fa-pen"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy kirim" amounts=stats.confirmed.income pending_amounts=stats.pending.income tone="positive" %}
         </div>
         <div class="relative group">
             <button type="button" @click="editStat('expense', {{ stats.confirmed.expense.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.expense.total_usd|default:0|unlocalize }}, {{ stats.confirmed.expense.total_rub|default:0|unlocalize }}, {{ stats.confirmed.expense.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
+                <i class="fa-solid fa-pen"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Umumiy chiqim" amounts=stats.confirmed.expense pending_amounts=stats.pending.expense tone="negative" %}
         </div>
         <div class="relative group">
             <button type="button" @click="editStat('diff', {{ stats.confirmed.diff.total_uzs|default:0|unlocalize }}, {{ stats.confirmed.diff.total_usd|default:0|unlocalize }}, {{ stats.confirmed.diff.total_rub|default:0|unlocalize }}, {{ stats.confirmed.diff.total_eur|default:0|unlocalize }})" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Tahrirlash">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4l10-10-4-4L4 16v4z"></path><path d="M13.5 6.5l4 4"></path></svg>
+                <i class="fa-solid fa-pen"></i>
             </button>
             {% include "partials/_stat_card.html" with title="Qoldiq" amounts=stats.confirmed.diff pending_amounts=stats.pending.diff tone="neutral" %}
         </div>
@@ -39,7 +39,7 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="rounded-xl border p-4 flex items-center gap-3" style="background: var(--color-surface); border-color: var(--color-border);">
             <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><circle cx="17" cy="9" r="2.5"></circle><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path></svg>
+                <i class="fa-solid fa-users"></i>
             </span>
             <div class="min-w-0">
                 <p class="text-xs font-medium truncate" style="color: var(--color-text-muted);">Operatorlar</p>
@@ -48,7 +48,7 @@
         </div>
         <div class="rounded-xl border p-4 flex items-center gap-3" style="background: var(--color-surface); border-color: var(--color-border);">
             <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"></circle><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"></path><circle cx="17" cy="9" r="2.5"></circle><path d="M15.5 14.2c2.6.4 4.5 2.6 4.5 5.3"></path></svg>
+                <i class="fa-solid fa-users"></i>
             </span>
             <div class="min-w-0">
                 <p class="text-xs font-medium truncate" style="color: var(--color-text-muted);">Kassirlar</p>
@@ -57,7 +57,7 @@
         </div>
         <div class="rounded-xl border p-4 flex items-center gap-3" style="background: var(--color-surface); border-color: var(--color-border);">
             <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10M7 7l3-3M7 7l3 3"></path><path d="M17 17H7M17 17l-3-3M17 17l-3 3"></path></svg>
+                <i class="fa-solid fa-right-left"></i>
             </span>
             <div class="min-w-0">
                 <p class="text-xs font-medium truncate" style="color: var(--color-text-muted);">Tranzaksiyalar</p>
@@ -66,7 +66,7 @@
         </div>
         <div class="rounded-xl border p-4 flex items-center gap-3" style="background: var(--color-surface); border-color: var(--color-border);">
             <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-pending-bg); color: var(--color-pending);">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+                <i class="fa-solid fa-clock"></i>
             </span>
             <div class="min-w-0">
                 <p class="text-xs font-medium truncate" style="color: var(--color-text-muted);">Kutilayotgan hisobotlar</p>
@@ -80,7 +80,7 @@
         <div class="flex items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center w-10 h-10 rounded-lg shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path><path d="M9 13h6M9 17h4"></path></svg>
+                    <i class="fa-solid fa-receipt"></i>
                 </span>
                 <div>
                     <h2 class="text-lg font-bold" style="color: var(--color-text);">So'nggi hisobotlar</h2>
@@ -88,7 +88,7 @@
                 </div>
             </div>
             <a href="{% url 'boss_reports' %}" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path><path d="M9 13h6M9 17h4"></path></svg>
+                <i class="fa-solid fa-receipt"></i>
                 Hisobotlarni ko'rish
             </a>
         </div>
@@ -130,7 +130,7 @@
             {% else %}
             <div class="flex flex-col items-center justify-center py-10 text-center">
                 <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"></path><path d="M6 3h8l5 5v13H6z"></path></svg>
+                    <i class="fa-solid fa-receipt text-xl"></i>
                 </span>
                 <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
             </div>

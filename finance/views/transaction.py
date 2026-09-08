@@ -32,6 +32,7 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
         date_to = request.GET.get('to') or report_date
         q = request.GET.get('q') or ''
         counterparty = request.GET.get('counterparty') or ''
+        payment_type = request.GET.get('payment_type') or ''
 
         my_transactions = Transaction.objects.filter(operator=request.user).filter(
             date__date__gte=datetime.strptime(date_from, '%Y-%m-%d').date(),
@@ -43,6 +44,8 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
             )
         if counterparty:
             my_transactions = my_transactions.filter(counterparty__icontains=counterparty)
+        if payment_type:
+            my_transactions = my_transactions.filter(payment_type=payment_type)
 
         context = {
             'form': form or TransactionFrom(),
@@ -59,6 +62,7 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
             'to': date_to,
             'q': q,
             'counterparty': counterparty,
+            'payment_type': payment_type,
             'clicks': CLICKS,
         }
         return render(request, self.template_name, context)

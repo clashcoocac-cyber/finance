@@ -11,12 +11,7 @@
             <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <div class="flex items-center gap-3">
                     <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
+                        <i class="fa-solid fa-receipt text-lg"></i>
                     </span>
                     <div>
                         <div class="text-lg font-bold" style="color: var(--color-text);">Kunlik chiqimlar</div>
@@ -26,20 +21,12 @@
                 <div class="flex items-center gap-2">
                     <input value="{{ date }}" type="date" class="px-3 py-2 border rounded-lg text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" onchange="window.location.href = `?date=${this.value}`">
                     <a href="{% url 'expenses_list' %}" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
+                        <i class="fa-solid fa-calendar-days"></i>
                         Bugun
                     </a>
                     <div x-data="{ open: {% if form.errors %}true{% else %}false{% endif %} }">
                         <button type="button" @click="open = true" class="rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
+                            <i class="fa-solid fa-plus"></i>
                             Yangi chiqim
                         </button>
                         {% include "partials/_modal_open.html" with modal_title="Chiqim qo'shish" modal_subtitle="Chiqim ma'lumotlarini to'ldiring va tizimga kiriting" modal_tone="negative" modal_icon="plus" %}
@@ -67,10 +54,7 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov maqsadi</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                                <line x1="4" y1="22" x2="4" y2="15"></line>
-                                            </svg>
+                                            <i class="fa-solid fa-filter"></i>
                                         </span>
                                         <select required x-model="expType" name="exp_type"
                                             @change="categoryValue = ''; categoryMode = 'select'"
@@ -86,11 +70,7 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kategoriya</label>
                                     <div class="relative" x-show="categoryMode === 'select'">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                                            </svg>
+                                            <i class="fa-solid fa-list"></i>
                                         </span>
                                         <select name="category" x-ref="categorySelect"
                                             @change="categoryValue = $event.target.value; categoryMode = categoryValue === '__new__' ? 'new' : 'select'"
@@ -105,11 +85,7 @@
                                     <div x-show="categoryMode === 'new'" class="flex gap-2">
                                         <div class="relative flex-1">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                                                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                                                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                                                </svg>
+                                                <i class="fa-solid fa-list"></i>
                                             </span>
                                             <input type="text" name="new_category" value="{{ form.new_category.value|default_if_none:'' }}"
                                                 placeholder="Yangi kategoriya nomi" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
@@ -132,12 +108,7 @@
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <circle cx="8" cy="8" r="6"></circle>
-                                                    <path d="M18.09 10.37A6 6 0 1 1 10.34 18"></path>
-                                                    <path d="M7 6h1v4"></path>
-                                                    <path d="m16.71 13.88.7.71-2.82 2.82"></path>
-                                                </svg>
+                                                <i class="fa-solid fa-coins"></i>
                                             </span>
                                             <input type="number" step="1" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
@@ -146,12 +117,7 @@
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <circle cx="8" cy="8" r="6"></circle>
-                                                    <path d="M18.09 10.37A6 6 0 1 1 10.34 18"></path>
-                                                    <path d="M7 6h1v4"></path>
-                                                    <path d="m16.71 13.88.7.71-2.82 2.82"></path>
-                                                </svg>
+                                                <i class="fa-solid fa-coins"></i>
                                             </span>
                                             <input type="number" step="1" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
@@ -163,12 +129,7 @@
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <circle cx="8" cy="8" r="6"></circle>
-                                                    <path d="M18.09 10.37A6 6 0 1 1 10.34 18"></path>
-                                                    <path d="M7 6h1v4"></path>
-                                                    <path d="m16.71 13.88.7.71-2.82 2.82"></path>
-                                                </svg>
+                                                <i class="fa-solid fa-coins"></i>
                                             </span>
                                             <input type="number" step="1" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
@@ -177,12 +138,7 @@
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
                                         <div class="relative">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <circle cx="8" cy="8" r="6"></circle>
-                                                    <path d="M18.09 10.37A6 6 0 1 1 10.34 18"></path>
-                                                    <path d="M7 6h1v4"></path>
-                                                    <path d="m16.71 13.88.7.71-2.82 2.82"></path>
-                                                </svg>
+                                                <i class="fa-solid fa-coins"></i>
                                             </span>
                                             <input type="number" step="1" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
@@ -193,10 +149,7 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                                                <line x1="1" y1="10" x2="23" y2="10"></line>
-                                            </svg>
+                                            <i class="fa-solid fa-credit-card"></i>
                                         </span>
                                         <select required x-model="paymentType" name="payment_type" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                             <option value="">To'lov turini tanlang</option>
@@ -211,10 +164,7 @@
                                     <label class="block text-sm font-medium mb-1.5" style="color: var(--color-positive);">Click kartani tanlang</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                                                <line x1="1" y1="10" x2="23" y2="10"></line>
-                                            </svg>
+                                            <i class="fa-solid fa-credit-card"></i>
                                         </span>
                                         <select name="click" :required="paymentType === 'click'" class="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                             <option value="">---</option>
@@ -226,10 +176,7 @@
                                 </div>
 
                                 <button type="submit" class="w-full rounded-lg px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                    </svg>
+                                    <i class="fa-solid fa-plus"></i>
                                     Chiqim qo'shish
                                 </button>
                             </form>
@@ -242,30 +189,50 @@
                 {% if reports %}
                 <div class="-mx-2">
                     {% for report in reports %}
-                    <div class="flex items-center justify-between gap-4 px-2 py-3 rounded-lg transition-colors hover:bg-[var(--color-surface-muted)]" style="border-bottom: 1px solid var(--color-border);">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                            </span>
-                            <div class="min-w-0">
-                                <p class="font-semibold truncate" style="color: var(--color-text);">{{ report.category }}</p>
-                                <p class="text-xs truncate" style="color: var(--color-text-muted);">
-                                    {{ report.date|date:"d/m/Y" }}
-                                    {% if report.uzs_detail %}
-                                    &middot;
-                                    {% for key, val in report.uzs_detail.items %}{% if val %}{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}
-                                    {% endif %}
-                                </p>
+                    <div class="rounded-lg px-3 py-3 transition-colors hover:bg-[var(--color-surface-muted)]" style="border-bottom: 1px solid var(--color-border);">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <span class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);">
+                                    <i class="fa-solid fa-arrow-trend-down"></i>
+                                </span>
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <p class="font-semibold truncate" style="color: var(--color-text);">{{ report.category }}</p>
+                                        {% include "partials/_status_badge.html" with status=report.type %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <div class="space-y-0.5 money" style="color: var(--color-negative);">
+                                    {% if report.total_uzs %}<p class="text-xl font-bold">{{ report.total_uzs|format_currency }} so'm</p>{% endif %}
+                                    {% if report.total_usd %}<p class="text-sm font-semibold">{{ report.total_usd|format_currency }} $</p>{% endif %}
+                                    {% if report.total_rub %}<p class="text-sm font-semibold">{{ report.total_rub|format_currency }} ₽</p>{% endif %}
+                                    {% if report.total_eur %}<p class="text-sm font-semibold">{{ report.total_eur|format_currency }} €</p>{% endif %}
+                                </div>
+                                <div class="mt-1.5">
+                                    {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3 shrink-0">
-                            <div class="text-right space-y-0.5 money" style="color: var(--color-negative);">
-                                {% if report.total_uzs %}<p class="text-sm font-semibold">{{ report.total_uzs|format_currency }} so'm</p>{% endif %}
-                                {% if report.total_usd %}<p class="text-xs">{{ report.total_usd|format_currency }} $</p>{% endif %}
-                                {% if report.total_rub %}<p class="text-xs">{{ report.total_rub|format_currency }} ₽</p>{% endif %}
-                                {% if report.total_eur %}<p class="text-xs">{{ report.total_eur|format_currency }} €</p>{% endif %}
+                        <div class="mt-3 pt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs" style="border-top: 1px solid var(--color-border); color: var(--color-text-muted);">
+                            <div class="min-w-0">
+                                <span class="flex items-center gap-1.5 uppercase tracking-wide text-[10px] opacity-75"><i class="fa-solid fa-credit-card"></i>To'lov turi</span>
+                                <p class="mt-0.5 font-medium truncate" style="color: var(--color-text);">
+                                    {% if report.uzs_detail %}
+                                    {% for key, val in report.uzs_detail.items %}{% if val %}{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}{% if not forloop.last %}, {% endif %}{% endif %}{% endfor %}
+                                    {% else %}&mdash;{% endif %}
+                                </p>
                             </div>
-                            {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                            <div class="min-w-0">
+                                <span class="flex items-center gap-1.5 uppercase tracking-wide text-[10px] opacity-75"><i class="fa-solid fa-calendar-days"></i>Sana</span>
+                                <p class="mt-0.5 font-medium" style="color: var(--color-text);">{{ report.date|date:"d/m/Y" }}</p>
+                            </div>
+                            {% if report.desc %}
+                            <div class="min-w-0 col-span-2 sm:col-span-1">
+                                <span class="flex items-center gap-1.5 uppercase tracking-wide text-[10px] opacity-75"><i class="fa-solid fa-list"></i>Tafsilot</span>
+                                <p class="mt-0.5 font-medium truncate" style="color: var(--color-text);">{{ report.desc }}</p>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -273,10 +240,7 @@
                 {% else %}
                 <div class="flex flex-col items-center justify-center py-10 text-center">
                     <span class="w-12 h-12 rounded-lg flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                        </svg>
+                        <i class="fa-solid fa-inbox text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Bu sanada chiqimlar yo'q</p>
                 </div>
