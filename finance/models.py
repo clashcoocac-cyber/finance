@@ -33,7 +33,10 @@ class Category(models.Model):
 
 
 class Counterparty(models.Model):
+    GROUPS = [('person', 'Shaxs'), ('income', 'Kirim turi')]
+
     name = models.CharField(max_length=255, unique=True)
+    group = models.CharField(max_length=10, choices=GROUPS, default='person')
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
 

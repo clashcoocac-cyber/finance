@@ -33,6 +33,6 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Counterparty)
 class CounterpartyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'is_active', 'created']
-    list_filter = ['is_active']
+    list_display = ['name', 'group', 'is_active', 'created']
+    list_filter = ['group', 'is_active']
     search_fields = ['name']

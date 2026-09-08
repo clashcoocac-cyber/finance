@@ -10,7 +10,7 @@ from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Sum, Q
-from finance.forms import ExpenseForm, TransactionFrom, IncomeCHoices, IncomeForm
+from finance.forms import ExpenseForm, TransactionFrom, IncomeForm
 from finance.models import User, Company, Category
 from finance.models import DailyReport, CLICKS
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
@@ -207,7 +207,6 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
             'form': form or IncomeForm(),
             'reports': reports,
             'date': report_date,
-            'choices': IncomeCHoices,
             'clicks': CLICKS,
             'clicks_map': dict(CLICKS),
         }

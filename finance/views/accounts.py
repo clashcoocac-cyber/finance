@@ -178,7 +178,7 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
             )
         context['my_transactions'] = my_transactions.order_by('-date')
         context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:3]
-        context['counterparties'] = Counterparty.objects.filter(is_active=True)
+        context['counterparties'] = Counterparty.objects.filter(is_active=True, group='person')
         context['form'] = TransactionFrom()
 
         queryset = Transaction.objects.filter(

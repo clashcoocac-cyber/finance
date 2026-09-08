@@ -72,7 +72,7 @@ class TransactionFrom(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['counterparty'].choices = (
-            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True)] + [('__new__', "+ Yangi qo'shish")]
+            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True, group='person')] + [('__new__', "+ Yangi qo'shish")]
         )
 
     def clean(self):
@@ -89,7 +89,7 @@ class TransactionFrom(forms.ModelForm):
     def save(self, commit=True, operator=None, date=None):
         transaction = super().save(commit=False)
         counterparty = self.cleaned_data['counterparty']
-        Counterparty.objects.get_or_create(name__iexact=counterparty, defaults={'name': counterparty})
+        Counterparty.objects.get_or_create(name__iexact=counterparty, defaults={'name': counterparty, 'group': 'person'})
         transaction.counterparty = counterparty
         transaction.operator = operator
         transaction.type = 'income'
@@ -109,28 +109,38 @@ class TransactionFrom(forms.ModelForm):
 
         return transaction
 
-IncomeCHoices = [
-    ('almashdi', 'Almashdi'),
-    ('vozvrat', 'Vozvrat rasx den'),
-    ('other', 'Boshqa'),
-]
-
 class IncomeForm(forms.ModelForm):
-    counterparty = forms.ChoiceField(choices=IncomeCHoices)
-    other_counterparty = forms.CharField(required=False, max_length=255, label="Boshqa shaxs nomi")
+    counterparty = forms.ChoiceField(choices=[])
+    other_counterparty = forms.CharField(required=False, max_length=255, label="Yangi kategoriya nomi")
     click = forms.ChoiceField(choices=CLICKS, required=False)
 
     class Meta:
         model = Transaction
         fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty', 'other_counterparty']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['counterparty'].choices = (
+            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True, group='income')] + [('__new__', "+ Yangi qo'shish")]
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        counterparty = cleaned_data.get('counterparty')
+        other = (cleaned_data.get('other_counterparty') or '').strip()
+        if counterparty == '__new__':
+            if not other:
+                self.add_error('other_counterparty', "Yangi kategoriya nomini kiriting.")
+            else:
+                cleaned_data['counterparty'] = other
+        return cleaned_data
+
     def save(self, commit = True, operator=None, date=None):
         # build transaction instance (don't save yet)
         transaction = super().save(commit=False)
-        if self.cleaned_data['counterparty'] == 'other':
-            transaction.counterparty = self.cleaned_data['other_counterparty'].lower()
-        else:
-            transaction.counterparty = self.cleaned_data['counterparty'].lower()
+        counterparty = self.cleaned_data['counterparty']
+        Counterparty.objects.get_or_create(name__iexact=counterparty, defaults={'name': counterparty, 'group': 'income'})
+        transaction.counterparty = counterparty
         transaction.operator = operator
 
         # parse date if provided, otherwise use today
