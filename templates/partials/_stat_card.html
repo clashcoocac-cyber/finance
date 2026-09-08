@@ -7,17 +7,17 @@
                          color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text-muted){% endif %};">
                 <i class="fa-solid text-lg {% if tone == 'positive' %}fa-arrow-trend-up{% elif tone == 'negative' %}fa-arrow-trend-down{% else %}fa-wallet{% endif %}"></i>
             </span>
-            <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
+            <p class="text-sm font-semibold" style="color: var(--color-text-muted);">{{ title }}</p>
         </div>
         {% if not pending_amounts %}
         {% include "partials/_status_badge.html" with status=status %}
         {% endif %}
     </div>
-    <div class="grid grid-cols-2 gap-1.5 money" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
-        <div class="rounded-lg px-2.5 py-1.5 text-base font-bold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_uzs|default:0|format_currency }} so'm">{{ amounts.total_uzs|default:0|format_currency }} so'm</div>
-        <div class="rounded-lg px-2.5 py-1.5 text-base font-bold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_usd|default:0|format_currency }} $">{{ amounts.total_usd|default:0|format_currency }} $</div>
-        <div class="rounded-lg px-2.5 py-1.5 text-base font-bold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_rub|default:0|format_currency }} ₽">{{ amounts.total_rub|default:0|format_currency }} ₽</div>
-        <div class="rounded-lg px-2.5 py-1.5 text-base font-bold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_eur|default:0|format_currency }} €">{{ amounts.total_eur|default:0|format_currency }} €</div>
+    <div class="grid grid-cols-2 gap-2 money" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
+        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_uzs|default:0|format_currency }} so'm">{{ amounts.total_uzs|default:0|format_currency }} <span class="text-sm font-semibold">so'm</span></div>
+        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_usd|default:0|format_currency }} $">{{ amounts.total_usd|default:0|format_currency }} <span class="text-sm font-semibold">$</span></div>
+        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_rub|default:0|format_currency }} ₽">{{ amounts.total_rub|default:0|format_currency }} <span class="text-sm font-semibold">₽</span></div>
+        <div class="rounded-lg px-3 py-2 text-xl font-extrabold truncate" style="background: var(--color-surface-muted);" title="{{ amounts.total_eur|default:0|format_currency }} €">{{ amounts.total_eur|default:0|format_currency }} <span class="text-sm font-semibold">€</span></div>
     </div>
     {% if pending_amounts %}
     {% with pending_line=pending_amounts|pending_summary %}
