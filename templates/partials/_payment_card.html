@@ -12,10 +12,10 @@
         </span>
         <p class="text-sm font-medium" style="color: var(--color-text-muted);">{{ title }}</p>
     </div>
-    <div class="space-y-1.5 money" style="color: var(--color-text);">
-        <div class="text-lg font-semibold">{{ amounts_uzs|default:0|format_currency }} so'm</div>
-        <div class="text-lg font-semibold">{{ amounts_usd|default:0|format_currency }} $</div>
-        <div class="text-lg font-semibold">{{ amounts_rub|default:0|format_currency }} ₽</div>
-        <div class="text-lg font-semibold">{{ amounts_eur|default:0|format_currency }} €</div>
+    <div class="grid grid-cols-2 gap-1.5 money" style="color: var(--color-text);">
+        <div class="rounded-lg px-2.5 py-1.5 text-sm font-semibold truncate" style="background: var(--color-bg);" title="{{ amounts_uzs|default:0|format_currency }} so'm">{{ amounts_uzs|default:0|format_currency }} so'm</div>
+        <div class="rounded-lg px-2.5 py-1.5 text-sm font-semibold truncate" style="background: var(--color-bg);" title="{{ amounts_usd|default:0|format_currency }} $">{{ amounts_usd|default:0|format_currency }} $</div>
+        <div class="rounded-lg px-2.5 py-1.5 text-sm font-semibold truncate" style="background: var(--color-bg);" title="{{ amounts_rub|default:0|format_currency }} ₽">{{ amounts_rub|default:0|format_currency }} ₽</div>
+        <div class="rounded-lg px-2.5 py-1.5 text-sm font-semibold truncate" style="background: var(--color-bg);" title="{{ amounts_eur|default:0|format_currency }} €">{{ amounts_eur|default:0|format_currency }} €</div>
     </div>
 </div>
