@@ -7,8 +7,11 @@ Sidebar nav link. Params:
   match / match2 — url name(s) that light this item up
 {% endcomment %}
 <a href="{{ url }}"
-   class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors {% if current == match or current == match2 %}font-semibold{% else %}font-medium{% endif %}"
-   style="{% if current == match or current == match2 %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text); box-shadow: 0 2px 6px rgba(105, 108, 255, 0.4);{% else %}color: var(--color-sidebar-text);{% endif %}">
-    <i class="fa-solid {% if icon == 'home' %}fa-house{% elif icon == 'reports' %}fa-receipt{% elif icon == 'transactions' %}fa-right-left{% elif icon == 'users' %}fa-users{% elif icon == 'income' %}fa-arrow-trend-up{% elif icon == 'expense' %}fa-arrow-trend-down{% endif %} text-lg shrink-0" style="width: 1.25rem; text-align: center;"></i>
+   class="relative flex items-center gap-3 px-4 py-2.5 rounded-md text-sm transition-colors {% if current == match or current == match2 %}font-semibold{% else %}font-medium hover:bg-[var(--color-surface-muted)]{% endif %}"
+   style="{% if current == match or current == match2 %}background: var(--color-sidebar-active-bg); color: var(--color-sidebar-active-text);{% else %}color: var(--color-sidebar-text);{% endif %}">
+    <i class="fa-solid {% if icon == 'home' %}fa-house{% elif icon == 'reports' %}fa-receipt{% elif icon == 'transactions' %}fa-right-left{% elif icon == 'users' %}fa-users{% elif icon == 'income' %}fa-arrow-trend-up{% elif icon == 'expense' %}fa-arrow-trend-down{% endif %} text-base shrink-0" style="width: 1.25rem; text-align: center;"></i>
     <span>{{ label }}</span>
+    {% if current == match or current == match2 %}
+    <span class="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-full" style="background: var(--color-brand);"></span>
+    {% endif %}
 </a>
