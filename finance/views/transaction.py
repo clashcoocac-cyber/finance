@@ -123,12 +123,16 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         if not unreported:
             return redirect(self.success_url + f'?report_date={report_date_str}')
 
-        # Get or create a report for the selected date
+        # One report per operator per day, full stop — "Kassani yopish" bundles
+        # every transaction from the day into a single report, regardless of
+        # which shift was active in the session when each close happened
+        # (operator_shift used to be part of this lookup, which silently
+        # created a second report whenever the session's shift value changed
+        # or was missing between closes).
         report, created = DailyReport.objects.get_or_create(
             operator=user,
-            operator_shift=shift,
             date=selected_date,
-            defaults={'is_closed': False, 'type': 'income'},
+            defaults={'is_closed': False, 'type': 'income', 'operator_shift': shift},
         )
 
         # If a report already existed and was closed, reopen it so boss can confirm

@@ -4,9 +4,9 @@ from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
     ROLES = [
-        ('boss', 'Бошлиқ'),
-        ('cashier', 'Главный кассир'),
-        ('operator', 'Оператор')
+        ('boss', 'Rahbar'),
+        ('cashier', 'Bosh kassir'),
+        ('operator', 'Operator')
     ]
     role = models.CharField(max_length=20, choices=ROLES)
     company = models.ForeignKey('Company', on_delete=models.CASCADE, null=True)

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.db.models.functions import Lower
 from django.views.generic import TemplateView
 
@@ -62,6 +62,12 @@ class ReportListBase(LoginRequiredMixin, TemplateView):
         context['pending_count'] = reports.filter(is_closed=False).count()
         context['confirmed_count'] = reports.filter(is_closed=True).count()
         context['category_options'] = Category.objects.filter(is_active=True)
+
+        totals = reports.aggregate(
+            total_uzs=Sum('total_uzs'), total_usd=Sum('total_usd'),
+            total_rub=Sum('total_rub'), total_eur=Sum('total_eur'),
+        )
+        context['totals'] = {k: v or 0 for k, v in totals.items()}
         return context
 
 

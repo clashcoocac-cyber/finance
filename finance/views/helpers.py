@@ -61,7 +61,19 @@ def compute_money_stats():
         setattr(diff_stat, f'total_{cur}', int(raw['diff'][f'total_{cur}']) - getattr(diff_stat, f'default_{cur}'))
     diff_stat.save()
 
+    combined = {}
+    for key, stat in (('income', inc_stat), ('expense', exp_stat), ('diff', diff_stat)):
+        combined[key] = {
+            f'total_{cur}': getattr(stat, f'total_{cur}') + pending[key][f'total_{cur}']
+            for cur in CURRENCIES
+        }
+
     return {
         'confirmed': {'income': inc_stat, 'expense': exp_stat, 'diff': diff_stat},
         'pending': pending,
+        # Confirmed + pending combined, so the headline figure reflects every
+        # recorded amount regardless of confirmation state — the pending
+        # summary line under each stat card shows the part still awaiting
+        # confirmation, but the main number already includes it.
+        'combined': combined,
     }
