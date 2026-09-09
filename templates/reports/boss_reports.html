@@ -7,6 +7,14 @@
 {% block page_content %}
 <div class="finance-page-heading">
     {% include "partials/_page_header.html" with title="Hisobotlar" subtitle="Kunlik hisobotlarni ko'rish va tasdiqlash" icon="bx-receipt" %}
+    <div class="finance-page-heading-actions">
+        <span class="badge bg-label-warning finance-count-badge">
+            <i class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}
+        </span>
+        <span class="badge bg-label-success finance-count-badge">
+            <i class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}
+        </span>
+    </div>
 </div>
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
     <!-- Filter bar -->
@@ -14,17 +22,6 @@
         {% include "partials/_filter_bar.html" with action=request.path date_from=from date_to=to search=q selected_categories=categories category_options=category_options type_filter=True type_value=type %}
     </div>
 
-    <!-- Summary chips -->
-    <div class="flex flex-wrap gap-3">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-            <i class="bx bx-time"></i>
-            Kutilmoqda: {{ pending_count }}
-        </span>
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
-            <i class="bx bx-check"></i>
-            Tasdiqlangan: {{ confirmed_count }}
-        </span>
-    </div>
 
     <!-- Reports table -->
     <div class="card rounded-lg" style="background: var(--color-surface);">
