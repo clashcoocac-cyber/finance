@@ -4,6 +4,9 @@
 {% block page_title %}Foydalanuvchilar{% endblock %}
 
 {% block page_content %}
+<div class="finance-page-heading">
+    {% include "partials/_page_header.html" with title="Foydalanuvchilar" subtitle="Operator va kassirlarni boshqarish" icon="bx-group" %}
+</div>
 <div class="max-w-5xl mx-auto space-y-6">
     <div class="card rounded-lg" style="background: var(--color-surface);" x-data="{ open: {% if form.errors %}true{% else %}false{% endif %}, editUser: {id: '', username: '', company: ''}, editOpen: false }">
         <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">

@@ -6,6 +6,9 @@
 {% block page_title %}Kunlik hisobotlarim{% endblock %}
 
 {% block page_content %}
+<div class="finance-page-heading">
+    {% include "partials/_page_header.html" with title="Kunlik hisobotlarim" subtitle="Kassani yopish orqali yaratilgan hisobotlar" icon="bx-receipt" %}
+</div>
 <div class="max-w-7xl mx-auto space-y-6">
         {% if is_expired %}
         <div class="rounded-md border p-4 flex items-center gap-3 text-sm" style="background: var(--color-pending-bg); border-color: var(--color-pending); color: var(--color-pending);">

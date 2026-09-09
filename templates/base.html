@@ -17,6 +17,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" rel="stylesheet"
           integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tailwind's preflight resets h1-h6 to `font-size: inherit; font-weight: inherit`,
+        // which silently flattens every Sneat heading (an h4 ends up smaller than the
+        // paragraph under it). Sneat's core.css is the base layer here, so keep the
+        // utilities and drop the reset. Remove this whole script once the last template
+        // is off Tailwind.
+        tailwind.config = { corePlugins: { preflight: false } };
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"
         integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6"
         crossorigin="anonymous"></script>
@@ -92,13 +100,8 @@
         .flatpickr-day.today { border-color: var(--color-brand); }
         /* Sneat-style soft elevation on every surface card (border + surface-bg combo). */
         [class*="rounded-lg"][style*="var(--color-surface)"]:not([style*="var(--color-surface-muted)"]) { box-shadow: var(--shadow-card); }
-        /* Sneat's violet focus glow, applied globally so every input/select/textarea/button gets it. */
-        input:not([type="checkbox"]):not([type="radio"]):focus,
-        select:focus, textarea:focus, button:focus-visible, a:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0.25rem 0.05rem rgba(105, 108, 255, 0.25);
-            border-color: var(--color-brand) !important;
-        }
+        /* Sneat's own core.css supplies focus styling (including .input-group-merge,
+           which a blanket border-color override would split in half). */
     </style>
 </head>
 <body class="min-h-screen">

@@ -5,6 +5,9 @@
 {% block page_title %}Kassa{% endblock %}
 
 {% block page_content %}
+<div class="finance-page-heading">
+    {% include "partials/_page_header.html" with title="Bosh sahifa" subtitle="Kunlik kirim va chiqimlar" icon="bx-home-circle" %}
+</div>
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {% include "partials/_stat_card.html" with title="Kirim" amounts=stats.combined.income pending_amounts=stats.pending.income tone="positive" %}

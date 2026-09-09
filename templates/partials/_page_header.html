@@ -1,0 +1,14 @@
+{% comment %}
+Page heading. Params: title, subtitle (optional), icon (boxicons name, optional).
+Wrap in .finance-page-heading and add a .finance-page-heading-actions sibling
+when the page needs buttons on the right.
+{% endcomment %}
+<div class="finance-page-heading-main">
+    {% if icon %}
+    <span class="finance-page-heading-icon"><i class="bx {{ icon }}"></i></span>
+    {% endif %}
+    <div class="finance-page-heading-text">
+        <h1 class="finance-page-heading-title">{{ title }}</h1>
+        {% if subtitle %}<p class="finance-page-heading-subtitle">{{ subtitle }}</p>{% endif %}
+    </div>
+</div>

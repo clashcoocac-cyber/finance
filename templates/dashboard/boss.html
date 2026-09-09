@@ -5,6 +5,9 @@
 {% block page_title %}Bosh sahifa{% endblock %}
 
 {% block page_content %}
+<div class="finance-page-heading">
+    {% include "partials/_page_header.html" with title="Bosh sahifa" subtitle="Umumiy moliyaviy holat" icon="bx-home-circle" %}
+</div>
 <div class="max-w-7xl mx-auto space-y-6"
      x-data="{
         open: {% if form.errors %}true{% else %}false{% endif %},
