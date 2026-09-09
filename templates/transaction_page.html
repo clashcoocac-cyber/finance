@@ -27,55 +27,69 @@
                 <table class="table table-hover align-middle mb-0 w-full">
                     <thead style="background: var(--color-surface-muted);">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Vaqt</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya / Kategoriya</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kimdan</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Komentariya</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Amallar</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Vaqt</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya / Kategoriya</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kimdan</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Komentariya</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Amallar</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for transaction in transactions %}
                         <tr style="border-bottom: 1px solid var(--color-border);">
-                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.date|date:"d.m.Y" }}<br>{{ transaction.date|time:"H:i" }}</td>
-                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.operator.username }}</td>
-                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                            <td class="px-3 py-3 text-sm" style="color: var(--color-text);">{{ transaction.date|date:"d.m.Y" }}<br>{{ transaction.date|time:"H:i" }}</td>
+                            <td class="px-3 py-3 text-sm" style="color: var(--color-text);">{{ transaction.operator.username }}</td>
+                            <td class="px-3 py-3 text-sm" style="color: var(--color-text);">
                                 {% if transaction.report.category %}
                                     {{ transaction.report.category }}
                                 {% else %}
                                     {{ transaction.operator.company.name }}
                                 {% endif %}
                             </td>
-                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.counterparty }}</td>
-                            <td class="px-4 py-3 text-sm money font-medium" style="color: {% if transaction.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
-                                {% if transaction.amount_uzs %}<div>{{ transaction.amount_uzs|format_currency }} so'm</div>{% endif %}
-                                {% if transaction.amount_usd %}<div>{{ transaction.amount_usd|format_currency }} $</div>{% endif %}
-                                {% if transaction.amount_rub %}<div>{{ transaction.amount_rub|format_currency }} ₽</div>{% endif %}
-                                {% if transaction.amount_eur %}<div>{{ transaction.amount_eur|format_currency }} €</div>{% endif %}
+                            <td class="px-3 py-3 text-sm" style="color: var(--color-text);">
+                                {% if transaction.type == 'income' %}{{ transaction.counterparty }}{% endif %}
                             </td>
-                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ transaction.comment|default:"" }}</td>
-                            <td class="px-4 py-3 text-sm">
+                            <td class="px-3 py-3 text-sm money font-medium finance-amount-cell" style="color: {% if transaction.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
+                                {% if transaction.amount_uzs %}<span>{{ transaction.amount_uzs|format_currency }} so'm</span>{% endif %}
+                                {% if transaction.amount_usd %}<span>{{ transaction.amount_usd|format_currency }} $</span>{% endif %}
+                                {% if transaction.amount_rub %}<span>{{ transaction.amount_rub|format_currency }} ₽</span>{% endif %}
+                                {% if transaction.amount_eur %}<span>{{ transaction.amount_eur|format_currency }} €</span>{% endif %}
+                            </td>
+                            <td class="px-3 py-3 text-sm" style="color: var(--color-text);">{{ transaction.comment|default:"" }}</td>
+                            <td class="px-3 py-3 text-sm">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
                                     {{ transaction.get_payment_type_display }}
                                     {% if transaction.payment_type == 'click' %} &middot; {{ transaction.get_click_display }}{% endif %}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-sm">
-                                <div class="flex items-center gap-2">
-                                    <a href="{% url 'transaction' transaction.pk %}" class="rounded-md px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-surface-muted); color: var(--color-text);">
-                                        <i class="bx bx-edit-alt"></i>
-                                        Tahrirlash
-                                    </a>
-                                    <form method="post" action="{% url 'transaction_delete' transaction.pk %}" onsubmit="return confirm('O\'chirilsinmi?')">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
-                                            <i class="bx bx-trash"></i>
-                                            O'chirish
-                                        </button>
-                                    </form>
+                            <td class="px-3 py-3 text-sm">
+                                <div class="relative" x-data="{ menuOpen: false, menuPos: {top: 0, left: 0} }">
+                                    <button type="button" @click="const r = $el.getBoundingClientRect(); menuPos = {top: r.bottom + 4, left: r.right - 160}; menuOpen = !menuOpen"
+                                        class="btn btn-icon btn-label-secondary w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Amallar">
+                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                    </button>
+                                    <template x-teleport="body">
+                                        <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
+                                            class="fixed w-40 rounded-md shadow-lg z-50 overflow-hidden"
+                                            :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px'"
+                                            style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                                            <a href="{% url 'transaction' transaction.pk %}"
+                                               class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">
+                                                <i class="bx bx-edit-alt w-4"></i>
+                                                Tahrirlash
+                                            </a>
+                                            <form method="post" action="{% url 'transaction_delete' transaction.pk %}" onsubmit="return confirm('O\'chirilsinmi?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-negative);">
+                                                    <i class="bx bx-trash w-4"></i>
+                                                    O'chirish
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </template>
                                 </div>
                             </td>
                         </tr>

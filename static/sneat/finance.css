@@ -1226,3 +1226,18 @@ body {
 .finance-money-grid .finance-money-cell.is-negative .finance-money-unit {
   color: #ff3e1d;
 }
+
+/* Transaction amounts: keep each figure unbreakable so a number never wraps
+   mid-digits, and let the currencies sit on one line when the row has room. */
+.finance-amount-cell {
+  white-space: nowrap;
+}
+
+.finance-amount-cell > span {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.finance-amount-cell > span + span {
+  margin-left: 0.75rem;
+}
