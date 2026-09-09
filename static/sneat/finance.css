@@ -1031,3 +1031,50 @@ body {
   text-transform: none;
   letter-spacing: 0;
 }
+
+/* Compact report list (operator dashboard). Was a stack of tall grey boxes
+   that were mostly empty whitespace when a report had no totals yet. */
+.finance-report-list > .finance-report-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border, #e7e7ef);
+}
+
+.finance-report-list > .finance-report-row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.finance-report-list > .finance-report-row:first-child {
+  padding-top: 0;
+}
+
+.finance-report-row-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  border-radius: 0.5rem;
+  background: rgba(105, 108, 255, 0.12);
+  color: #696cff;
+  font-size: 1.125rem;
+}
+
+.finance-report-row-date {
+  font-weight: 600;
+  color: #384551;
+}
+
+.finance-report-row-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin-left: auto;
+  font-weight: 600;
+  color: #71dd37;
+  text-align: right;
+}

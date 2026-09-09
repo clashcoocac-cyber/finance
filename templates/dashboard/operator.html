@@ -10,14 +10,14 @@
     {% include "partials/_page_header.html" with title="Bosh sahifa" subtitle="Smena holati va so'nggi hisobotlar" icon="bx-home-circle" %}
 </div>
 <div class="max-w-7xl mx-auto space-y-6">
-        <div class="flex flex-wrap items-center gap-2">
+        <div class="d-flex flex-wrap align-items-center gap-2">
             {% if request.session.shift %}
-            <span class="px-3 py-1 rounded-full text-sm" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                {{ request.session.shift }}-smena
+            <span class="badge bg-label-primary finance-count-badge">
+                <i class="bx bx-time-five"></i>{{ request.session.shift }}-smena
             </span>
             {% endif %}
-            <span class="text-sm" style="color: var(--color-text-muted);">
-                Bugun {{ today_transaction_count }} ta tranzaksiya
+            <span class="badge bg-label-secondary finance-count-badge">
+                <i class="bx bx-transfer-alt"></i>Bugun {{ today_transaction_count }} ta tranzaksiya
                 {% if unreported_count %}&middot; {{ unreported_count }} ta hisobotga kiritilmagan{% endif %}
             </span>
         </div>
@@ -42,25 +42,21 @@
             </div>
             <div class="card-body p-5">
                 {% if reports %}
-                <div class="space-y-3">
+                <ul class="list-unstyled mb-0 finance-report-list">
                     {% for report in reports %}
-                    <div class="rounded-md border p-4 flex flex-wrap items-center justify-between gap-3" style="background: var(--color-surface-muted); border-color: var(--color-border);">
-                        <div class="flex items-center gap-3">
-                            <span class="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-surface); color: var(--color-text-muted);">
-                                <i class="bx bx-calendar"></i>
-                            </span>
-                            <span class="font-semibold" style="color: var(--color-text);">{{ report.date }}</span>
-                            {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
-                        </div>
-                        <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium money" style="color: var(--color-positive);">
+                    <li class="finance-report-row">
+                        <span class="finance-report-row-icon"><i class="bx bx-calendar"></i></span>
+                        <span class="finance-report-row-date">{{ report.date }}</span>
+                        {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
+                        <span class="finance-report-row-totals money">
                             {% if report.total_uzs %}<span>{{ report.total_uzs|format_currency }} so'm</span>{% endif %}
                             {% if report.total_usd %}<span>{{ report.total_usd|format_currency }} $</span>{% endif %}
                             {% if report.total_rub %}<span>{{ report.total_rub|format_currency }} ₽</span>{% endif %}
                             {% if report.total_eur %}<span>{{ report.total_eur|format_currency }} €</span>{% endif %}
-                        </div>
-                    </div>
+                        </span>
+                    </li>
                     {% endfor %}
-                </div>
+                </ul>
                 {% else %}
                 <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                     <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
