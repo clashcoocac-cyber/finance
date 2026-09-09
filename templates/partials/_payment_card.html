@@ -1,23 +1,19 @@
 {% load custom_filters %}
-{% comment %}Neutral running-balance card (Click / Naqd channels) — same visual language as _stat_card.html,
-   but a plain amounts shape (uzs/usd/rub/eur, no "total_" prefix, no confirmed/pending split).
-   icon: "cash" gets a positive-tinted badge, anything else (click channels) gets a brand-tinted badge —
-   so the cash channel reads visually distinct from the card channels.{% endcomment %}
-<div class="finance-metric-card finance-channel-card card rounded-lg" style="background: var(--color-surface);">
-<div class="finance-metric-body card-body p-5">
-    <div class="finance-metric-header flex items-center gap-3 mb-3">
-        <span class="flex items-center justify-center w-9 h-9 rounded-md shrink-0"
-              style="background: {% if icon == 'cash' %}var(--color-positive-bg){% else %}var(--color-surface-muted){% endif %};
-                     color: {% if icon == 'cash' %}var(--color-positive){% else %}var(--color-brand){% endif %};">
-            <i class="bx text-lg {% if icon == 'cash' %}bx-money{% else %}bx-credit-card{% endif %}"></i>
-        </span>
-        <p class="text-sm font-semibold" style="color: var(--color-text-muted);">{{ title }}</p>
+{% comment %}
+Payment-channel running balance (Click / Naqd). Params: title, icon ("cash" or
+anything else), amounts_uzs/usd/rub/eur. Same visual language as _stat_card,
+minus the confirmed/pending split. The cash channel gets a green badge so it
+reads as distinct from the card channels.
+{% endcomment %}
+<div class="card finance-money-card finance-money-card-{% if icon == 'cash' %}positive{% else %}brand{% endif %}">
+    <div class="card-body">
+        <div class="finance-money-card-head">
+            <span class="finance-money-card-icon">
+                <i class="bx {% if icon == 'cash' %}bx-money{% else %}bx-credit-card{% endif %}"></i>
+            </span>
+            <span class="finance-money-card-title">{{ title }}</span>
+        </div>
+
+        {% include "partials/_money_grid.html" with uzs=amounts_uzs usd=amounts_usd rub=amounts_rub eur=amounts_eur tone="neutral" %}
     </div>
-    <div class="finance-metric-grid grid grid-cols-2 gap-2 money" style="color: var(--color-text);">
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-bg);" title="{{ amounts_uzs|default:0|format_currency }} so'm"><span class="finance-amount-value">{{ amounts_uzs|default:0|format_currency }}</span><span class="finance-amount-currency">so'm</span></div>
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-bg);" title="{{ amounts_usd|default:0|format_currency }} $"><span class="finance-amount-value">{{ amounts_usd|default:0|format_currency }}</span><span class="finance-amount-currency">$</span></div>
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-bg);" title="{{ amounts_rub|default:0|format_currency }} ₽"><span class="finance-amount-value">{{ amounts_rub|default:0|format_currency }}</span><span class="finance-amount-currency">₽</span></div>
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-bg);" title="{{ amounts_eur|default:0|format_currency }} €"><span class="finance-amount-value">{{ amounts_eur|default:0|format_currency }}</span><span class="finance-amount-currency">€</span></div>
-    </div>
-</div>
 </div>

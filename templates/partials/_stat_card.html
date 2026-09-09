@@ -1,38 +1,37 @@
 {% load custom_filters %}
-<div class="finance-stat-card card rounded-lg" style="background: var(--color-surface);">
-<div class="card-body p-5">
-    <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-3">
-            <span class="flex items-center justify-center w-9 h-9 rounded-md shrink-0"
-                  style="background: {% if tone == 'positive' %}var(--color-positive-bg){% elif tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
-                         color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text-muted){% endif %};">
-                <i class="bx text-lg {% if tone == 'positive' %}bx-trending-up{% elif tone == 'negative' %}bx-trending-down{% else %}bx-wallet{% endif %}"></i>
+{% comment %}
+Headline totals card. Params: title, amounts (total_uzs/usd/rub/eur), tone,
+optional pending_amounts, optional status (shown when there is no pending block).
+The boss dashboard overlays an edit button top-right, so the header keeps that
+corner clear.
+{% endcomment %}
+<div class="card finance-money-card finance-money-card-{{ tone|default:'neutral' }}">
+    <div class="card-body">
+        <div class="finance-money-card-head">
+            <span class="finance-money-card-icon">
+                <i class="bx {% if tone == 'positive' %}bx-trending-up{% elif tone == 'negative' %}bx-trending-down{% else %}bx-wallet{% endif %}"></i>
             </span>
-            <p class="text-sm font-semibold" style="color: var(--color-text-muted);">{{ title }}</p>
+            <span class="finance-money-card-title">{{ title }}</span>
+            {% if not pending_amounts %}
+            <span class="finance-money-card-status">{% include "partials/_status_badge.html" with status=status %}</span>
+            {% endif %}
         </div>
-        {% if not pending_amounts %}
-        {% include "partials/_status_badge.html" with status=status %}
+
+        {% include "partials/_money_grid.html" with uzs=amounts.total_uzs usd=amounts.total_usd rub=amounts.total_rub eur=amounts.total_eur tone=tone %}
+
+        {% if pending_amounts %}
+        {% with pending_line=pending_amounts|pending_summary %}
+        <div class="finance-money-card-foot">
+            {% if pending_line %}
+            <i class="bx bx-time-five"></i>
+            <span class="finance-money-card-foot-label">Kutilmoqda</span>
+            <span class="finance-money-card-foot-value money">{{ pending_line }}</span>
+            {% else %}
+            <i class="bx bx-check-circle"></i>
+            <span class="finance-money-card-foot-label">Kutilayotgan summa yo'q</span>
+            {% endif %}
+        </div>
+        {% endwith %}
         {% endif %}
     </div>
-    <div class="finance-stat-grid grid grid-cols-2 gap-2 money" style="color: {% if tone == 'positive' %}var(--color-positive){% elif tone == 'negative' %}var(--color-negative){% else %}var(--color-text){% endif %};">
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_uzs|default:0|format_currency }} so'm"><span class="finance-amount-value">{{ amounts.total_uzs|default:0|format_currency }}</span><span class="finance-amount-currency">so'm</span></div>
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_usd|default:0|format_currency }} $"><span class="finance-amount-value">{{ amounts.total_usd|default:0|format_currency }}</span><span class="finance-amount-currency">$</span></div>
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_rub|default:0|format_currency }} ₽"><span class="finance-amount-value">{{ amounts.total_rub|default:0|format_currency }}</span><span class="finance-amount-currency">₽</span></div>
-        <div class="finance-amount rounded-md px-3 py-2 text-xl font-extrabold" style="background: var(--color-surface-muted);" title="{{ amounts.total_eur|default:0|format_currency }} €"><span class="finance-amount-value">{{ amounts.total_eur|default:0|format_currency }}</span><span class="finance-amount-currency">€</span></div>
-    </div>
-    {% if pending_amounts %}
-    {% with pending_line=pending_amounts|pending_summary %}
-    <div class="mt-3 pt-3 border-t" style="border-color: var(--color-border);">
-        {% if pending_line %}
-        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-            <i class="bx bx-time shrink-0"></i>
-            Kutilmoqda: {{ pending_line }}
-        </span>
-        {% else %}
-        <span class="text-xs" style="color: var(--color-text-muted);">Kutilmoqda: yo'q</span>
-        {% endif %}
-    </div>
-    {% endwith %}
-    {% endif %}
-</div>
 </div>

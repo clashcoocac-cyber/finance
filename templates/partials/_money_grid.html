@@ -1,0 +1,26 @@
+{% load custom_filters %}
+{% comment %}
+Four-currency money block shared by the stat and payment-channel cards.
+Params: uzs, usd, rub, eur, tone ("positive" | "negative" | anything else).
+
+Every currency carries equal weight, but a cell holding zero is muted so the
+amounts that actually exist read at a glance instead of being buried in zeros.
+{% endcomment %}
+<div class="finance-money-grid finance-money-{{ tone|default:'neutral' }}">
+    <div class="finance-money-cell{% if not uzs %} is-empty{% elif uzs < 0 %} is-negative{% endif %}">
+        <span class="finance-money-value">{{ uzs|default:0|format_currency }}</span>
+        <span class="finance-money-unit">so'm</span>
+    </div>
+    <div class="finance-money-cell{% if not usd %} is-empty{% elif usd < 0 %} is-negative{% endif %}">
+        <span class="finance-money-value">{{ usd|default:0|format_currency }}</span>
+        <span class="finance-money-unit">$</span>
+    </div>
+    <div class="finance-money-cell{% if not rub %} is-empty{% elif rub < 0 %} is-negative{% endif %}">
+        <span class="finance-money-value">{{ rub|default:0|format_currency }}</span>
+        <span class="finance-money-unit">₽</span>
+    </div>
+    <div class="finance-money-cell{% if not eur %} is-empty{% elif eur < 0 %} is-negative{% endif %}">
+        <span class="finance-money-value">{{ eur|default:0|format_currency }}</span>
+        <span class="finance-money-unit">€</span>
+    </div>
+</div>
