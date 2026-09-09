@@ -109,7 +109,7 @@
                             <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
                             <div class="relative">
                                 <i class="bx bx-credit-card absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                                     <option value="">To'lov turini tanlang</option>
                                     <option value="click">Click</option>
                                     <option value="cash">Naqd</option>
@@ -124,7 +124,7 @@
                             <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Click kartani tanlang</label>
                             <div class="relative">
                                 <i class="bx bx-transfer-alt absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                                <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                                     <option value="">---</option>
                                     {% for click in clicks %}
                                     <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
@@ -151,7 +151,7 @@
                     <input type="hidden" name="report_date" value="{{ report_date }}">
                     <div>
                         <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">Kimdan</label>
-                        <select name="counterparty" class="form-select w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <select name="counterparty" class="form-select w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                             <option value="">Barchasi</option>
                             {% for value, label in form.counterparty.field.choices %}
                             {% if value != '__new__' %}
@@ -162,7 +162,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium mb-1" style="color: var(--color-text-muted);">To'lov turi</label>
-                        <select name="payment_type" class="form-select w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <select name="payment_type" class="form-select w-full px-3 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                             <option value="">Barchasi</option>
                             <option value="click" {% if payment_type == 'click' %}selected{% endif %}>Click</option>
                             <option value="cash" {% if payment_type == 'cash' %}selected{% endif %}>Naqd</option>

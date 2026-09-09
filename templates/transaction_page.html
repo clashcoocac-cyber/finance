@@ -71,7 +71,7 @@
                                     </a>
                                     <form method="post" action="{% url 'transaction_delete' transaction.pk %}" onsubmit="return confirm('O\'chirilsinmi?')">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn rounded-md px-3 py-1.5 text-xs font-medium inline-flex items-center gap-1" style="background: var(--color-negative-bg); color: var(--color-negative);">
+                                        <button type="submit" class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
                                             <i class="bx bx-trash"></i>
                                             O'chirish
                                         </button>

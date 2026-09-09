@@ -7,7 +7,7 @@
 <div class="finance-page-heading">
     {% include "partials/_page_header.html" with title="Foydalanuvchilar" subtitle="Operator va kassirlarni boshqarish" icon="bx-group" %}
 </div>
-<div class="max-w-5xl mx-auto space-y-6">
+<div class="space-y-6">
     <div class="card rounded-lg" style="background: var(--color-surface);" x-data="{ open: {% if form.errors %}true{% else %}false{% endif %}, editUser: {id: '', username: '', company: ''}, editOpen: false }">
         <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
@@ -132,7 +132,7 @@
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
                             <i class="bx bx-group"></i>
                         </span>
-                        <select required name="role" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <select required name="role" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                             <option value="">Rol tanlang</option>
                             <option value="operator">Operator</option>
                             <option value="cashier">Kassir</option>

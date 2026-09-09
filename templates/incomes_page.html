@@ -57,7 +57,7 @@
                                         </span>
                                         <select name="counterparty"
                                             @change="counterparty = $event.target.value; counterpartyMode = counterparty === '__new__' ? 'new' : 'select'"
-                                            class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                                             <option value="" {% if not form.counterparty.value %}selected{% endif %}>Kategoriya tanlang</option>
                                             {% for value, label in form.counterparty.field.choices %}
                                             <option value="{{ value }}" {% if form.counterparty.value == value %}selected{% endif %}>{{ label }}</option>
@@ -127,7 +127,7 @@
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
                                             <i class="bx bx-credit-card"></i>
                                         </span>
-                                        <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                        <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                                             <option value="">To'lov turini tanlang</option>
                                             <option value="click">Click</option>
                                             <option value="cash">Naqd</option>
@@ -143,7 +143,7 @@
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
                                             <i class="bx bx-credit-card"></i>
                                         </span>
-                                        <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                        <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                                             <option value="">---</option>
                                             {% for click in clicks %}
                                             <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
@@ -152,7 +152,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-positive-bg); color: var(--color-positive);">
+                                <button type="submit" class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
                                     <i class="bx bx-plus"></i>
                                     Kirim qo'shish
                                 </button>
