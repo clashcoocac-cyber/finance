@@ -27,20 +27,15 @@
                     <p class="text-sm" style="color: var(--color-text-muted);">Kassani yopish orqali yaratiladi</p>
                 </div>
                 <div class="finance-report-heading-actions ms-auto">
-                    <form method="get" class="finance-report-date-form flex items-center gap-2">
-                        <div class="relative">
-                            <i class="bx bx-calendar absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                            <input type="date" id="reportFrom" name="from" value="{{ from }}" onchange="this.form.submit()" class="form-control finance-report-date-input pl-10 pr-10 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                        </div>
-                        <span class="text-sm" style="color: var(--color-text-muted);">dan</span>
-                        <div class="relative">
-                            <i class="bx bx-calendar absolute left-3 top-1/2 -translate-y-1/2" style="color: var(--color-text-muted);"></i>
-                            <input type="date" id="reportTo" name="to" value="{{ to }}" onchange="this.form.submit()" class="form-control finance-report-date-input pl-10 pr-10 py-2 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                        </div>
+                    <form method="get" class="finance-report-date-form d-flex align-items-end gap-2">
+                        {% include "partials/_date_range_input.html" with date_from=from date_to=to %}
+                        <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1 text-nowrap">
+                            <i class="bx bx-search"></i>Ko'rish
+                        </button>
                     </form>
                     <div class="finance-report-summary finance-report-summary-compact flex flex-wrap items-center gap-2">
-                        <span class="inline-flex items-center gap-1 rounded-full text-xs font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);"><i class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}</span>
-                        <span class="inline-flex items-center gap-1 rounded-full text-xs font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);"><i class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}</span>
+                        <span class="badge bg-label-warning finance-count-badge"><i class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}</span>
+                        <span class="badge bg-label-success finance-count-badge"><i class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}</span>
                     </div>
                 </div>
             </div>

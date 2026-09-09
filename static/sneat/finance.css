@@ -943,11 +943,14 @@ body {
   display: none !important;
 }
 
-/* `.app-brand-text.demo` lowercases the wordmark (Sneat's own demo styling, for
-   their "sneat" logotype). SFBMSSB is an acronym, so keep the sizing, drop the
-   transform. */
-.app-brand-text.demo {
-  text-transform: none;
+/* Sneat's demo styling lowercases the wordmark for their own "sneat" logotype.
+   SFBMSSB is an acronym and is always written in capitals, so force uppercase
+   rather than merely unsetting the transform — that way it stays correct even
+   if the source text is ever typed in lower case. */
+.app-brand-text,
+.app-brand-text.demo,
+.app-brand-link .app-brand-text {
+  text-transform: uppercase !important;
 }
 
 /* ---------------------------------------------------------------------------

@@ -36,14 +36,13 @@
                     <button type="submit"
                         {% if not unreported_count %}disabled{% endif %}
                         onclick="return confirm('Rostan ham kassani yopmoqchimisiz?')"
-                        class="btn btn-label-danger rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2 {% if not unreported_count %}opacity-50 cursor-not-allowed{% endif %}"
-                        style="background: var(--color-negative-bg); color: var(--color-negative);">
+                        class="btn btn-danger d-inline-flex align-items-center gap-2">
                         <i class="bx bx-lock-alt"></i>
                         Kassani yopish
                     </button>
                 </form>
                 <div x-data="{ open: {% if form.errors %}true{% else %}false{% endif %} }">
-                    <button type="button" @click="open = true" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-positive-bg); color: var(--color-positive);">
+                    <button type="button" @click="open = true" class="btn btn-success d-inline-flex align-items-center gap-2">
                         <i class="bx bx-plus"></i>
                         Yangi amaliyot
                     </button>
