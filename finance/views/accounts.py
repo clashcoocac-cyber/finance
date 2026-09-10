@@ -8,6 +8,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
+from django.contrib import messages
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
 from finance.models import Counterparty, User
 from finance.models import DailyReport, Category
@@ -26,7 +27,15 @@ class BossDashboardView(LoginRequiredMixin, BossRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['stats'] = compute_money_stats()
+        today = datetime.today()
+        month_start = today.replace(day=1).strftime('%Y-%m-%d')
+        context['from'] = self.request.GET.get('from', None) or month_start
+        context['to'] = self.request.GET.get('to', None) or today.strftime('%Y-%m-%d')
+
+        date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
+        date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
+
+        context['stats'] = compute_money_stats(date_from=date_from, date_to=date_to)
         context['operator_count'] = User.objects.filter(role='operator').count()
         context['cashier_count'] = User.objects.filter(role='cashier').count()
         context['transaction_count'] = Transaction.objects.count()
@@ -40,8 +49,10 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['from'] = self.request.GET.get('from', None) or (datetime.today()- timedelta(days=7)).strftime('%Y-%m-%d')
-        context['to'] = self.request.GET.get('to', None) or datetime.today().strftime('%Y-%m-%d')
+        today = datetime.today()
+        month_start = today.replace(day=1).strftime('%Y-%m-%d')
+        context['from'] = self.request.GET.get('from', None) or month_start
+        context['to'] = self.request.GET.get('to', None) or today.strftime('%Y-%m-%d')
 
         context['pending_reports_count'] = DailyReport.objects.filter(
             type='income', is_closed=False
@@ -105,9 +116,105 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
             
         context['total'] = result
 
-        context['stats'] = compute_money_stats()
+        context['stats'] = compute_money_stats(date_from=date_from, date_to=date_to)
         context['clicks'] = CLICKS
         return context
+
+class FinancePageView(LoginRequiredMixin, TemplateView):
+    template_name = 'finance_page.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_superuser:
+            return super().dispatch(request, *args, **kwargs)
+        if not (hasattr(request.user, 'role') and request.user.role in ['boss', 'cashier']):
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        from finance.forms import IncomeForm, ExpenseForm
+        kind = request.POST.get('kind')
+        if kind == 'income':
+            form = IncomeForm(request.POST)
+            if form.is_valid():
+                form.save(operator=request.user)
+                messages.success(request, "Kirim muvaffaqiyatli qo'shildi.")
+                return redirect('finance_page')
+        elif kind == 'expense':
+            form = ExpenseForm(request.POST)
+            if form.is_valid():
+                form.save(operator=request.user)
+                messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
+                return redirect('finance_page')
+        messages.error(request, "Formani tekshiring.")
+        return self.get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = datetime.today()
+        month_start = today.replace(day=1).strftime('%Y-%m-%d')
+        context['from'] = self.request.GET.get('from', None) or month_start
+        context['to'] = self.request.GET.get('to', None) or today.strftime('%Y-%m-%d')
+
+        date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
+        date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
+
+        def _sum(qs, **extra):
+            return qs.filter(**extra).aggregate(
+                usd=Sum('amount_usd'), uzs=Sum('amount_uzs'),
+                rub=Sum('amount_rub'), eur=Sum('amount_eur'),
+            )
+
+        noncash = ['click', 'terminal', 'bank']
+        income_qs = Transaction.objects.filter(date__date__range=(date_from, date_to), type='income')
+        expense_qs = Transaction.objects.filter(date__date__range=(date_from, date_to), type='expense')
+
+        # split by report confirmation state, like the dashboard does
+        noncash_income = _sum(income_qs, report__is_closed=True, payment_type__in=noncash)
+        noncash_expense = _sum(expense_qs, report__is_closed=True, payment_type__in=noncash)
+        noncash_income_pending = _sum(income_qs, report__is_closed=False, payment_type__in=noncash)
+        noncash_expense_pending = _sum(expense_qs, report__is_closed=False, payment_type__in=noncash)
+
+        all_income = _sum(income_qs, report__is_closed=True)
+        all_expense = _sum(expense_qs, report__is_closed=True)
+        all_income_pending = _sum(income_qs, report__is_closed=False)
+        all_expense_pending = _sum(expense_qs, report__is_closed=False)
+
+        cur_keys = ['usd', 'uzs', 'rub', 'eur']
+
+        def _stats(confirmed, pending):
+            stats = {
+                'income': {f'total_{k}': confirmed['income'].get(k) or 0 for k in cur_keys},
+                'expense': {f'total_{k}': confirmed['expense'].get(k) or 0 for k in cur_keys},
+            }
+            stats['diff'] = {f'total_{k}': stats['income'][f'total_{k}'] - stats['expense'][f'total_{k}'] for k in cur_keys}
+            stats['pending'] = {
+                'income': {f'total_{k}': pending['income'].get(k) or 0 for k in cur_keys},
+                'expense': {f'total_{k}': pending['expense'].get(k) or 0 for k in cur_keys},
+            }
+            stats['pending']['diff'] = {f'total_{k}': stats['pending']['income'][f'total_{k}'] - stats['pending']['expense'][f'total_{k}'] for k in cur_keys}
+            # headline numbers include pending, like the dashboard
+            stats['combined'] = {
+                key: {f'total_{k}': stats[key][f'total_{k}'] + stats['pending'][key][f'total_{k}'] for k in cur_keys}
+                for key in ['income', 'expense', 'diff']
+            }
+            return stats
+
+        context['noncash_stats'] = _stats(
+            {'income': noncash_income, 'expense': noncash_expense},
+            {'income': noncash_income_pending, 'expense': noncash_expense_pending},
+        )
+        context['all_stats'] = _stats(
+            {'income': all_income, 'expense': all_expense},
+            {'income': all_income_pending, 'expense': all_expense_pending},
+        )
+
+        context['income_counterparties'] = Counterparty.objects.filter(is_active=True, group='income')
+        context['expense_category_options'] = [
+            {'name': c.name, 'group': c.group} for c in Category.objects.filter(is_active=True)
+        ]
+        context['clicks'] = CLICKS
+        return context
+
 
 class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateView):
     template_name = 'dashboard/operator.html'

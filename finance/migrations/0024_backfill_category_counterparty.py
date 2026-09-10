@@ -2,16 +2,7 @@
 
 from django.db import migrations
 
-PERSONS_SEED = [
-    ('kenjayev_jasur', 'Kenjayev Jasur'),
-    ('abdullayev_vohid', 'Abdullayev Vohid'),
-    ('murodov_zubaydullo', 'Murodov Zubaydullo'),
-    ('yarashev_kamol', 'Yarashev Kamol'),
-    ('umarov_maxsud', 'Umarov Maxsud'),
-    ('axmedov_ulugbek', "Axmedov Ulug'bek"),
-    ('amonova_rushana', 'Amonova Rushana'),
-    ('hamidova_umida', 'Hamidova Umida'),
-]
+PERSONS_SEED = []
 
 CATEGORIES_SEED = [
     ('chikako zavod', 'expense'),

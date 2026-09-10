@@ -1,7 +1,7 @@
 {% comment %}Sneat vertical navigation item.{% endcomment %}
 <li class="menu-item {% if current == match or current == match2 %}active{% endif %}">
     <a href="{{ url }}" class="menu-link">
-        <i class="menu-icon tf-icons bx {% if icon == 'home' %}bx-home-circle{% elif icon == 'reports' %}bx-receipt{% elif icon == 'transactions' %}bx-transfer-alt{% elif icon == 'users' %}bx-group{% elif icon == 'income' %}bx-trending-up{% elif icon == 'expense' %}bx-trending-down{% endif %}"></i>
+        <i class="menu-icon tf-icons bx {% if icon == 'home' %}bx-home-circle{% elif icon == 'reports' %}bx-receipt{% elif icon == 'transactions' %}bx-transfer-alt{% elif icon == 'users' %}bx-group{% elif icon == 'income' %}bx-trending-up{% elif icon == 'expense' %}bx-trending-down{% elif icon == 'wallet' %}bx-wallet{% endif %}"></i>
         <div>{{ label }}</div>
     </a>
 </li>

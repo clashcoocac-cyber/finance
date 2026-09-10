@@ -1,9 +1,6 @@
 from django.db import migrations
 
-INCOME_COUNTERPARTIES_SEED = [
-    'Almashdi',
-    'Vozvrat rasx den',
-]
+INCOME_COUNTERPARTIES_SEED = []
 
 
 def backfill(apps, schema_editor):

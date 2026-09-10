@@ -23,28 +23,35 @@ def _aggregate(qs):
     return {k: v or 0 for k, v in result.items()}
 
 
-def _totals_for(is_closed):
-    income = _aggregate(Transaction.objects.filter(type='income', report__is_closed=is_closed, payment_type='cash'))
-    expense = _aggregate(Transaction.objects.filter(type='expense', report__is_closed=is_closed, payment_type='cash'))
+def _totals_for(is_closed, date_from=None, date_to=None):
+    income_qs = Transaction.objects.filter(type='income', report__is_closed=is_closed, payment_type='cash')
+    expense_qs = Transaction.objects.filter(type='expense', report__is_closed=is_closed, payment_type='cash')
+
+    if date_from and date_to:
+        income_qs = income_qs.filter(date__date__range=(date_from, date_to))
+        expense_qs = expense_qs.filter(date__date__range=(date_from, date_to))
+
+    income = _aggregate(income_qs)
+    expense = _aggregate(expense_qs)
     diff = {f'total_{cur}': income[f'total_{cur}'] - expense[f'total_{cur}'] for cur in CURRENCIES}
     return {'income': income, 'expense': expense, 'diff': diff}
 
 
-def raw_confirmed_totals():
-    return _totals_for(is_closed=True)
+def raw_confirmed_totals(date_from=None, date_to=None):
+    return _totals_for(is_closed=True, date_from=date_from, date_to=date_to)
 
 
-def raw_pending_totals():
-    return _totals_for(is_closed=False)
+def raw_pending_totals(date_from=None, date_to=None):
+    return _totals_for(is_closed=False, date_from=date_from, date_to=date_to)
 
 
-def compute_money_stats():
+def compute_money_stats(date_from=None, date_to=None):
     """Confirmed totals get the manual `Stat.default_*` correction applied
     (existing boss "edit daily stats" feature); pending totals are always
     live with no correction — there's nothing to manually fix on money that
     hasn't been confirmed yet."""
-    raw = raw_confirmed_totals()
-    pending = raw_pending_totals()
+    raw = raw_confirmed_totals(date_from=date_from, date_to=date_to)
+    pending = raw_pending_totals(date_from=date_from, date_to=date_to)
 
     inc_stat, _ = Stat.objects.get_or_create(type=StatTypes.INCOME)
     for cur in CURRENCIES:

@@ -1,7 +1,7 @@
 from django.urls import path
 from .views.accounts import (
     HomeView,
-    BossDashboardView, ChiefCashierDashboardView, OperatorDashboardView,
+    BossDashboardView, ChiefCashierDashboardView, OperatorDashboardView, FinancePageView,
     CustomLoginView, CustomLogoutView,
     UserListCreateView, UserUpdateView, UserDeleteView, TransactionView
 )
@@ -24,6 +24,7 @@ urlpatterns = [
     path("dashboard/boss/", BossDashboardView.as_view(), name="boss_dashboard"),
     path("dashboard/cashier/", ChiefCashierDashboardView.as_view(), name="cashier_dashboard"),
     path("dashboard/operator/", OperatorDashboardView.as_view(), name="operator_dashboard"),
+    path("finance/", FinancePageView.as_view(), name="finance_page"),
 
     # Profile
 

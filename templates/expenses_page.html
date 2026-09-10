@@ -48,7 +48,6 @@
                                     expType: '{{ form.exp_type.value|default_if_none:'' }}',
                                     categoryValue: '{{ form.category.value|default_if_none:'' }}',
                                     categoryMode: '{{ form.category.value|default_if_none:'' }}' === '__new__' ? 'new' : 'select',
-                                    paymentType: '{{ form.payment_type.value|default_if_none:'' }}',
                                     categoryOptions: [],
                                 }"
                                 x-init="categoryOptions = JSON.parse(document.getElementById('category-options-data').textContent)">
@@ -148,35 +147,7 @@
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="bx bx-credit-card"></i>
-                                        </span>
-                                        <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
-                                            <option value="">To'lov turini tanlang</option>
-                                            <option value="click">Click</option>
-                                            <option value="cash">Naqd</option>
-                                            <option value="terminal">Terminal</option>
-                                            <option value="bank">Bank</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div x-show="paymentType === 'click'" x-cloak>
-                                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-positive);">Click kartani tanlang</label>
-                                    <div class="relative">
-                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="bx bx-credit-card"></i>
-                                        </span>
-                                        <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
-                                            <option value="">---</option>
-                                            {% for click in clicks %}
-                                            <option value="{{ click.0 }}" {% if form.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
+                                <input type="hidden" name="payment_type" value="cash">
 
                                 <button type="submit" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
                                     <i class="bx bx-plus"></i>
@@ -196,6 +167,7 @@
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kategoriya</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Maqsad</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
@@ -208,9 +180,10 @@
                         <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                             <div class="flex items-center gap-2">
                                 <span class="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);"><i class="bx bx-trending-down"></i></span>
-                                <div class="min-w-0"><div class="font-semibold truncate" title="{{ report.category }}">{{ report.category }}</div>{% if report.desc %}<div class="text-xs truncate" style="color: var(--color-text-muted);" title="{{ report.desc }}">{{ report.desc }}</div>{% endif %}</div>
+                                <div class="font-semibold truncate" title="{{ report.category }}">{{ report.category }}</div>
                             </div>
                         </td>
+                        <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{% if report.type == 'expense' %}<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--color-negative-bg); color: var(--color-negative);">Chiqim</span>{% elif report.type == 'xarajat' %}<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--color-pending-bg); color: var(--color-pending);">Xarajat</span>{% else %}{{ report.type }}{% endif %}</td>
                         <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                             {% for key, val in report.uzs_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}
                             {% for key, val in report.usd_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}

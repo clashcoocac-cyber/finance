@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from finance.models import User, Transaction, DailyReport, Category, Counterparty
-from finance.forms import ExpenseForm, TransactionFrom
+from finance.forms import ExpenseForm, TransactionFrom, IncomeForm
 from finance.views.helpers import compute_money_stats
 
 
@@ -14,9 +14,6 @@ class DataMigrationBackfillTests(TestCase):
     def test_seed_categories_exist_with_correct_group(self):
         self.assertTrue(Category.objects.filter(name__iexact='chikako zavod', group='expense').exists())
         self.assertTrue(Category.objects.filter(name__iexact='mssb xarajat', group='xarajat').exists())
-
-    def test_seed_counterparties_exist(self):
-        self.assertTrue(Counterparty.objects.filter(name__iexact='Kenjayev Jasur').exists())
 
 
 class BulkConfirmReportsViewTests(TestCase):
@@ -94,6 +91,47 @@ class ExpenseFormCategoryTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         form.save(operator=self.cashier, date='2026-09-07')
         self.assertEqual(Category.objects.filter(name__iexact='chikako zavod').count(), 1)
+
+
+class IncomeFormPurposeTests(TestCase):
+    def setUp(self):
+        self.cashier = User.objects.create_user(username='cashier_ip', password='pass12345', role='cashier')
+
+    def test_new_purpose_persists_for_next_form(self):
+        Counterparty.objects.get_or_create(name='Almashdi', defaults={'group': 'income'})
+        form = IncomeForm(data={
+            'counterparty': 'Almashdi', 'purpose': 'tushum',
+            'amount_uzs': '250000', 'payment_type': 'cash',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save(operator=self.cashier, date='2026-09-10')
+
+        # purpose is a fixed choice, nothing new to persist
+        next_form = IncomeForm()
+        choice_values = dict(next_form.fields['purpose'].choices)
+        self.assertIn('tushum', choice_values)
+        self.assertIn('foyda', choice_values)
+
+    def test_purpose_saved_in_report_desc(self):
+        Counterparty.objects.get_or_create(name='Almashdi', defaults={'group': 'income'})
+        form = IncomeForm(data={
+            'counterparty': 'Almashdi', 'purpose': 'foyda',
+            'amount_uzs': '10000', 'payment_type': 'cash',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        transaction = form.save(operator=self.cashier, date='2026-09-10')
+        self.assertEqual(transaction.report.category, 'Almashdi')
+        self.assertEqual(transaction.report.desc, 'Maqsad: foyda')
+
+    def test_empty_purpose_falls_back_to_counterparty(self):
+        Counterparty.objects.get_or_create(name='Almashdi', defaults={'group': 'income'})
+        form = IncomeForm(data={
+            'counterparty': 'Almashdi', 'amount_uzs': '10000', 'payment_type': 'cash',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        transaction = form.save(operator=self.cashier, date='2026-09-10')
+        self.assertEqual(transaction.report.category, 'Almashdi')
+        self.assertIsNone(transaction.report.desc)
 
 
 class OperatorCounterpartyFormTests(TestCase):

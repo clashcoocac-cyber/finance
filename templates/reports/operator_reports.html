@@ -62,7 +62,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="px-4 py-3 text-sm">
-                                    {% include "partials/_status_badge.html" with status=report.type %}
+                                    {% if report.type == 'income' %}{% if report.desc and report.desc|slice:":7" == "Maqsad:" %}<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--color-positive-bg); color: var(--color-positive);">{{ report.desc|slice:"8:"|capfirst }}</span>{% else %}{% include "partials/_status_badge.html" with status="income" %}{% endif %}{% else %}{% include "partials/_status_badge.html" with status=report.type %}{% endif %}
                                 </td>
                                 <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                                     <div class="flex flex-wrap gap-1">

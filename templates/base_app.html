@@ -18,11 +18,13 @@
                 <li class="menu-header small text-uppercase"><span class="menu-header-text">Asosiy menyu</span></li>
                 {% if request.user.is_boss %}
                     {% url 'boss_dashboard' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="boss_dashboard" %}
+                    {% url 'finance_page' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Moliya" icon="wallet" current=url_name match="finance_page" %}
                     {% url 'boss_reports' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Hisobotlar" icon="reports" current=url_name match="boss_reports" %}
                     {% url 'transaction_list' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Tranzaksiyalar" icon="transactions" current=url_name match="transaction_list" match2="transaction" %}
                     {% url 'users' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Foydalanuvchilar" icon="users" current=url_name match="users" %}
                 {% elif request.user.is_cashier %}
                     {% url 'cashier_dashboard' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Bosh sahifa" icon="home" current=url_name match="cashier_dashboard" %}
+                    {% url 'finance_page' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Moliya" icon="wallet" current=url_name match="finance_page" %}
                     {% url 'cashier_reports' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Kunlik hisobotlar" icon="reports" current=url_name match="cashier_reports" %}
                     {% url 'incomes_list' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Kirimlar" icon="income" current=url_name match="incomes_list" %}
                     {% url 'expenses_list' as nav_url %}{% include "partials/_nav_item.html" with url=nav_url label="Chiqimlar" icon="expense" current=url_name match="expenses_list" %}

@@ -72,7 +72,9 @@ class TransactionFrom(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['counterparty'].choices = (
-            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True, group='person')] + [('__new__', "+ Yangi qo'shish")]
+            [('', '-- Tanlang --')] +
+            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True, group='person')] +
+            [('__new__', "+ Yangi qo'shish")]
         )
 
     def clean(self):
@@ -112,8 +114,9 @@ class TransactionFrom(forms.ModelForm):
         return transaction
 
 class IncomeForm(forms.ModelForm):
-    counterparty = forms.ChoiceField(choices=[])
-    other_counterparty = forms.CharField(required=False, max_length=255, label="Yangi kategoriya nomi")
+    counterparty = forms.ChoiceField(choices=[], label="Manba (Kirim manbai)")
+    other_counterparty = forms.CharField(required=False, max_length=255, label="Yangi manba nomi")
+    purpose = forms.ChoiceField(choices=[], label="Maqsad (Kirim turi)", required=False)
     click = forms.ChoiceField(choices=CLICKS, required=False)
 
     class Meta:
@@ -123,7 +126,15 @@ class IncomeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['counterparty'].choices = (
-            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True, group='income')] + [('__new__', "+ Yangi qo'shish")]
+            [('', '-- Tanlang --')] +
+            [(c.name, c.name) for c in Counterparty.objects.filter(is_active=True, group='income')] +
+            [('__new__', "+ Yangi qo'shish")]
+        )
+        # Maqsad is a fixed DB-level choice like the expense form's
+        # Chiqim/Xarajat pair — not a user-extensible list.
+        self.fields['purpose'].choices = (
+            [('', '-- Tanlang --')] +
+            [('foyda', 'Foyda'), ('tushum', 'Tushum')]
         )
 
     def clean(self):
@@ -132,7 +143,7 @@ class IncomeForm(forms.ModelForm):
         other = (cleaned_data.get('other_counterparty') or '').strip()
         if counterparty == '__new__':
             if not other:
-                self.add_error('other_counterparty', "Yangi kategoriya nomini kiriting.")
+                self.add_error('other_counterparty', "Yangi manba nomini kiriting.")
             else:
                 cleaned_data['counterparty'] = other
         return cleaned_data
@@ -147,6 +158,8 @@ class IncomeForm(forms.ModelForm):
         transaction.counterparty = counterparty
         transaction.operator = operator
 
+        # handle purpose/category — fixed choice, stored on the report
+        purpose = self.cleaned_data.get('purpose') or ''
         # parse date if provided, otherwise use today
         if date:
             try:
@@ -156,12 +169,15 @@ class IncomeForm(forms.ModelForm):
         else:
             parsed_date = datetime.now().date()
 
-        # create the report first (store date as date object)
+        # create the report first (store date as date object);
+        # category = counterparty, purpose goes into desc ("Maqsad: X")
         report = DailyReport.objects.create(
             operator=operator,
             type='income',
             is_closed=True,
-            date=parsed_date
+            date=parsed_date,
+            category=transaction.counterparty,
+            desc=f"Maqsad: {purpose}" if purpose else None,
         )
 
         report.total_uzs = self.cleaned_data.get('amount_uzs') or 0
@@ -176,7 +192,6 @@ class IncomeForm(forms.ModelForm):
         report.usd_detail = {detail_key: float(self.cleaned_data.get('amount_usd') or 0)}
         report.rub_detail = {detail_key: float(self.cleaned_data.get('amount_rub') or 0)}
         report.eur_detail = {detail_key: float(self.cleaned_data.get('amount_eur') or 0)}
-        report.category = transaction.counterparty
         report.save()
 
         # finish transaction fields and save (ensure non-null date for stats/admin)
@@ -207,7 +222,9 @@ class ExpenseForm(forms.Form):
         active_categories = Category.objects.filter(is_active=True)
         self.category_options = [{'name': c.name, 'group': c.group} for c in active_categories]
         self.fields['category'].choices = (
-            [(c.name, c.name) for c in active_categories] + [('__new__', "+ Yangi qo'shish")]
+            [('', '-- Tanlang --')] +
+            [(c.name, c.name) for c in active_categories] +
+            [('__new__', "+ Yangi qo'shish")]
         )
 
     def clean(self):
@@ -229,6 +246,10 @@ class ExpenseForm(forms.Form):
             defaults={'name': category, 'group': exp_type if exp_type in dict(Category.GROUPS) else 'expense'},
         )
         desc = self.cleaned_data.get('description') or None
+        # expense "maqsad" — the Chiqim/Xarajat kind, stored as a fixed
+        # "Maqsad:" prefix in desc like the income form does
+        kind = 'Xarajat' if exp_type == 'xarajat' else 'Chiqim'
+        desc = f"Maqsad: {kind.lower()}" + (f" — {desc}" if desc else '')
 
         if date:
             try:

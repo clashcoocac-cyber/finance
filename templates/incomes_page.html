@@ -79,6 +79,20 @@
                                     </div>
                                 </div>
 
+                                <div>
+                                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Maqsad</label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
+                                            <i class="bx bx-filter"></i>
+                                        </span>
+                                        <select required name="purpose" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                                            <option value="">Maqsadni tanlang</option>
+                                            <option value="foyda" {% if form.purpose.value == 'foyda' %}selected{% endif %}>Foyda</option>
+                                            <option value="tushum" {% if form.purpose.value == 'tushum' %}selected{% endif %}>Tushum</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
@@ -170,6 +184,7 @@
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kategoriya</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Maqsad</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
@@ -184,11 +199,11 @@
                         <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                             <div class="flex items-center gap-2">
                                 <span class="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);"><i class="bx bx-trending-up"></i></span>
-                                <div class="min-w-0">
-                                    <div class="font-semibold truncate" title="{{ report.category }}">{{ report.category }}</div>
-                                    {% if report.desc %}<div class="text-xs truncate" style="color: var(--color-text-muted);" title="{{ report.desc }}">{{ report.desc }}</div>{% endif %}
-                                </div>
+                                <div class="font-semibold truncate" title="{{ report.category }}">{{ report.category }}</div>
                             </div>
+                        </td>
+                        <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
+                            {% if report.desc and report.desc|slice:":7" == "Maqsad:" %}<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--color-positive-bg); color: var(--color-positive);">{{ report.desc|slice:"8:"|capfirst }}</span>{% endif %}
                         </td>
                         <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                             {% for key, val in report.uzs_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}

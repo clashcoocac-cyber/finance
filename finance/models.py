@@ -32,7 +32,7 @@ class Company(models.Model):
 
 
 class Category(models.Model):
-    GROUPS = [('expense', 'Chiqim'), ('xarajat', 'Xarajat')]
+    GROUPS = [('income', 'Kirim'), ('expense', 'Chiqim'), ('xarajat', 'Xarajat')]
 
     name = models.CharField(max_length=100, unique=True)
     group = models.CharField(max_length=10, choices=GROUPS)
@@ -83,7 +83,7 @@ class Transaction(models.Model):
         ('terminal', 'Terminal'),
         ('bank', 'Bank'),
     ]
-    
+
     date = models.DateTimeField(null=True, blank=True)
     type = models.CharField(max_length=10, choices=TYPES)
     click = models.CharField(max_length=255, choices=CLICKS, null=True, blank=True)
@@ -112,7 +112,7 @@ class DailyReport(models.Model):
     operator_shift = models.IntegerField(null=True, blank=True)
     category = models.CharField(max_length=100)
     desc = models.TextField(null=True, blank=True)
-    
+
     total_uzs = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     total_usd = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
     total_rub = models.DecimalField(max_digits=15, decimal_places=2, null=True, blank=True)
@@ -122,7 +122,7 @@ class DailyReport(models.Model):
     usd_detail = models.JSONField(null=True, blank=True)
     rub_detail = models.JSONField(null=True, blank=True)
     eur_detail = models.JSONField(null=True, blank=True)
-    
+
     is_closed = models.BooleanField(default=False)
     comment = models.TextField(null=True, blank=True)
 

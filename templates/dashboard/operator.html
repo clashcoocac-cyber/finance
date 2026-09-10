@@ -8,7 +8,41 @@
 {% block page_content %}
 <div class="finance-page-heading">
     {% include "partials/_page_header.html" with title="Bosh sahifa" subtitle="Smena holati va so'nggi hisobotlar" icon="bx-home-circle" %}
+    <div class="finance-page-heading-actions">
+        <input type="month" id="monthPicker" class="form-control rounded-md" style="max-width: 14rem; min-height: 2.5rem; border: 2px solid var(--finance-primary); padding: 0.5rem 0.75rem; font-size: 0.9375rem; color: var(--color-text); box-shadow: 0 0.125rem 0.25rem rgba(105, 108, 255, 0.15);" />
+    </div>
 </div>
+
+<div style="margin-bottom: 1.5rem;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const monthPicker = document.getElementById('monthPicker');
+
+        const fromParam = '{{ from }}';
+        const toParam = '{{ to }}';
+
+        if (fromParam && fromParam !== 'None') {
+            const [year, month, day] = fromParam.split('-');
+            monthPicker.value = `${year}-${month}`;
+        } else {
+            const today = new Date();
+            monthPicker.value = today.toISOString().slice(0, 7);
+        }
+
+        monthPicker.addEventListener('change', function() {
+            const [year, month] = this.value.split('-');
+            const fromStr = `${year}-${month}-01`;
+
+            const nextMonth = parseInt(month) === 12 ? 1 : parseInt(month) + 1;
+            const nextYear = parseInt(month) === 12 ? parseInt(year) + 1 : year;
+            const lastDay = new Date(nextYear, nextMonth - 1, 0).getDate();
+            const toStr = `${year}-${month.padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+            window.location.search = `from=${fromStr}&to=${toStr}`;
+        });
+    });
+</script>
 <div class="max-w-7xl mx-auto space-y-6">
         <div class="d-flex flex-wrap align-items-center gap-2">
             {% if request.session.shift %}
