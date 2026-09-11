@@ -38,3 +38,15 @@ def pending_summary(amounts):
         if value:
             parts.append(f"{format_currency(value)} {label}")
     return ', '.join(parts)
+
+@register.filter
+def maqsad(report):
+    """Purpose stored as desc = "Maqsad: <kind>[ — <comment>]"; returns the
+    kind ('foyda', 'tushum', 'xarajat', 'chiqim') or '' when absent."""
+    if not report or not getattr(report, 'desc', ''):
+        return ''
+    desc = report.desc
+    if not desc.startswith('Maqsad:'):
+        return ''
+    rest = desc[len('Maqsad:'):].strip()
+    return rest.split(' — ')[0]

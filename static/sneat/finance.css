@@ -954,6 +954,64 @@ body {
   white-space: nowrap;
 }
 
+/* Secondary action: soft danger (negative-bg + negative text), used for the
+   expense CTA so the income CTA keeps visual priority. */
+.finance-btn-soft-danger {
+  background: var(--color-negative-bg) !important;
+  color: var(--color-negative) !important;
+  border: 1px solid transparent;
+}
+.finance-btn-soft-danger:hover:not(:disabled) {
+  filter: brightness(0.96);
+}
+
+/* Month input: a quiet sibling of the buttons, not a violet billboard.
+   Same height as the CTAs so the header row reads as one control strip. */
+.finance-month-picker {
+  max-width: 12rem;
+  min-height: 2.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+/* Amount inputs get a right-aligned muted currency suffix inside the field */
+.finance-amount-wrap {
+  position: relative;
+}
+.finance-amount-suffix {
+  position: absolute;
+  right: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+.finance-amount-wrap .form-control {
+  padding-right: 3rem;
+}
+
+/* Subtle press feedback on every button */
+.content-wrapper .btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Grouped fieldset inside modal forms */
+.finance-form-group-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
 /* The dark sidebar already marks the active item with a solid violet fill, so
    Sneat's right-edge indicator bar is redundant here — and it renders outside
    the sidebar's dark area, reading as a stray violet sliver. */

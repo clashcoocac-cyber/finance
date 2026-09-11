@@ -29,8 +29,8 @@
                         <tr>
                             <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Vaqt</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya / Kategoriya</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kimdan</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Maqsad</th>
+                            <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kimdan / Kategoriya</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Komentariya</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
@@ -43,20 +43,18 @@
                             <td class="px-3 py-3 text-sm" style="color: var(--color-text);">{{ transaction.date|date:"d.m.Y" }}<br>{{ transaction.date|time:"H:i" }}</td>
                             <td class="px-3 py-3 text-sm" style="color: var(--color-text);">{{ transaction.operator.username }}</td>
                             <td class="px-3 py-3 text-sm" style="color: var(--color-text);">
-                                {% if transaction.report.category %}
-                                    {{ transaction.report.category }}
-                                {% else %}
-                                    {{ transaction.operator.company.name }}
-                                {% endif %}
+                                {% if transaction.report|maqsad %}<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: {% if transaction.type == 'income' %}var(--color-positive-bg); color: var(--color-positive){% else %}var(--color-surface-muted); color: var(--color-text){% endif %};">{{ transaction.report|maqsad|capfirst }}</span>
+                                {% elif transaction.report.category %}{{ transaction.report.category }}
+                                {% else %}{{ transaction.operator.company.name }}{% endif %}
                             </td>
                             <td class="px-3 py-3 text-sm" style="color: var(--color-text);">
-                                {% if transaction.type == 'income' %}{{ transaction.counterparty }}{% endif %}
+                                {% if transaction.type == 'income' %}{{ transaction.counterparty }}{% else %}{{ transaction.report.category|default:"" }}{% endif %}
                             </td>
-                            <td class="px-3 py-3 text-sm money font-medium finance-amount-cell" style="color: {% if transaction.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
-                                {% if transaction.amount_uzs %}<span>{{ transaction.amount_uzs|format_currency }} so'm</span>{% endif %}
-                                {% if transaction.amount_usd %}<span>{{ transaction.amount_usd|format_currency }} $</span>{% endif %}
-                                {% if transaction.amount_rub %}<span>{{ transaction.amount_rub|format_currency }} ₽</span>{% endif %}
-                                {% if transaction.amount_eur %}<span>{{ transaction.amount_eur|format_currency }} €</span>{% endif %}
+                            <td class="px-3 py-3 text-sm font-medium finance-amount-cell" style="color: {% if transaction.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
+                                {% if transaction.amount_uzs %}<div>{{ transaction.amount_uzs|format_currency }} so'm</div>{% endif %}
+                                {% if transaction.amount_usd %}<div>{{ transaction.amount_usd|format_currency }} $</div>{% endif %}
+                                {% if transaction.amount_rub %}<div>{{ transaction.amount_rub|format_currency }} ₽</div>{% endif %}
+                                {% if transaction.amount_eur %}<div>{{ transaction.amount_eur|format_currency }} €</div>{% endif %}
                             </td>
                             <td class="px-3 py-3 text-sm" style="color: var(--color-text);">{{ transaction.comment|default:"" }}</td>
                             <td class="px-3 py-3 text-sm">
@@ -74,8 +72,7 @@
                                     <template x-teleport="body">
                                         <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
                                             class="fixed w-40 rounded-md shadow-lg z-50 overflow-hidden"
-                                            :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px'"
-                                            style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                                            :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px; background: var(--color-surface); border: 1px solid var(--color-border);'">
                                             <a href="{% url 'transaction' transaction.pk %}"
                                                class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">
                                                 <i class="bx bx-edit-alt w-4"></i>

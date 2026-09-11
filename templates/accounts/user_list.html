@@ -60,8 +60,7 @@
                                     <template x-teleport="body">
                                         <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
                                             class="fixed w-40 rounded-md shadow-lg z-50 overflow-hidden"
-                                            :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px'"
-                                            style="background: var(--color-surface); border: 1px solid var(--color-border);">
+                                            :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px; background: var(--color-surface); border: 1px solid var(--color-border);'">
                                             <button type="button"
                                                 @click="editUser = {id: {{ user.pk }}, username: '{{ user.username|escapejs }}', company: '{{ user.company.name|default:''|escapejs }}'}; editOpen = true; menuOpen = false"
                                                 class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">

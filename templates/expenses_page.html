@@ -60,7 +60,7 @@
                                         </span>
                                         <select required x-model="expType" name="exp_type"
                                             @change="categoryValue = ''; categoryMode = 'select'"
-                                            class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                                            class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                                             <option value="">Maqsadni tanlang</option>
                                             <option value="expense">Chiqim</option>
                                             <option value="xarajat">Xarajat</option>
@@ -76,7 +76,7 @@
                                         </span>
                                         <select name="category" x-ref="categorySelect"
                                             @change="categoryValue = $event.target.value; categoryMode = categoryValue === '__new__' ? 'new' : 'select'"
-                                            class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                                            class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
                                             <option value="" :selected="categoryValue === ''">Kategoriya tanlang</option>
                                             <template x-for="opt in categoryOptions.filter(o => o.group === expType)" :key="opt.name">
                                                 <option :value="opt.name" x-text="opt.name" :selected="opt.name === categoryValue"></option>
@@ -108,20 +108,22 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
-                                        <div class="relative">
+                                        <div class="relative finance-amount-wrap">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
                                                 <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="any" inputmode="decimal" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <span class="finance-amount-suffix">so'm</span>
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
-                                        <div class="relative">
+                                        <div class="relative finance-amount-wrap">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
                                                 <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="any" inputmode="decimal" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <span class="finance-amount-suffix">$</span>
                                         </div>
                                     </div>
                                 </div>
@@ -129,20 +131,22 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
-                                        <div class="relative">
+                                        <div class="relative finance-amount-wrap">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
                                                 <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="any" inputmode="decimal" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <span class="finance-amount-suffix">₽</span>
                                         </div>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
-                                        <div class="relative">
+                                        <div class="relative finance-amount-wrap">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
                                                 <i class="bx bx-coin-stack"></i>
                                             </span>
-                                            <input type="number" step="1" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <input type="number" step="any" inputmode="decimal" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                            <span class="finance-amount-suffix">€</span>
                                         </div>
                                     </div>
                                 </div>
