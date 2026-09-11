@@ -1012,22 +1012,29 @@ body {
   background: var(--color-surface);
 }
 
-/* Amount inputs get a right-aligned muted currency suffix inside the field */
+/* Amount inputs: currency unit sits inside the field as a small pill so the
+   number and its unit read as one control (label above already names it,
+   so the pill uses the compact symbol: so'm/$/₽/€). */
 .finance-amount-wrap {
   position: relative;
 }
 .finance-amount-suffix {
   position: absolute;
-  right: 0.875rem;
+  right: 0.5rem;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.375rem;
+  background: var(--color-surface-muted);
   color: var(--color-text-muted);
   user-select: none;
 }
 .finance-amount-wrap .form-control {
-  padding-right: 3rem;
+  padding-right: 3.25rem;
 }
 
 /* Subtle press feedback on every button */
