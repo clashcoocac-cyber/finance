@@ -9,7 +9,7 @@
     {% include "partials/_page_header.html" with title="Moliya" subtitle="Naqd bo'lmagan va umumiy moliya harakati" icon="bx-wallet" %}
     <div class="finance-page-heading-actions">
         <input type="month" id="monthPicker" class="finance-month-picker form-control rounded-md" />
-        <div x-data="{ open: false, modal: null }">
+        <div class="finance-heading-cta-group" x-data="{ open: {% if failed_modal %}true{% else %}false{% endif %}, modal: '{{ failed_modal|default:"" }}' }">
             <button type="button" @click="open = true; modal = 'income'"
                 class="finance-fab btn btn-success d-inline-flex align-items-center gap-2">
                 <i class="bx bx-trending-up"></i>
@@ -22,12 +22,14 @@
             </button>
 
             {% if messages %}
+                <div class="finance-flash-messages">
                 {% for message in messages %}
-                <div class="rounded-md px-4 py-2.5 mb-4 text-sm fade-in"
-                     style="background: {% if message.tags == 'error' %}var(--color-negative-bg){% else %}var(--color-positive-bg){% endif %}; color: {% if message.tags == 'error' %}var(--color-negative){% else %}var(--color-positive){% endif %};">
-                    {{ message }}
-                </div>
+                    <div class="rounded-md px-4 py-2.5 mb-4 text-sm fade-in"
+                         style="background: {% if message.tags == 'error' %}var(--color-negative-bg){% else %}var(--color-positive-bg){% endif %}; color: {% if message.tags == 'error' %}var(--color-negative){% else %}var(--color-positive){% endif %};">
+                        {{ message }}
+                    </div>
                 {% endfor %}
+                </div>
             {% endif %}
 
             <!-- Kirim modal (naqd bo'lmagan) -->
@@ -136,7 +138,7 @@
                         <textarea name="comment" rows="2" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"></textarea>
                     </div>
 
-                    <button type="submit" :disabled="submitting" @click="submitting = true" class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
+                    <button type="submit" :disabled="submitting" class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
                         <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm"></span>
                         <i class="bx bx-plus" x-show="!submitting"></i>
                         <span x-text="submitting ? 'Saqlanmoqda...' : 'Kirim qo\'shish'">Kirim qo'shish</span>
@@ -252,7 +254,7 @@
                     <textarea name="description" rows="2" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"></textarea>
                 </div>
 
-                <button type="submit" :disabled="submitting" @click="submitting = true" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
+                <button type="submit" :disabled="submitting" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
                     <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm"></span>
                     <i class="bx bx-plus" x-show="!submitting"></i>
                     <span x-text="submitting ? 'Saqlanmoqda...' : 'Chiqim qo\'shish'">Chiqim qo'shish</span>

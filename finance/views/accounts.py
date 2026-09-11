@@ -146,6 +146,7 @@ class FinancePageView(LoginRequiredMixin, TemplateView):
                 messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
                 return redirect('finance_page')
         messages.error(request, "Formani tekshiring.")
+        kwargs['failed_modal'] = kind or 'income'
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -213,6 +214,9 @@ class FinancePageView(LoginRequiredMixin, TemplateView):
             {'name': c.name, 'group': c.group} for c in Category.objects.filter(is_active=True)
         ]
         context['clicks'] = CLICKS
+        # reopen the modal whose submission just failed, so the error message
+        # and the form are visible together
+        context['failed_modal'] = kwargs.get('failed_modal')
         return context
 
 

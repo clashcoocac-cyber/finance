@@ -900,6 +900,7 @@ body {
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .finance-page-heading-main {
@@ -952,6 +953,39 @@ body {
 .finance-fab {
   min-width: 8.75rem;
   white-space: nowrap;
+}
+
+/* Header control strip: date picker + the two CTAs read as one aligned group.
+   CTAs stay slightly taller/heavier so they dominate the quiet month input. */
+.finance-heading-cta-group {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+.finance-heading-cta-group .finance-fab {
+  min-height: 2.625rem;
+  padding-block: 0.5rem;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(67, 89, 113, 0.18);
+}
+.finance-heading-cta-group .finance-fab i {
+  font-size: 1.05rem;
+}
+
+/* Flash messages float above the modal overlay so errors from a failed
+   submission stay visible while the form is reopened. */
+.finance-flash-messages {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 0.5rem;
+  z-index: 60;
+  pointer-events: none;
+}
+.finance-flash-messages > div {
+  pointer-events: auto;
 }
 
 /* Secondary action: soft danger (negative-bg + negative text), used for the
