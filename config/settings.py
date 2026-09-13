@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from config.config import env_config
 
@@ -143,3 +144,9 @@ LOGGING = {
         'django.request': {'handlers': ['console'], 'level': 'WARNING', 'propagate': False},
     },
 }
+
+
+# Tests: fast password hasher + in-memory SQLite (PBKDF2 and Postgres dominate test time)
+if 'test' in sys.argv:
+    PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}
