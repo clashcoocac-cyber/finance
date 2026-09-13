@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, ListView, DeleteView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
@@ -15,7 +16,7 @@ from finance.models import User, Company, Category
 from finance.models import DailyReport, CLICKS
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, Stat
-from finance.views.helpers import preserve_filters, raw_confirmed_totals
+from finance.views.helpers import preserve_filters, raw_confirmed_totals, date_param
 
 
 class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
@@ -27,9 +28,9 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
         return self._render(request)
 
     def _render(self, request, form=None):
-        report_date = request.GET.get('report_date') or datetime.today().strftime('%Y-%m-%d')
-        date_from = request.GET.get('from') or report_date
-        date_to = request.GET.get('to') or report_date
+        report_date = date_param(request.GET.get('report_date'), datetime.today().strftime('%Y-%m-%d'))
+        date_from = date_param(request.GET.get('from'), report_date)
+        date_to = date_param(request.GET.get('to'), report_date)
         q = request.GET.get('q') or ''
         counterparty = request.GET.get('counterparty') or ''
         payment_type = request.GET.get('payment_type') or ''
@@ -73,12 +74,12 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = TransactionFrom(request.POST)
-        date_param = request.GET.get('report_date', None) or datetime.today().date().strftime('%Y-%m-%d')
+        report_date = date_param(request.GET.get('report_date'), datetime.today().date().strftime('%Y-%m-%d'))
 
         if form.is_valid():
-            form.save(operator=request.user, date=date_param)
+            form.save(operator=request.user, date=report_date)
             messages.success(request, "Amaliyot qo'shildi.")
-            return redirect(str(self.success_url) + '?report_date=' + date_param)
+            return redirect(str(self.success_url) + '?report_date=' + report_date)
 
         messages.error(request, "Formani tekshiring.")
         return OperatorTransactionsView()._render(request, form=form)
@@ -111,7 +112,7 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        report_date_str = request.GET.get('report_date', None) or datetime.today().date().strftime('%Y-%m-%d')
+        report_date_str = date_param(request.GET.get('report_date'), datetime.today().date().strftime('%Y-%m-%d'))
         shift = request.session.get('shift', None)
 
         try:
@@ -207,7 +208,7 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = ExpenseForm(request.POST)
-        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
+        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
         if form.is_valid():
             form.save(operator=request.user, date=report_date)
             messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
@@ -216,7 +217,7 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
         return self._render(request, form=form)
 
     def _render(self, request, form=None):
-        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
+        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
         reports = DailyReport.objects.filter(type__in=['expense', 'xarajat'], date=report_date).order_by('-date')
         context = {
             'form': form or ExpenseForm(),
@@ -237,7 +238,7 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = IncomeForm(request.POST)
-        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
+        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
         if form.is_valid():
             form.save(operator=request.user, date=report_date)
             messages.success(request, "Kirim muvaffaqiyatli qo'shildi.")
@@ -246,7 +247,7 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
         return self._render(request, form=form)
 
     def _render(self, request, form=None):
-        report_date = request.GET.get('date', None) or date.today().strftime('%Y-%m-%d')
+        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
         reports = DailyReport.objects.filter(type='income', operator=request.user, date=report_date).order_by('-date')
         context = {
             'form': form or IncomeForm(),
@@ -262,8 +263,8 @@ class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):
     template_name = 'transaction_page.html'
 
     def get(self, request, *args, **kwargs):
-        date_from = request.GET.get('from', None) or (date.today() - timedelta(days=7)).strftime('%Y-%m-%d')
-        date_to = request.GET.get('to', None) or date.today().strftime('%Y-%m-%d')
+        date_from = date_param(request.GET.get('from'), (date.today() - timedelta(days=7)).strftime('%Y-%m-%d'))
+        date_to = date_param(request.GET.get('to'), date.today().strftime('%Y-%m-%d'))
         search_query = request.GET.get('q', '').strip()
 
         transactions = Transaction.objects.all().order_by('-date')
@@ -282,8 +283,11 @@ class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):
         if categories:
             transactions = transactions.filter(report__category__in=categories)
 
+        page = Paginator(transactions.select_related('operator', 'operator__company', 'report'), 50).get_page(request.GET.get('page'))
         context = {
-            'transactions': transactions,
+            'transactions': page.object_list,
+            'page_obj': page,
+            'page_range': page.paginator.get_elided_page_range(page.number),
             'total_usd': transactions.aggregate(Sum('amount_usd'))['amount_usd__sum'] or 0,
             'total_uzs': transactions.aggregate(Sum('amount_uzs'))['amount_uzs__sum'] or 0,
             'total_rub': transactions.aggregate(Sum('amount_rub'))['amount_rub__sum'] or 0,

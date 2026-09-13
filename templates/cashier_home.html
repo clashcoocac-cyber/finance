@@ -8,40 +8,11 @@
 <div class="finance-page-heading">
     {% include "partials/_page_header.html" with title="Bosh sahifa" subtitle="Kunlik kirim va chiqimlar" icon="bx-home-circle" %}
     <div class="finance-page-heading-actions">
-        <input type="month" id="monthPicker" class="finance-month-picker form-control rounded-md" />
+        {% include "partials/_month_picker.html" %}
     </div>
 </div>
 
-<div style="margin-bottom: 1.5rem;"></div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const monthPicker = document.getElementById('monthPicker');
-
-        const fromParam = '{{ from }}';
-        const toParam = '{{ to }}';
-
-        if (fromParam && fromParam !== 'None') {
-            const [year, month, day] = fromParam.split('-');
-            monthPicker.value = `${year}-${month}`;
-        } else {
-            const today = new Date();
-            monthPicker.value = today.toISOString().slice(0, 7);
-        }
-
-        monthPicker.addEventListener('change', function() {
-            const [year, month] = this.value.split('-');
-            const fromStr = `${year}-${month}-01`;
-
-            const nextMonth = parseInt(month) === 12 ? 1 : parseInt(month) + 1;
-            const nextYear = parseInt(month) === 12 ? parseInt(year) + 1 : year;
-            const lastDay = new Date(nextYear, nextMonth - 1, 0).getDate();
-            const toStr = `${year}-${month.padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-
-            window.location.search = `from=${fromStr}&to=${toStr}`;
-        });
-    });
-</script>
 <div class="max-w-7xl mx-auto space-y-6" id="invoice">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {% include "partials/_stat_card.html" with title="Kirim" amounts=stats.combined.income pending_amounts=stats.pending.income tone="positive" %}
@@ -53,7 +24,7 @@
             <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <div class="flex items-center gap-3">
                     <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                        <i class="bx bx-receipt text-lg"></i>
+                        <i aria-hidden="true" class="bx bx-receipt text-lg"></i>
                     </span>
                     <div>
                         <div class="text-lg font-bold" style="color: var(--color-text);">So'nggi hisobotlar</div>
@@ -69,12 +40,12 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="generatePDF()" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                        <i class="bx bx-down-arrow-alt"></i>
+                    <button type="button" onclick="generatePDF(this)" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
+                        <i aria-hidden="true" class="bx bx-down-arrow-alt"></i>
                         PDF
                     </button>
                     <a href="{% url 'cashier_reports' %}" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                        <i class="bx bx-receipt"></i>
+                        <i aria-hidden="true" class="bx bx-receipt"></i>
                         Barcha hisobotlar
                     </a>
                 </div>
@@ -85,11 +56,11 @@
                     <table class="table table-hover align-middle mb-0 w-full">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Umumiy</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
+                                <th>Sana</th>
+                                <th>Operator</th>
+                                <th>Kompaniya</th>
+                                <th class="finance-amount-col">Umumiy</th>
+                                <th>Holat</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -103,7 +74,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.operator.company.name }}</td>
-                                <td class="px-4 py-3 text-sm">
+                                <td class="px-4 py-3 text-sm finance-amount-col">
                                     <div class="space-y-1 font-semibold money" style="color: var(--color-positive);">
                                         {% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}
                                         {% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}
@@ -122,7 +93,7 @@
                 {% else %}
                 <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                     <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="bx bx-inbox text-xl"></i>
+                        <i aria-hidden="true" class="bx bx-folder-open text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hozircha hisobotlar yo'q</p>
                 </div>
@@ -131,32 +102,5 @@
         </div>
     </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
-
-<script>
-    function generatePDF() {
-        const element = document.getElementById("invoice");
-
-        const opt = {
-            margin:       0,
-            filename:     'document.pdf',
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  {
-                scale: 2,
-                useCORS: true, // agar rasm bo'lsa
-                logging: true,
-                scrollY: 0, // skrollni hisobga olmasin
-                windowWidth: document.body.scrollWidth,
-                windowHeight: document.body.scrollHeight,
-            },
-            jsPDF:        {
-                unit: 'mm',
-                format: 'a4',
-                orientation: 'landscape' // <-- bu albom ko'rinish uchun
-            }
-        };
-
-        html2pdf().set(opt).from(element).save();
-    }
-</script>
+{% include "partials/_pdf_export.html" with pdf_name="kassa" %}
 {% endblock %}

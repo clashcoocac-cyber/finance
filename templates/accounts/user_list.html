@@ -12,14 +12,14 @@
         <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                    <i class="bx bx-group"></i>
+                    <i aria-hidden="true" class="bx bx-group"></i>
                 </span>
                 <div>
                     <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha foydalanuvchilar</h2>
                 </div>
             </div>
             <button type="button" @click="open = true" class="btn btn-primary d-inline-flex align-items-center gap-2">
-                <i class="bx bx-plus"></i>
+                <i aria-hidden="true" class="bx bx-plus"></i>
                 Yangi foydalanuvchi
             </button>
         </div>
@@ -30,12 +30,12 @@
                 <table class="table table-hover align-middle mb-0 w-full">
                     <thead style="background: var(--color-surface-muted);">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">#</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Username</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Rol</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Yaratilgan</th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Amallar</th>
+                            <th>#</th>
+                            <th>Login</th>
+                            <th>Rol</th>
+                            <th>Kompaniya</th>
+                            <th>Yaratilgan</th>
+                            <th>Amallar</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,24 +53,26 @@
                             <td class="px-4 py-3 text-sm">
                                 {% if not user.is_boss %}
                                 <div class="relative" x-data="{ menuOpen: false, menuPos: {top: 0, left: 0} }">
-                                    <button type="button" @click="const r = $el.getBoundingClientRect(); menuPos = {top: r.bottom + 4, left: r.right - 160}; menuOpen = !menuOpen"
+                                    <button type="button" @click="const r = $el.getBoundingClientRect(); menuPos = {top: r.bottom + 4, left: Math.max(8, r.right - 160)}; menuOpen = !menuOpen"
+                                        @scroll.window.capture.passive="menuOpen = false" @resize.window.passive="menuOpen = false" @keydown.escape.window="menuOpen = false"
+                                        aria-haspopup="menu" :aria-expanded="menuOpen"
                                         class="btn btn-icon btn-label-secondary w-8 h-8 rounded-md flex items-center justify-center" style="background: var(--color-surface-muted); color: var(--color-text);" aria-label="Amallar">
-                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                        <i aria-hidden="true" class="bx bx-dots-vertical-rounded"></i>
                                     </button>
                                     <template x-teleport="body">
                                         <div x-show="menuOpen" x-cloak @click.outside="menuOpen = false"
-                                            class="fixed w-40 rounded-md shadow-lg z-50 overflow-hidden"
+                                            role="menu" class="fixed w-40 rounded-md shadow-lg z-50 overflow-hidden"
                                             :style="'top:' + menuPos.top + 'px; left:' + menuPos.left + 'px; background: var(--color-surface); border: 1px solid var(--color-border);'">
                                             <button type="button"
                                                 @click="editUser = {id: {{ user.pk }}, username: '{{ user.username|escapejs }}', company: '{{ user.company.name|default:''|escapejs }}'}; editOpen = true; menuOpen = false"
                                                 class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-text);">
-                                                <i class="bx bx-edit-alt w-4"></i>
+                                                <i aria-hidden="true" class="bx bx-edit-alt w-4"></i>
                                                 Tahrirlash
                                             </button>
-                                            <form method="post" action="{% url 'user_delete' user.pk %}" onsubmit="return confirm('Rostan o\'chirmoqchimisiz?')">
+                                            <form method="post" action="{% url 'user_delete' user.pk %}" onsubmit="return confirm('{{ user.username|escapejs }} foydalanuvchisi o\'chirilsinmi? Bu amalni qaytarib bo\'lmaydi.')">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn w-full text-left px-4 py-2.5 text-sm inline-flex items-center gap-2" style="color: var(--color-negative);">
-                                                    <i class="bx bx-trash w-4"></i>
+                                                    <i aria-hidden="true" class="bx bx-trash w-4"></i>
                                                     O'chirish
                                                 </button>
                                             </form>
@@ -87,7 +89,7 @@
             {% else %}
             <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                 <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                    <i class="bx bx-group text-xl"></i>
+                    <i aria-hidden="true" class="bx bx-group text-xl"></i>
                 </span>
                 <p class="text-sm" style="color: var(--color-text-muted);">Foydalanuvchilar topilmadi</p>
             </div>
@@ -96,132 +98,101 @@
 
         <!-- Create user modal -->
         {% include "partials/_modal_open.html" with modal_title="Yangi foydalanuvchi" modal_subtitle="Operator yoki kassir uchun hisob yarating" modal_tone="brand" modal_icon="user" modal_width="max-w-md" %}
-            {% if form.errors %}
-            <div class="rounded-md p-4 mb-4 border" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
-                <ul class="list-disc pl-5 space-y-1 text-sm" style="color: var(--color-negative);">
-                    {% for field, errors in form.errors.items %}
-                    <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
-            <form action="{% url 'users' %}" method="POST" class="space-y-4">
+            {% include "partials/_form_errors.html" with form=form %}
+            <form action="{% url 'users' %}" method="POST" class="space-y-4" @submit="submitting = true" x-data="{ submitting: false }">
                 {% csrf_token %}
                 <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Username</label>
+                    <label for="f2-username" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Login</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="bx bx-user"></i>
+                            <i aria-hidden="true" class="bx bx-user"></i>
                         </span>
-                        <input required type="text" name="username" placeholder="Username kiriting" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input id="f2-username" required type="text" name="username" value="{{ form.username.value|default_if_none:'' }}" placeholder="Login kiriting" autocomplete="off" spellcheck="false" autocapitalize="none" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Parol</label>
+                    <label for="f2-password" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Parol</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="bx bx-lock-alt"></i>
+                            <i aria-hidden="true" class="bx bx-lock-alt"></i>
                         </span>
-                        <input required type="password" name="password" placeholder="Parol kiriting" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input id="f2-password" required type="password" name="password" placeholder="Parol kiriting" autocomplete="new-password" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rol</label>
+                    <label for="f2-role" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rol</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="bx bx-group"></i>
+                            <i aria-hidden="true" class="bx bx-group"></i>
                         </span>
-                        <select required name="role" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                        <select id="f2-role" required name="role" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             <option value="">Rol tanlang</option>
-                            <option value="operator">Operator</option>
-                            <option value="cashier">Kassir</option>
+                            <option value="operator" {% if form.role.value == 'operator' %}selected{% endif %}>Operator</option>
+                            <option value="cashier" {% if form.role.value == 'cashier' %}selected{% endif %}>Kassir</option>
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
+                    <label for="f2-company_name" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
                     <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                            <i class="bx bx-buildings"></i>
+                            <i aria-hidden="true" class="bx bx-buildings"></i>
                         </span>
-                        <input type="text" name="company_name" placeholder="Kompaniya nomi" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                        <input id="f2-company_name" type="text" name="company_name" value="{{ form.company_name.value|default_if_none:'' }}" placeholder="Kompaniya nomi" autocomplete="organization" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                     </div>
                 </div>
-                <button type="submit" class="btn w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                    <i class="bx bx-plus"></i>
-                    Foydalanuvchi yaratish
+                <button type="submit" :disabled="submitting" class="btn w-full rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center justify-center gap-2" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                    <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm"></span>
+                    <i aria-hidden="true" class="bx bx-plus" x-show="!submitting"></i>
+                    <span x-text="submitting ? 'Saqlanmoqda…' : 'Foydalanuvchi yaratish'">Foydalanuvchi yaratish</span>
                 </button>
             </form>
         {% include "partials/_modal_close.html" %}
 
         <!-- Edit user modal -->
-        <div x-show="editOpen" x-cloak
-             class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8"
-             style="background: rgba(15, 23, 42, 0.55);"
-             @keydown.escape.window="editOpen = false">
-            <div class="w-full max-w-2xl my-auto rounded-2xl shadow-2xl"
-                 style="background: var(--color-surface); border: 1px solid var(--color-border);"
-                 @click.outside="editOpen = false"
-                 x-transition:enter="transition ease-out duration-150"
-                 x-transition:enter-start="opacity-0 scale-95"
-                 x-transition:enter-end="opacity-100 scale-100">
-                <div class="flex items-start gap-4 px-6 py-5" style="border-bottom: 1px solid var(--color-border);">
-                    <span class="flex items-center justify-center w-12 h-12 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                        <i class="bx bx-edit-alt text-xl"></i>
-                    </span>
-                    <div class="min-w-0 flex-1">
-                        <h2 class="text-xl font-bold" style="color: var(--color-text);">Foydalanuvchini tahrirlash</h2>
-                    </div>
-                    <button type="button" @click="editOpen = false"
-                            class="shrink-0 flex items-center justify-center w-9 h-9 rounded-md"
-                            style="background: var(--color-surface-muted); color: var(--color-text-muted);" aria-label="Yopish">
-                        <i class="bx bx-x text-lg"></i>
-                    </button>
-                </div>
-                <div class="px-6 py-5">
-                    <form action="{% url 'user_update' %}" method="POST" class="space-y-4">
+        {% include "partials/_modal_open.html" with modal_title="Foydalanuvchini tahrirlash" modal_tone="brand" modal_icon="edit" modal_width="max-w-md" modal_open_var="editOpen" %}
+                    <form action="{% url 'user_update' %}" method="POST" class="space-y-4" @submit="submitting = true" x-data="{ submitting: false }">
                         {% csrf_token %}
                         <input type="hidden" name="user_id" :value="editUser.id">
                         <div>
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Username</label>
+                            <label for="f3-username" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Login</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                                    <i class="bx bx-user"></i>
+                                    <i aria-hidden="true" class="bx bx-user"></i>
                                 </span>
-                                <input type="text" name="username" x-model="editUser.username" required class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input id="f3-username" type="text" name="username" x-model="editUser.username" required autocomplete="off" spellcheck="false" autocapitalize="none" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yangi parol</label>
+                            <label for="f3-new_password" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yangi parol</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                                    <i class="bx bx-lock-alt"></i>
+                                    <i aria-hidden="true" class="bx bx-lock-alt"></i>
                                 </span>
-                                <input type="password" name="new_password" placeholder="" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input id="f3-new_password" type="password" name="new_password" autocomplete="new-password" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                             <p class="text-xs mt-1" style="color: var(--color-text-muted);">Bo'sh qoldirsangiz, eski parol saqlanadi</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
+                            <label for="f3-company_name" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kompaniya</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" style="color: var(--color-text-muted);">
-                                    <i class="bx bx-buildings"></i>
+                                    <i aria-hidden="true" class="bx bx-buildings"></i>
                                 </span>
-                                <input type="text" name="company_name" x-model="editUser.company" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <input id="f3-company_name" type="text" name="company_name" x-model="editUser.company" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                             </div>
                         </div>
                         <div class="flex gap-3 pt-2">
-                            <button type="submit" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
-                                Saqlash
-                            </button>
                             <button type="button" @click="editOpen = false" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-surface-muted); color: var(--color-text);">
                                 Bekor qilish
                             </button>
+                            <button type="submit" :disabled="submitting" class="btn flex-1 rounded-md px-4 py-2.5 text-sm font-medium" style="background: var(--color-brand); color: var(--color-brand-foreground);">
+                                <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm me-1"></span>
+                                <span x-text="submitting ? 'Saqlanmoqda…' : 'Saqlash'">Saqlash</span>
+                            </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
+        {% include "partials/_modal_close.html" %}
     </div>
 </div>
 {% endblock %}

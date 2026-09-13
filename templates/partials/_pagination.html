@@ -1,0 +1,24 @@
+{% comment %}Page links for a Paginator page. Params: page_obj, page_range
+(paginator.get_elided_page_range(page_obj.number)). Keeps other query params.{% endcomment %}
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-4" aria-label="Sahifalar">
+    <span class="text-sm" style="color: var(--color-text-muted);">
+        {{ page_obj.start_index }}–{{ page_obj.end_index }} / {{ page_obj.paginator.count }}
+    </span>
+    <ul class="pagination pagination-sm mb-0">
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+            <a class="page-link" {% if page_obj.has_previous %}href="{% querystring page=page_obj.previous_page_number %}"{% else %}aria-disabled="true"{% endif %} aria-label="Oldingi sahifa"><i aria-hidden="true" class="bx bx-chevron-left"></i></a>
+        </li>
+        {% for n in page_range %}
+            {% if n == page_obj.paginator.ELLIPSIS %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+            {% else %}
+            <li class="page-item {% if n == page_obj.number %}active{% endif %}"><a class="page-link" href="{% querystring page=n %}" {% if n == page_obj.number %}aria-current="page"{% endif %}>{{ n }}</a></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+            <a class="page-link" {% if page_obj.has_next %}href="{% querystring page=page_obj.next_page_number %}"{% else %}aria-disabled="true"{% endif %} aria-label="Keyingi sahifa"><i aria-hidden="true" class="bx bx-chevron-right"></i></a>
+        </li>
+    </ul>
+</nav>
+{% endif %}

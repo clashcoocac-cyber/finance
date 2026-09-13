@@ -9,10 +9,10 @@
     {% include "partials/_page_header.html" with title="Hisobotlar" subtitle="Kunlik hisobotlarni ko'rish va tasdiqlash" icon="bx-receipt" %}
     <div class="finance-page-heading-actions">
         <span class="badge bg-label-warning finance-count-badge">
-            <i class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}
+            <i aria-hidden="true" class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}
         </span>
         <span class="badge bg-label-success finance-count-badge">
-            <i class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}
+            <i aria-hidden="true" class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}
         </span>
     </div>
 </div>
@@ -28,15 +28,15 @@
         <div class="card-header d-flex align-items-center justify-between px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
             <div class="flex items-center gap-3">
                 <span class="flex items-center justify-center w-10 h-10 rounded-md shrink-0" style="background: var(--color-surface-muted); color: var(--color-brand);">
-                    <i class="bx bx-receipt"></i>
+                    <i aria-hidden="true" class="bx bx-receipt"></i>
                 </span>
                 <div>
                     <h2 class="text-lg font-bold" style="color: var(--color-text);">Barcha hisobotlar</h2>
                     <p class="text-sm" style="color: var(--color-text-muted);">Chiqim va xarajat hisobotlarini belgilab tasdiqlang</p>
                 </div>
             </div>
-            <button type="button" onclick="generatePDF()" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                <i class="bx bx-download"></i>
+            <button type="button" onclick="generatePDF(this)" class="btn rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
+                <i aria-hidden="true" class="bx bx-download"></i>
                 Yuklab olish
             </button>
         </div>
@@ -44,21 +44,20 @@
             <form method="post" action="{% url 'bulk_confirm_reports' %}" x-data="bulkSelect()" class="space-y-3">
                 {% csrf_token %}
                 <input type="hidden" name="current_qs" value="{{ request.GET.urlencode }}">
-                {% include "partials/_bulk_action_bar.html" %}
-                {% if reports %}
+                                {% if reports %}
                 <div class="overflow-x-auto">
                     <table class="table table-hover align-middle mb-0 w-full finance-boss-reports-table">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">
-                                    <input type="checkbox" x-model="allSelected" @change="toggleAll($event)">
+                                <th>
+                                    <input type="checkbox" x-model="allSelected" @change="toggleAll($event)" aria-label="Barchasini belgilash">
                                 </th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya / Kategoriya</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Turi</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
+                                <th>Sana</th>
+                                <th>Operator</th>
+                                <th>Kompaniya / Kategoriya</th>
+                                <th>Turi</th>
+                                <th class="finance-amount-col">Miqdor</th>
+                                <th>Holat</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,7 +65,7 @@
                             <tr style="border-bottom: 1px solid var(--color-border);">
                                 <td class="px-4 py-3 text-sm">
                                     {% if report.type != 'income' and not report.is_closed %}
-                                    <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected">
+                                    <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected" aria-label="{{ report.date|date:'d.m.Y' }} hisobotini belgilash">
                                     {% endif %}
                                 </td>
                                 <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.date|date:"d/m/Y" }}</td>
@@ -86,7 +85,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="px-4 py-3 text-sm">{% if report.type == 'income' %}{% if report.desc and report.desc|slice:":7" == "Maqsad:" %}<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--color-positive-bg); color: var(--color-positive);">{{ report.desc|slice:"8:"|capfirst }}</span>{% else %}{% include "partials/_status_badge.html" with status="income" %}{% endif %}{% else %}{% include "partials/_status_badge.html" with status=report.type %}{% endif %}</td>
-                                <td class="px-4 py-3 text-sm money font-medium" style="color: {% if report.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
+                                <td class="px-4 py-3 text-sm money font-medium finance-amount-col" style="color: {% if report.type == 'income' %}var(--color-positive){% else %}var(--color-negative){% endif %};">
                                     {% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}
                                     {% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}
                                     {% if report.total_rub %}<div>{{ report.total_rub|format_currency }} ₽</div>{% endif %}
@@ -98,8 +97,8 @@
                         </tbody>
                         <tfoot>
                             <tr class="font-bold" style="background: var(--color-surface-muted);">
-                                <td class="px-4 py-3 text-sm" colspan="5" style="color: var(--color-text);">Jami</td>
-                                <td class="px-4 py-3 text-sm money" style="color: var(--color-text);">
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);" colspan="5">Jami</td>
+                                <td class="px-4 py-3 text-sm money finance-amount-col" style="color: var(--color-text);">
                                     {% if totals.total_uzs %}<div>{{ totals.total_uzs|format_currency }} so'm</div>{% endif %}
                                     {% if totals.total_usd %}<div>{{ totals.total_usd|format_currency }} $</div>{% endif %}
                                     {% if totals.total_rub %}<div>{{ totals.total_rub|format_currency }} ₽</div>{% endif %}
@@ -110,44 +109,20 @@
                         </tfoot>
                     </table>
                 </div>
+                {% include "partials/_pagination.html" %}
                 {% else %}
                 <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                     <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="bx bx-receipt text-xl"></i>
+                        <i aria-hidden="true" class="bx bx-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                 </div>
                 {% endif %}
+                {% include "partials/_bulk_action_bar.html" %}
             </form>
         </div>
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc" crossorigin="anonymous"></script>
-<script>
-    function generatePDF() {
-        const element = document.getElementById("invoice");
-
-        const opt = {
-            margin:       0,
-            filename:     'document.pdf',
-            image:        { type: 'jpeg', quality: 1 },
-            html2canvas:  {
-                scale: 2,
-                useCORS: true,
-                logging: true,
-                scrollY: 0,
-                windowWidth: document.body.scrollWidth,
-                windowHeight: document.body.scrollHeight,
-            },
-            jsPDF:        {
-                unit: 'mm',
-                format: 'a4',
-                orientation: 'landscape'
-            }
-        };
-
-        html2pdf().set(opt).from(element).save();
-    }
-</script>
+{% include "partials/_pdf_export.html" with pdf_name="hisobotlar" %}
 {% endblock %}

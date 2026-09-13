@@ -1,0 +1,10 @@
+{% comment %}Field-labelled error list for a bound form. Param: form.{% endcomment %}
+{% if form.errors %}
+<div class="rounded-md p-4 mb-4 border fade-in" role="alert" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
+    <h3 class="text-sm font-medium mb-2" style="color: var(--color-negative);">Quyidagi xatolarni tuzating:</h3>
+    <ul class="list-disc pl-5 space-y-1 text-sm mb-0" style="color: var(--color-negative);">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        {% for field in form %}{% for error in field.errors %}<li>{{ field.label }}: {{ error }}</li>{% endfor %}{% endfor %}
+    </ul>
+</div>
+{% endif %}

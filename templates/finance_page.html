@@ -8,111 +8,70 @@
 <div class="finance-page-heading">
     {% include "partials/_page_header.html" with title="Moliya" subtitle="Naqd bo'lmagan va umumiy moliya harakati" icon="bx-wallet" %}
     <div class="finance-page-heading-actions">
-        <input type="month" id="monthPicker" class="finance-month-picker form-control rounded-md" />
-        <div class="finance-heading-cta-group" x-data="{ open: {% if failed_modal %}true{% else %}false{% endif %}, modal: '{{ failed_modal|default:"" }}' }">
-            <button type="button" @click="open = true; modal = 'income'"
-                class="finance-fab btn btn-success d-inline-flex align-items-center gap-2">
-                <i class="bx bx-trending-up"></i>
-                Kirim qo'shish
-            </button>
-            <button type="button" @click="open = true; modal = 'expense'"
-                class="finance-fab btn finance-btn-soft-danger d-inline-flex align-items-center gap-2">
-                <i class="bx bx-trending-down"></i>
-                Chiqim qo'shish
-            </button>
-
-            {% if messages %}
-                <div class="finance-flash-messages">
-                {% for message in messages %}
-                    <div class="rounded-md px-4 py-2.5 mb-4 text-sm fade-in"
-                         style="background: {% if message.tags == 'error' %}var(--color-negative-bg){% else %}var(--color-positive-bg){% endif %}; color: {% if message.tags == 'error' %}var(--color-negative){% else %}var(--color-positive){% endif %};">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-                </div>
-            {% endif %}
-
+        {% include "partials/_month_picker.html" %}
+        <div class="finance-heading-cta-group">
             <!-- Kirim modal (naqd bo'lmagan) -->
-            <div x-show="open && modal === 'income'" x-cloak>
+            <div x-data="{ open: {% if failed_modal == 'income' %}true{% else %}false{% endif %} }">
+                <button type="button" @click="open = true"
+                    class="finance-fab btn btn-success d-inline-flex align-items-center gap-2">
+                    <i aria-hidden="true" class="bx bx-trending-up"></i>
+                    Kirim qo'shish
+                </button>
                 {% include "partials/_modal_open.html" with modal_title="Kirim qo'shish" modal_subtitle="Naqd bo'lmagan kirim (Click, Terminal, Bank)" modal_tone="positive" modal_icon="plus" %}
+                {% with f=income_form %}
+                {% include "partials/_form_errors.html" with form=f %}
                 <form action="{% url 'finance_page' %}" method="POST" class="space-y-4"
                     @submit="submitting = true"
-                    x-effect="if (!open) { $el.reset(); counterparty = ''; counterpartyMode = 'select'; allCurrencies = false; submitting = false; }"
                     x-data="{
-                        counterparty: '',
-                        counterpartyMode: 'select',
-                        paymentType: 'click',
-                        allCurrencies: false,
+                        counterpartyMode: '{{ f.counterparty.value|default_if_none:'' }}' === '__new__' ? 'new' : 'select',
+                        paymentType: '{{ f.payment_type.value|default:'click' }}',
                         submitting: false,
                     }">
                     {% csrf_token %}
                     <input type="hidden" name="kind" value="income">
                     <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Manba</label>
+                        <label for="inc-counterparty" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Manba</label>
                         <div class="relative" x-show="counterpartyMode === 'select'">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-user"></i></span>
-                            <select required name="counterparty"
-                                @change="counterparty = $event.target.value; counterpartyMode = counterparty === '__new__' ? 'new' : 'select'"
-                                class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-user"></i></span>
+                            <select required id="inc-counterparty" name="counterparty" x-ref="incCounterparty"
+                                @change="counterpartyMode = $event.target.value === '__new__' ? 'new' : 'select'"
+                                class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 <option value="">Manbani tanlang</option>
                                 {% for c in income_counterparties %}
-                                <option value="{{ c.name }}">{{ c.name }}</option>
+                                <option value="{{ c.name }}" {% if f.counterparty.value == c.name %}selected{% endif %}>{{ c.name }}</option>
                                 {% endfor %}
-                                <option value="__new__">+ Yangi qo'shish</option>
+                                <option value="__new__" {% if f.counterparty.value == '__new__' %}selected{% endif %}>+ Yangi qo'shish</option>
                             </select>
                         </div>
                         <div x-show="counterpartyMode === 'new'" x-cloak class="flex gap-2">
-                            <input type="text" name="other_counterparty" placeholder="Yangi manba nomi"
+                            <input type="text" name="other_counterparty" placeholder="Yangi manba nomi" aria-label="Yangi manba nomi" value="{{ f.other_counterparty.value|default_if_none:'' }}"
                                 class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                            <button type="button" @click="counterpartyMode = 'select'"
-                                class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text);">
+                            <button type="button" @click="counterpartyMode = 'select'; $refs.incCounterparty.selectedIndex = 0"
+                                class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 Ro'yxatdan tanlash
                             </button>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Maqsad</label>
+                        <label for="inc-purpose" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Maqsad</label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-filter"></i></span>
-                            <select required name="purpose" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-filter"></i></span>
+                            <select required id="inc-purpose" name="purpose" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 <option value="">Maqsadni tanlang</option>
-                                <option value="foyda">Foyda</option>
-                                <option value="tushum">Tushum</option>
+                                <option value="foyda" {% if f.purpose.value == 'foyda' %}selected{% endif %}>Foyda</option>
+                                <option value="tushum" {% if f.purpose.value == 'tushum' %}selected{% endif %}>Tushum</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="finance-amount-wrap">
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
-                            <input type="number" step="any" inputmode="decimal" name="amount_uzs" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">so'm</span>
-                        </div>
-                        <div class="finance-amount-wrap">
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
-                            <input type="number" step="any" inputmode="decimal" name="amount_usd" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">$</span>
-                        </div>
-                    </div>
-                    <div x-show="allCurrencies" x-cloak class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="finance-amount-wrap">
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
-                            <input type="number" step="any" inputmode="decimal" name="amount_rub" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">₽</span>
-                        </div>
-                        <div class="finance-amount-wrap">
-                            <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
-                            <input type="number" step="any" inputmode="decimal" name="amount_eur" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">€</span>
-                        </div>
-                    </div>
-                    <button type="button" x-show="!allCurrencies" @click="allCurrencies = true"
-                        class="btn btn-sm" style="color: var(--color-brand); background: transparent; padding-left: 0;">
-                        <i class="bx bx-plus"></i> Boshqa valyuta
-                    </button>
+                    {% include "partials/_amount_fields.html" with form=f prefix="inc" %}
 
                     <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
+                        <label for="inc-payment-type" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-credit-card"></i></span>
-                            <select required x-model="paymentType" name="payment_type" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-credit-card"></i></span>
+                            <select required id="inc-payment-type" x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 <option value="click">Click</option>
                                 <option value="terminal">Terminal</option>
                                 <option value="bank">Bank</option>
@@ -121,145 +80,131 @@
                     </div>
 
                     <div x-show="paymentType === 'click'" x-cloak>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-positive);">Click kartani tanlang</label>
+                        <label for="inc-click" class="block text-sm font-medium mb-1.5" style="color: var(--color-positive);">Click kartani tanlang</label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-credit-card"></i></span>
-                            <select name="click" :required="paymentType === 'click'" class="w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-credit-card"></i></span>
+                            <select id="inc-click" name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                 <option value="">---</option>
                                 {% for click in clicks %}
-                                <option value="{{ click.0 }}">{{ click.1 }}</option>
+                                <option value="{{ click.0 }}" {% if f.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Izoh</label>
-                        <textarea name="comment" rows="2" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"></textarea>
+                        <label for="inc-comment" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Izoh</label>
+                        <textarea id="inc-comment" name="comment" rows="2" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">{{ f.comment.value|default_if_none:'' }}</textarea>
                     </div>
 
                     <button type="submit" :disabled="submitting" class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2">
                         <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm"></span>
-                        <i class="bx bx-plus" x-show="!submitting"></i>
-                        <span x-text="submitting ? 'Saqlanmoqda...' : 'Kirim qo\'shish'">Kirim qo'shish</span>
+                        <i aria-hidden="true" class="bx bx-plus" x-show="!submitting"></i>
+                        <span x-text="submitting ? 'Saqlanmoqda…' : 'Kirim qo\'shish'">Kirim qo'shish</span>
                     </button>
                 </form>
+                {% endwith %}
                 {% include "partials/_modal_close.html" %}
             </div>
 
             <!-- Chiqim modal (naqd bo'lmagan) -->
-            <div x-show="open && modal === 'expense'" x-cloak>
+            <div x-data="{ open: {% if failed_modal == 'expense' %}true{% else %}false{% endif %} }">
+                <button type="button" @click="open = true"
+                    class="finance-fab btn finance-btn-soft-danger d-inline-flex align-items-center gap-2">
+                    <i aria-hidden="true" class="bx bx-trending-down"></i>
+                    Chiqim qo'shish
+                </button>
                 {% include "partials/_modal_open.html" with modal_title="Chiqim qo'shish" modal_subtitle="Naqd bo'lmagan chiqim (Click, Terminal, Bank)" modal_tone="negative" modal_icon="plus" %}
+                {% with f=expense_form %}
+                {% include "partials/_form_errors.html" with form=f %}
+                {{ expense_category_options|json_script:"finance-category-options" }}
                 <form action="{% url 'finance_page' %}" method="POST" class="space-y-4"
                     @submit="submitting = true"
-                    x-effect="if (!open) { $el.reset(); categoryValue = ''; categoryMode = 'select'; allCurrencies = false; submitting = false; }"
                     x-data="{
-                        categoryValue: '',
-                        categoryMode: 'select',
-                        paymentType: 'click',
-                        allCurrencies: false,
+                        expType: '{{ f.exp_type.value|default_if_none:'' }}',
+                        categoryValue: '{{ f.category.value|default_if_none:'' }}',
+                        categoryMode: '{{ f.category.value|default_if_none:'' }}' === '__new__' ? 'new' : 'select',
+                        categoryOptions: JSON.parse(document.getElementById('finance-category-options').textContent),
+                        paymentType: '{{ f.payment_type.value|default:'click' }}',
                         submitting: false,
-                    }"
-                    x-init="categoryOptions = JSON.parse(document.getElementById('finance-category-options').textContent)">
-                {% csrf_token %}
-                <input type="hidden" name="kind" value="expense">
-                {{ expense_category_options|json_script:"finance-category-options" }}
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Maqsad</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-filter"></i></span>
-                        <select required name="exp_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
-                            <option value="">Maqsadni tanlang</option>
-                            <option value="expense">Chiqim</option>
-                            <option value="xarajat">Xarajat</option>
-                        </select>
+                    }">
+                    {% csrf_token %}
+                    <input type="hidden" name="kind" value="expense">
+                    <div>
+                        <label for="exp-type" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Maqsad</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-filter"></i></span>
+                            <select required id="exp-type" name="exp_type" x-model="expType" @change="categoryValue = ''; categoryMode = 'select'"
+                                class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <option value="">Maqsadni tanlang</option>
+                                <option value="expense">Chiqim</option>
+                                <option value="xarajat">Xarajat</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kategoriya</label>
-                    <div class="relative" x-show="categoryMode === 'select'">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-list-ul"></i></span>
-                        <select required name="category"
-                            @change="categoryValue = $event.target.value; categoryMode = categoryValue === '__new__' ? 'new' : 'select'"
-                            class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
-                            <option value="">Kategoriya tanlang</option>
-                            <template x-for="opt in categoryOptions" :key="opt.name">
-                                <option :value="opt.name" x-text="opt.name"></option>
-                            </template>
-                            <option value="__new__">+ Yangi qo'shish</option>
-                        </select>
+                    <div>
+                        <label for="exp-category" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kategoriya</label>
+                        <div class="relative" x-show="categoryMode === 'select'">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-list-ul"></i></span>
+                            <select required id="exp-category" name="category"
+                                @change="categoryValue = $event.target.value; categoryMode = categoryValue === '__new__' ? 'new' : 'select'"
+                                class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <option value="" :selected="categoryValue === ''">Kategoriya tanlang</option>
+                                <template x-for="opt in categoryOptions.filter(o => o.group === expType)" :key="opt.name">
+                                    <option :value="opt.name" x-text="opt.name" :selected="opt.name === categoryValue"></option>
+                                </template>
+                                <option value="__new__" :selected="categoryValue === '__new__'">+ Yangi qo'shish</option>
+                            </select>
+                        </div>
+                        <div x-show="categoryMode === 'new'" x-cloak class="flex gap-2">
+                            <input type="text" name="new_category" placeholder="Yangi kategoriya nomi" aria-label="Yangi kategoriya nomi" value="{{ f.new_category.value|default_if_none:'' }}"
+                                class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                            <button type="button" @click="categoryMode = 'select'; categoryValue = ''"
+                                class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                Ro'yxatdan tanlash
+                            </button>
+                        </div>
                     </div>
-                    <div x-show="categoryMode === 'new'" x-cloak class="flex gap-2">
-                        <input type="text" name="new_category" placeholder="Yangi kategoriya nomi"
-                            class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                        <button type="button" @click="categoryMode = 'select'"
-                            class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text);">
-                            Ro'yxatdan tanlash
-                        </button>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="finance-amount-wrap">
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
-                        <input type="number" step="any" inputmode="decimal" name="amount_uzs" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">so'm</span>
-                    </div>
-                    <div class="finance-amount-wrap">
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
-                        <input type="number" step="any" inputmode="decimal" name="amount_usd" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">$</span>
-                    </div>
-                </div>
-                <div x-show="allCurrencies" x-cloak class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div class="finance-amount-wrap">
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
-                        <input type="number" step="any" inputmode="decimal" name="amount_rub" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">₽</span>
-                    </div>
-                    <div class="finance-amount-wrap">
-                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
-                        <input type="number" step="any" inputmode="decimal" name="amount_eur" placeholder="0" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"><span class="finance-amount-suffix">€</span>
-                    </div>
-                </div>
-                <button type="button" x-show="!allCurrencies" @click="allCurrencies = true"
-                    class="btn btn-sm" style="color: var(--color-brand); background: transparent; padding-left: 0;">
-                    <i class="bx bx-plus"></i> Boshqa valyuta
-                </button>
+                    {% include "partials/_amount_fields.html" with form=f prefix="exp" %}
 
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-credit-card"></i></span>
-                        <select required x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
-                            <option value="click">Click</option>
-                            <option value="terminal">Terminal</option>
-                            <option value="bank">Bank</option>
-                        </select>
+                    <div>
+                        <label for="exp-payment-type" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov turi</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-credit-card"></i></span>
+                            <select required id="exp-payment-type" x-model="paymentType" name="payment_type" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <option value="click">Click</option>
+                                <option value="terminal">Terminal</option>
+                                <option value="bank">Bank</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <div x-show="paymentType === 'click'" x-cloak>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-positive);">Click kartani tanlang</label>
-                    <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i class="bx bx-credit-card"></i></span>
-                        <select name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
-                            <option value="">---</option>
-                            {% for click in clicks %}
-                            <option value="{{ click.0 }}">{{ click.1 }}</option>
-                            {% endfor %}
-                        </select>
+                    <div x-show="paymentType === 'click'" x-cloak>
+                        <label for="exp-click" class="block text-sm font-medium mb-1.5" style="color: var(--color-positive);">Click kartani tanlang</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-credit-card"></i></span>
+                            <select id="exp-click" name="click" :required="paymentType === 'click'" class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+                                <option value="">---</option>
+                                {% for click in clicks %}
+                                <option value="{{ click.0 }}" {% if f.click.value == click.0 %}selected{% endif %}>{{ click.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-                </div>
 
-                <div>
-                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Izoh</label>
-                    <textarea name="description" rows="2" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"></textarea>
-                </div>
+                    <div>
+                        <label for="exp-description" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Izoh</label>
+                        <textarea id="exp-description" name="description" rows="2" class="form-control w-full px-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">{{ f.description.value|default_if_none:'' }}</textarea>
+                    </div>
 
-                <button type="submit" :disabled="submitting" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
-                    <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm"></span>
-                    <i class="bx bx-plus" x-show="!submitting"></i>
-                    <span x-text="submitting ? 'Saqlanmoqda...' : 'Chiqim qo\'shish'">Chiqim qo'shish</span>
-                </button>
+                    <button type="submit" :disabled="submitting" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
+                        <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm"></span>
+                        <i aria-hidden="true" class="bx bx-plus" x-show="!submitting"></i>
+                        <span x-text="submitting ? 'Saqlanmoqda…' : 'Chiqim qo\'shish'">Chiqim qo'shish</span>
+                    </button>
                 </form>
+                {% endwith %}
                 {% include "partials/_modal_close.html" %}
             </div>
         </div>
@@ -288,32 +233,4 @@
     </section>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const monthPicker = document.getElementById('monthPicker');
-
-        const fromParam = '{{ from }}';
-        const toParam = '{{ to }}';
-
-        if (fromParam && fromParam !== 'None') {
-            const [year, month, day] = fromParam.split('-');
-            monthPicker.value = `${year}-${month}`;
-        } else {
-            const today = new Date();
-            monthPicker.value = today.toISOString().slice(0, 7);
-        }
-
-        monthPicker.addEventListener('change', function() {
-            const [year, month] = this.value.split('-');
-            const fromStr = `${year}-${month}-01`;
-
-            const nextMonth = parseInt(month) === 12 ? 1 : parseInt(month) + 1;
-            const nextYear = parseInt(month) === 12 ? parseInt(year) + 1 : year;
-            const lastDay = new Date(nextYear, nextMonth - 1, 0).getDate();
-            const toStr = `${year}-${month.padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-
-            window.location.search = `from=${fromStr}&to=${toStr}`;
-        });
-    });
-</script>
 {% endblock %}

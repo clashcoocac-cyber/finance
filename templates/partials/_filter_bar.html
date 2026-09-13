@@ -9,8 +9,8 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
         </div>
         {% if type_filter %}
         <div class="col-12 col-md-6 col-xl-2">
-            <label class="form-label">Tranzaksiya turi</label>
-            <select name="type" class="form-select">
+            <label for="f1-type" class="form-label">Tranzaksiya turi</label>
+            <select id="f1-type" name="type" class="form-select">
                 <option value="">Barchasi</option>
                 <option value="income" {% if type_value == 'income' %}selected{% endif %}>Kirimlar</option>
                 <option value="expense" {% if type_value == 'expense' %}selected{% endif %}>Chiqimlar</option>
@@ -19,30 +19,28 @@ Optional: type_filter (truthy) + type_value — adds a "Tranzaksiya turi" select
         </div>
         {% endif %}
         <div class="col-12 col-md-6 col-xl-2 position-relative" x-data="{ open: false, selectedCats: [{% for c in selected_categories %}'{{ c|escapejs }}'{% if not forloop.last %}, {% endif %}{% endfor %}] }">
-            <label class="form-label">Kategoriya</label>
-            <button type="button" @click="open = !open" class="btn btn-outline-secondary w-100 text-start finance-filter-cats">
-                <span x-text="selectedCats.length + ' tanlangan'"></span>
+            <span class="form-label d-block" id="filter-cats-label">Kategoriya</span>
+            <button type="button" @click="open = !open" @keydown.escape="open = false" :aria-expanded="open" aria-labelledby="filter-cats-label"
+                class="btn btn-outline-secondary w-100 text-start finance-filter-cats">
+                <span x-text="selectedCats.length ? selectedCats.length + ' tanlangan' : 'Barchasi'"></span>
             </button>
             <div x-show="open" @click.outside="open = false" x-cloak
                 class="absolute z-10 mt-1 w-full rounded-md border shadow-lg p-1.5 max-h-56 overflow-y-auto" style="background: var(--color-surface); border-color: var(--color-border);">
                 {% for cat in category_options %}
-                <label class="flex items-center justify-between gap-2 px-3 py-2 text-sm rounded-md cursor-pointer transition-colors hover:bg-[var(--color-surface-muted)]"
-                    :style="'color: var(--color-text);' + (selectedCats.includes('{{ cat.name|escapejs }}') ? ' background: var(--color-surface-muted);' : '')"
-                    @click.prevent="selectedCats.includes('{{ cat.name|escapejs }}') ? selectedCats = selectedCats.filter(v => v !== '{{ cat.name|escapejs }}') : selectedCats.push('{{ cat.name|escapejs }}')">
+                <label class="form-check d-flex align-items-center gap-2 px-3 py-2 m-0 text-sm rounded-md cursor-pointer" style="color: var(--color-text);">
+                    <input type="checkbox" name="category" value="{{ cat.name }}" x-model="selectedCats" class="form-check-input m-0">
                     <span>{{ cat.name }}</span>
-                    <i x-show="selectedCats.includes('{{ cat.name|escapejs }}')" x-cloak class="bx bx-check shrink-0" style="color: var(--color-brand);"></i>
-                    <input type="checkbox" name="category" value="{{ cat.name }}" class="sr-only" :checked="selectedCats.includes('{{ cat.name|escapejs }}')">
                 </label>
                 {% endfor %}
             </div>
         </div>
         <div class="col-12 col-md-6 col-xl-2">
-            <label class="form-label">Qidiruv</label>
-            <input type="text" name="q" value="{{ search|default:'' }}" placeholder="Operator, kategoriya..." class="form-control">
+            <label for="f1-q" class="form-label">Qidiruv</label>
+            <input id="f1-q" type="search" name="q" value="{{ search|default:'' }}" placeholder="Operator, kategoriya…" class="form-control">
         </div>
         <div class="col-12 col-xl-2 filter-submit">
             <button type="submit" class="btn btn-primary w-100 text-nowrap">
-                <i class="bx bx-filter-alt me-1"></i>Filtrlash
+                <i aria-hidden="true" class="bx bx-filter-alt me-1"></i>Filtrlash
             </button>
         </div>
     </div>

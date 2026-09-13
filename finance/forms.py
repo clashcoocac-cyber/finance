@@ -5,6 +5,13 @@ from django.shortcuts import redirect
 from .models import Company, User, Transaction, DailyReport, CLICKS, Category, Counterparty
 
 
+# Uzbek labels shared by every money form; errors are shown as "label: message".
+AMOUNT_LABELS = {
+    'amount_uzs': "So'm", 'amount_usd': 'Dollar', 'amount_rub': 'Rubl', 'amount_eur': 'Yevro',
+    'payment_type': "To'lov turi", 'click': 'Click karta',
+    'comment': 'Izoh', 'description': 'Tavsif',
+}
+
 
 class UserRegisterForm(forms.ModelForm):    
     password = forms.CharField(widget=forms.PasswordInput)
@@ -13,6 +20,7 @@ class UserRegisterForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'role', 'company_name', 'password']
+        labels = {'username': 'Login', 'role': 'Rol', 'company_name': 'Kompaniya', 'password': 'Parol'}
 
     def save(self, commit = True):
         company_name = self.cleaned_data.pop('company_name', '')
@@ -68,6 +76,7 @@ class TransactionFrom(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty']
+        labels = {**AMOUNT_LABELS, 'counterparty': 'Kimdan olindi'}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -122,6 +131,7 @@ class IncomeForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['amount_usd' ,'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click', 'comment', 'counterparty', 'other_counterparty']
+        labels = AMOUNT_LABELS
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -206,16 +216,16 @@ class IncomeForm(forms.ModelForm):
         return transaction
 
 class ExpenseForm(forms.Form):
-    category = forms.ChoiceField(choices=[])
+    category = forms.ChoiceField(choices=[], label='Kategoriya')
     new_category = forms.CharField(required=False, max_length=100, label="Yangi kategoriya nomi")
-    amount_usd = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
-    amount_uzs = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
-    amount_rub = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
-    amount_eur = forms.DecimalField(max_digits=15, decimal_places=2, required=False)
-    payment_type = forms.ChoiceField(choices=Transaction.PAYMENT_TYPES)
-    click = forms.ChoiceField(choices=CLICKS, required=False)
-    description = forms.CharField(widget=forms.Textarea, required=False)
-    exp_type = forms.CharField()
+    amount_usd = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label=AMOUNT_LABELS['amount_usd'])
+    amount_uzs = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label=AMOUNT_LABELS['amount_uzs'])
+    amount_rub = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label=AMOUNT_LABELS['amount_rub'])
+    amount_eur = forms.DecimalField(max_digits=15, decimal_places=2, required=False, label=AMOUNT_LABELS['amount_eur'])
+    payment_type = forms.ChoiceField(choices=Transaction.PAYMENT_TYPES, label=AMOUNT_LABELS['payment_type'])
+    click = forms.ChoiceField(choices=CLICKS, required=False, label=AMOUNT_LABELS['click'])
+    description = forms.CharField(widget=forms.Textarea, required=False, label=AMOUNT_LABELS['description'])
+    exp_type = forms.CharField(label='Maqsad')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

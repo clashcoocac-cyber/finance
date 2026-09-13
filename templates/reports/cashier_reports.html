@@ -11,11 +11,11 @@
 <div class="max-w-7xl mx-auto space-y-6">
         <div class="flex flex-wrap items-center gap-3">
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-pending-bg); color: var(--color-pending);">
-                <i class="bx bx-time shrink-0"></i>
+                <i aria-hidden="true" class="bx bx-time shrink-0"></i>
                 Kutilmoqda: {{ pending_count }}
             </span>
             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium money" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                <i class="bx bx-check shrink-0"></i>
+                <i aria-hidden="true" class="bx bx-check shrink-0"></i>
                 Tasdiqlangan: {{ confirmed_count }}
             </span>
         </div>
@@ -27,7 +27,7 @@
         <div class="card rounded-lg" style="background: var(--color-surface);">
             <div class="card-header d-flex align-items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                    <i class="bx bx-trending-up text-lg"></i>
+                    <i aria-hidden="true" class="bx bx-trending-up text-lg"></i>
                 </span>
                 <div>
                     <div class="text-lg font-bold" style="color: var(--color-text);">Kirim hisobotlari</div>
@@ -38,21 +38,20 @@
                 <form method="post" action="{% url 'bulk_confirm_reports' %}" x-data="bulkSelect()">
                     {% csrf_token %}
                     <input type="hidden" name="current_qs" value="{{ request.GET.urlencode }}">
-                    {% include "partials/_bulk_action_bar.html" %}
-                    {% if reports %}
+                                        {% if reports %}
                     <div class="overflow-x-auto">
                         <table class="table table-hover align-middle mb-0 w-full">
                             <thead style="background: var(--color-surface-muted);">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">
-                                        <input type="checkbox" x-model="allSelected" @change="toggleAll($event)">
+                                    <th>
+                                        <input type="checkbox" x-model="allSelected" @change="toggleAll($event)" aria-label="Barchasini belgilash">
                                     </th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Operator</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kompaniya</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov kanallari</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Umumiy</th>
-                                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
+                                    <th>Sana</th>
+                                    <th>Operator</th>
+                                    <th>Kompaniya</th>
+                                    <th>To'lov kanallari</th>
+                                    <th class="finance-amount-col">Umumiy</th>
+                                    <th>Holat</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,7 +59,7 @@
                                 <tr style="border-bottom: 1px solid var(--color-border);">
                                     <td class="px-4 py-3 text-sm">
                                         {% if not report.is_closed %}
-                                        <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected">
+                                        <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected" aria-label="{{ report.date|date:'d.m.Y' }} hisobotini belgilash">
                                         {% endif %}
                                     </td>
                                     <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.date|date:"d/m/Y" }}</td>
@@ -107,7 +106,7 @@
                                             {% endfor %}
                                         </div>
                                     </td>
-                                    <td class="px-4 py-3 text-sm">
+                                    <td class="px-4 py-3 text-sm finance-amount-col">
                                         <div class="space-y-1 font-semibold money" style="color: var(--color-positive);">
                                             {% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}
                                             {% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}
@@ -123,8 +122,8 @@
                             </tbody>
                             <tfoot>
                                 <tr class="font-bold" style="background: var(--color-surface-muted); border-top: 2px solid var(--color-border);">
-                                    <td class="px-4 py-3 text-sm" colspan="5" style="color: var(--color-text);">Jami:</td>
-                                    <td class="px-4 py-3 text-sm">
+                                    <td class="px-4 py-3 text-sm" style="color: var(--color-text);" colspan="5">Jami:</td>
+                                    <td class="px-4 py-3 text-sm finance-amount-col">
                                         <div class="space-y-1 money" style="color: var(--color-text);">
                                             {% if totals.total_uzs %}<div>{{ totals.total_uzs|format_currency }} so'm</div>{% endif %}
                                             {% if totals.total_usd %}<div>{{ totals.total_usd|format_currency }} $</div>{% endif %}
@@ -137,14 +136,16 @@
                             </tfoot>
                         </table>
                     </div>
+                    {% include "partials/_pagination.html" %}
                     {% else %}
                     <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                         <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                            <i class="bx bx-inbox text-xl"></i>
+                            <i aria-hidden="true" class="bx bx-folder-open text-xl"></i>
                         </span>
                         <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                     </div>
                     {% endif %}
+                    {% include "partials/_bulk_action_bar.html" %}
                 </form>
             </div>
         </div>

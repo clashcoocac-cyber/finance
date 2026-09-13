@@ -1,0 +1,12 @@
+{% comment %}
+Month selector for the dashboard/finance pages. Reads the page's `from`
+(YYYY-MM-DD) to preselect, and on change reloads with from/to spanning the
+chosen month while keeping every other query param.
+{% endcomment %}
+<input type="month" class="finance-month-picker form-control rounded-md" aria-label="Oy tanlash"
+       value="{{ from|slice:':7' }}"
+       onchange="const [y, m] = this.value.split('-'); if (!y || !m) return;
+                 const last = new Date(Number(y), Number(m), 0).getDate();
+                 const p = new URLSearchParams(window.location.search);
+                 p.set('from', `${y}-${m}-01`); p.set('to', `${y}-${m}-${String(last).padStart(2, '0')}`);
+                 window.location.search = p.toString();">

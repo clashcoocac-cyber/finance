@@ -13,20 +13,25 @@ needs no changes. Params: date_from, date_to, from_name (default "from"), to_nam
                 dateFormat: 'Y-m-d',
                 defaultDate: [this.from, this.to].filter(Boolean),
                 onChange: (dates, str, instance) => {
-                    if (dates.length === 2) {
-                        this.from = instance.formatDate(dates[0], 'Y-m-d');
-                        this.to = instance.formatDate(dates[1], 'Y-m-d');
-                    }
+                    // a cleared or half-picked range must not keep stale params
+                    this.from = dates.length === 2 ? instance.formatDate(dates[0], 'Y-m-d') : '';
+                    this.to = dates.length === 2 ? instance.formatDate(dates[1], 'Y-m-d') : '';
                 },
             });
         },
      }">
-    {% if label %}<label class="form-label">{{ label }}</label>{% endif %}
+    {% with input_id=from_name|default:"from"|add:"-range" %}
+    {% if label %}<label for="{{ input_id }}" class="form-label">{{ label }}</label>{% endif %}
     <div class="input-group input-group-merge">
-        <span class="input-group-text"><i class="bx bx-calendar"></i></span>
-        <input type="text" x-ref="rangeInput" readonly placeholder="Sana oralig'ini tanlang"
+        <span class="input-group-text"><i aria-hidden="true" class="bx bx-calendar"></i></span>
+        <input type="text" id="{{ input_id }}" x-ref="rangeInput" readonly placeholder="Sana oralig'ini tanlang"
+               {% if not label %}aria-label="Sana oralig'i"{% endif %}
                class="form-control cursor-pointer">
+        <button type="button" class="input-group-text" aria-label="Sana oralig'ini tozalash" title="Tozalash"
+                x-show="from || to" x-cloak
+                @click="$refs.rangeInput._flatpickr.clear()"><i aria-hidden="true" class="bx bx-x"></i></button>
     </div>
+    {% endwith %}
     <input type="hidden" name="{{ from_name|default:'from' }}" :value="from">
     <input type="hidden" name="{{ to_name|default:'to' }}" :value="to">
 </div>

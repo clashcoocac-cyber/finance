@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.db.models.functions import Lower
 from django.views.generic import TemplateView
 
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
-from finance.models import Category, DailyReport, Transaction
+from finance.models import CLICKS, Category, DailyReport, Transaction
+from finance.views.helpers import date_param
 
 
 class ReportListBase(LoginRequiredMixin, TemplateView):
@@ -15,6 +17,7 @@ class ReportListBase(LoginRequiredMixin, TemplateView):
     report_types = None
     operator_scoped = False
     default_days = 7
+    paginate_by = 50
 
     def get_queryset(self):
         reports = DailyReport.objects.select_related('operator', 'operator__company')
@@ -28,10 +31,11 @@ class ReportListBase(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         request = self.request
 
-        context['from'] = request.GET.get('from') or (
-            datetime.today() - timedelta(days=self.default_days)
-        ).strftime('%Y-%m-%d')
-        context['to'] = request.GET.get('to') or datetime.today().strftime('%Y-%m-%d')
+        context['from'] = date_param(
+            request.GET.get('from'),
+            (datetime.today() - timedelta(days=self.default_days)).strftime('%Y-%m-%d'),
+        )
+        context['to'] = date_param(request.GET.get('to'), datetime.today().strftime('%Y-%m-%d'))
         context['q'] = request.GET.get('q') or ''
         context['type'] = request.GET.get('type') or ''
         context['categories'] = request.GET.getlist('category')
@@ -57,11 +61,15 @@ class ReportListBase(LoginRequiredMixin, TemplateView):
         if context['categories']:
             reports = reports.filter(category__in=context['categories'])
 
-        reports = reports.order_by('-date')
-        context['reports'] = reports
+        reports = reports.order_by('-date', '-pk')
+        page = Paginator(reports, self.paginate_by).get_page(request.GET.get('page'))
+        context['page_obj'] = page
+        context['page_range'] = page.paginator.get_elided_page_range(page.number)
+        context['reports'] = page.object_list
         context['pending_count'] = reports.filter(is_closed=False).count()
         context['confirmed_count'] = reports.filter(is_closed=True).count()
         context['category_options'] = Category.objects.filter(is_active=True)
+        context['clicks'] = CLICKS
 
         totals = reports.aggregate(
             total_uzs=Sum('total_uzs'), total_usd=Sum('total_usd'),
@@ -86,7 +94,7 @@ class OperatorReportsView(OperatorRequiredMixin, ReportListBase):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        report_date = self.request.GET.get('report_date') or context['to']
+        report_date = date_param(self.request.GET.get('report_date'), context['to'])
         context['report_date'] = report_date
         context['is_expired'] = (
             datetime.today().date() - datetime.strptime(report_date, '%Y-%m-%d').date()

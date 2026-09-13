@@ -12,7 +12,7 @@
 <div class="max-w-7xl mx-auto space-y-6">
         {% if is_expired %}
         <div class="rounded-md border p-4 flex items-center gap-3 text-sm" style="background: var(--color-pending-bg); border-color: var(--color-pending); color: var(--color-pending);">
-            <i class="bx bx-error text-lg shrink-0"></i>
+            <i aria-hidden="true" class="bx bx-error text-lg shrink-0"></i>
             Tanlangan sana 3 kundan eski &mdash; hisobot muddati o'tgan bo'lishi mumkin.
         </div>
         {% endif %}
@@ -20,7 +20,7 @@
         <div class="card rounded-lg" style="background: var(--color-surface);">
             <div class="card-header d-flex align-items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-positive-bg); color: var(--color-positive);">
-                    <i class="bx bx-receipt text-lg"></i>
+                    <i aria-hidden="true" class="bx bx-receipt text-lg"></i>
                 </span>
                 <div>
                     <div class="text-lg font-bold" style="color: var(--color-text);">Kunlik hisobotlar</div>
@@ -30,12 +30,12 @@
                     <form method="get" class="finance-report-date-form d-flex align-items-end gap-2">
                         {% include "partials/_date_range_input.html" with date_from=from date_to=to %}
                         <button type="submit" class="btn btn-primary d-inline-flex align-items-center gap-1 text-nowrap">
-                            <i class="bx bx-search"></i>Ko'rish
+                            <i aria-hidden="true" class="bx bx-search"></i>Ko'rish
                         </button>
                     </form>
                     <div class="finance-report-summary finance-report-summary-compact flex flex-wrap items-center gap-2">
-                        <span class="badge bg-label-warning finance-count-badge"><i class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}</span>
-                        <span class="badge bg-label-success finance-count-badge"><i class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}</span>
+                        <span class="badge bg-label-warning finance-count-badge"><i aria-hidden="true" class="bx bx-time"></i>Kutilmoqda: {{ pending_count }}</span>
+                        <span class="badge bg-label-success finance-count-badge"><i aria-hidden="true" class="bx bx-check"></i>Tasdiqlangan: {{ confirmed_count }}</span>
                     </div>
                 </div>
             </div>
@@ -45,11 +45,11 @@
                     <table class="table table-hover align-middle mb-0 w-full">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Turi</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov kanallari</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Umumiy</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
+                                <th>Sana</th>
+                                <th>Turi</th>
+                                <th>To'lov kanallari</th>
+                                <th class="finance-amount-col">Umumiy</th>
+                                <th>Holat</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,13 +66,13 @@
                                 </td>
                                 <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                                     <div class="flex flex-wrap gap-1">
-                                        {% for key, val in report.uzs_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} so'm</span>{% endif %}{% endfor %}
-                                        {% for key, val in report.usd_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} $</span>{% endif %}{% endfor %}
-                                        {% for key, val in report.rub_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} ₽</span>{% endif %}{% endfor %}
-                                        {% for key, val in report.eur_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click (SFB){% elif key == "click2" %}Click (OPT){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} €</span>{% endif %}{% endfor %}
+                                        {% for key, val in report.uzs_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} so'm</span>{% endif %}{% endfor %}
+                                        {% for key, val in report.usd_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} $</span>{% endif %}{% endfor %}
+                                        {% for key, val in report.rub_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} ₽</span>{% endif %}{% endfor %}
+                                        {% for key, val in report.eur_detail.items %}{% if val %}<span class="whitespace-nowrap px-1.5 py-0.5 rounded text-xs money" style="background: var(--color-surface-muted);">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}: {{ val|format_currency }} €</span>{% endif %}{% endfor %}
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-sm">
+                                <td class="px-4 py-3 text-sm finance-amount-col">
                                     <div class="space-y-1 font-semibold money" style="color: var(--color-positive);">
                                         {% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}
                                         {% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}
@@ -88,10 +88,11 @@
                         </tbody>
                     </table>
                 </div>
+                {% include "partials/_pagination.html" %}
                 {% else %}
                 <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                     <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="bx bx-receipt text-xl"></i>
+                        <i aria-hidden="true" class="bx bx-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hisobotlar topilmadi</p>
                 </div>

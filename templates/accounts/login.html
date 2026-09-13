@@ -14,7 +14,7 @@
                 <div class="app-brand justify-content-center mb-5">
                     <span class="app-brand-logo demo d-inline-flex align-items-center justify-content-center rounded"
                           style="width: 2.5rem; height: 2.5rem; background: #696cff; color: #fff; box-shadow: 0 0.125rem 0.25rem 0 rgba(105, 108, 255, 0.4);">
-                        <i class="bx bxs-wallet fs-4"></i>
+                        <i aria-hidden="true" class="bx bxs-wallet fs-4"></i>
                     </span>
                     <span class="app-brand-text demo text-heading fw-bold ms-2">SFBMSSB</span>
                 </div>
@@ -24,7 +24,7 @@
 
                 {% if form.non_field_errors %}
                 <div class="alert alert-danger d-flex align-items-center" role="alert">
-                    <i class="bx bx-error-circle me-2"></i>
+                    <i aria-hidden="true" class="bx bx-error-circle me-2"></i>
                     <div>{% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>
                 </div>
                 {% endif %}
@@ -35,7 +35,7 @@
                     <div class="mb-3">
                         <label for="id_username" class="form-label">Login</label>
                         <input type="text" name="username" id="id_username" class="form-control"
-                               placeholder="Loginingizni kiriting" autofocus required>
+                               placeholder="Loginingizni kiriting" autocomplete="username" spellcheck="false" autocapitalize="none" autofocus required>
                         {% if form.username.errors %}
                         <div class="text-danger small mt-1">{{ form.username.errors|striptags }}</div>
                         {% endif %}
@@ -45,12 +45,13 @@
                         <label for="id_password" class="form-label">Parol</label>
                         <div class="input-group input-group-merge">
                             <input :type="show ? 'text' : 'password'" name="password" id="id_password"
-                                   class="form-control" placeholder="&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;" required>
-                            <span class="input-group-text cursor-pointer" role="button" tabindex="0"
-                                  @click="show = !show" @keydown.enter.prevent="show = !show"
-                                  aria-label="Parolni ko'rsatish">
+                                   class="form-control" placeholder="&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;&#183;"
+                                   autocomplete="current-password" required>
+                            <button type="button" class="input-group-text cursor-pointer"
+                                    @click="show = !show" :aria-pressed="show"
+                                    aria-label="Parolni ko'rsatish">
                                 <i class="bx" :class="show ? 'bx-show' : 'bx-hide'"></i>
-                            </span>
+                            </button>
                         </div>
                         {% if form.password.errors %}
                         <div class="text-danger small mt-1">{{ form.password.errors|striptags }}</div>
@@ -69,7 +70,6 @@
                     <button type="submit" class="btn btn-primary d-grid w-100">Kirish</button>
                 </form>
 
-                <p class="text-center text-muted small mt-4 mb-0">SFBMSSB moliyaviy boshqaruv tizimi</p>
             </div>
         </div>
     </div>

@@ -10,18 +10,27 @@ Must sit inside an Alpine scope that owns an `open` boolean, e.g.
     </div>
 
 Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal_icon (plus|user|edit),
-        modal_width (optional Tailwind max-w-* class, default max-w-2xl — pass max-w-md for a short form)
+        modal_width (optional Tailwind max-w-* class, default max-w-2xl — pass max-w-md for a short form),
+        modal_open_var (optional Alpine variable name, default "open").
+
+Closes on Escape or the × button only — every modal here holds a form, and a
+stray click on the backdrop must not discard what was typed. Alpine's focus
+plugin (x-trap) keeps Tab inside, locks page scroll, and returns focus to the
+opener on close.
 {% endcomment %}
-<div x-show="open" x-cloak
-     class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8"
+{% with ov=modal_open_var|default:"open" %}
+<div x-show="{{ ov }}" x-cloak
+     class="finance-modal-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:p-8"
      style="background: rgba(15, 23, 42, 0.55);"
-     @keydown.escape.window="open = false"
-     x-effect="if (open) { $nextTick(() => $refs.modalPanel.querySelector('input:not([type=hidden]), select, textarea')?.focus()) }">
+     @keydown.escape.window="{{ ov }} = false"
+     x-trap.inert.noscroll="{{ ov }}"
+     {# focus the first field after x-trap activates (15ms), so the trap remembers the opener and returns focus to it on close #}
+     x-effect="if ({{ ov }}) { setTimeout(() => $refs.modalPanel.querySelector('input:not([type=hidden]), select, textarea')?.focus(), 50) }">
     <div class="finance-modal-panel w-full {{ modal_width|default:"max-w-2xl" }} {{ modal_class }} my-auto rounded-lg shadow-2xl outline-none"
-         x-ref="modalPanel"
-         tabindex="-1"
          style="background: var(--color-surface); border: 1px solid var(--color-border);"
-         @click.outside="open = false"
+         x-ref="modalPanel"
+         role="dialog" aria-modal="true" aria-labelledby="modal-title-{{ modal_title|slugify }}"
+         tabindex="-1"
          x-transition:enter="transition ease-out duration-150"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100">
@@ -29,19 +38,20 @@ Params: modal_title, modal_subtitle, modal_tone (positive|negative|brand), modal
             <span class="flex items-center justify-center w-12 h-12 rounded-md shrink-0"
                   style="background: {% if modal_tone == 'positive' %}var(--color-positive-bg){% elif modal_tone == 'negative' %}var(--color-negative-bg){% else %}var(--color-surface-muted){% endif %};
                          color: {% if modal_tone == 'positive' %}var(--color-positive){% elif modal_tone == 'negative' %}var(--color-negative){% else %}var(--color-brand){% endif %};">
-                <i class="bx text-xl {% if modal_icon == 'user' %}bx-user{% elif modal_icon == 'edit' %}bx-edit-alt{% else %}bx-plus{% endif %}"></i>
+                <i aria-hidden="true" class="bx text-xl {% if modal_icon == 'user' %}bx-user{% elif modal_icon == 'edit' %}bx-edit-alt{% else %}bx-plus{% endif %}"></i>
             </span>
             <div class="min-w-0 flex-1">
-                <h2 class="text-xl font-bold" style="color: var(--color-text);">{{ modal_title }}</h2>
+                <h2 id="modal-title-{{ modal_title|slugify }}" class="text-xl font-bold" style="color: var(--color-text);">{{ modal_title }}</h2>
                 {% if modal_subtitle %}
                 <p class="text-sm mt-0.5" style="color: var(--color-text-muted);">{{ modal_subtitle }}</p>
                 {% endif %}
             </div>
-            <button type="button" @click="open = false"
-                    class="btn btn-icon btn-label-secondary shrink-0 flex items-center justify-center w-9 h-9 rounded-md transition-colors"
-                    style="background: var(--color-surface-muted); color: var(--color-text-muted);"
+            <button type="button" @click="{{ ov }} = false"
+                    class="btn btn-icon btn-label-secondary shrink-0 flex items-center justify-center w-9 h-9 rounded-md transition-colors" style="background: var(--color-surface-muted); color: var(--color-text-muted);"
+                   
                     aria-label="Yopish">
-                <i class="bx bx-x text-lg"></i>
+                <i aria-hidden="true" class="bx bx-x text-lg"></i>
             </button>
         </div>
         <div class="finance-modal-body px-6 py-5">
+{% endwith %}

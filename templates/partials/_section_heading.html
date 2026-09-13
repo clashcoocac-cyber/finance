@@ -6,7 +6,7 @@ chip (optional label text, e.g. "Click + Terminal + Bank").
 <div class="flex items-center gap-2 mb-3">
     <span class="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
           style="background: {{ icon_bg|default:'rgba(105, 108, 255, 0.12)' }}; color: {{ icon_color|default:'var(--color-brand)' }};">
-        <i class="bx {{ icon }}"></i>
+        <i aria-hidden="true" class="bx {{ icon }}"></i>
     </span>
     <h2 class="text-base font-semibold" style="color: var(--color-text);">{{ title }}</h2>
     {% if chip %}

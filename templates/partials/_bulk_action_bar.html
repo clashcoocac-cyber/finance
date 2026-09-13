@@ -1,13 +1,15 @@
 {% comment %}Floating bulk-confirm bar. Requires the enclosing x-data="bulkSelect()" scope
-(selected[], allSelected, toggleAll()) from base.html. Only visible once something is selected.{% endcomment %}
-<div x-show="selected.length > 0" x-cloak
+(selected[], allSelected, toggleAll()) from base.html. Only visible once something is selected.
+Include it AFTER the table: `sticky bottom-4` then pins it to the viewport bottom while
+the table is long, so "Tasdiqlash" stays reachable.{% endcomment %}
+<div x-show="selected.length > 0" x-cloak role="status" aria-live="polite"
      x-transition:enter="transition ease-out duration-150"
      x-transition:enter-start="opacity-0 translate-y-2"
      x-transition:enter-end="opacity-100 translate-y-0"
      x-transition:leave="transition ease-in duration-100"
      x-transition:leave-start="opacity-100 translate-y-0"
      x-transition:leave-end="opacity-0 translate-y-2"
-     class="finance-bulk-action-bar sticky z-40 flex items-center gap-4 px-5 py-3 rounded-full border shadow-lg"
+     class="finance-bulk-action-bar sticky bottom-4 z-40 flex items-center gap-4 px-5 py-3 rounded-full border shadow-lg"
      style="background: var(--color-surface); border-color: var(--color-border);">
     <span class="text-sm font-medium whitespace-nowrap" style="color: var(--color-text);" x-text="selected.length + ' ta belgilandi'"></span>
     <button type="button" @click="selected = []; allSelected = false"

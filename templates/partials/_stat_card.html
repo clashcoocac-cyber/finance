@@ -9,7 +9,7 @@ corner clear.
     <div class="card-body">
         <div class="finance-money-card-head">
             <span class="finance-money-card-icon">
-                <i class="bx {% if tone == 'positive' %}bx-trending-up{% elif tone == 'negative' %}bx-trending-down{% else %}bx-wallet{% endif %}"></i>
+                <i aria-hidden="true" class="bx {% if tone == 'positive' %}bx-trending-up{% elif tone == 'negative' %}bx-trending-down{% else %}bx-wallet{% endif %}"></i>
             </span>
             <span class="finance-money-card-title">{{ title }}</span>
             {% if not pending_amounts %}
@@ -23,11 +23,11 @@ corner clear.
         {% with pending_line=pending_amounts|pending_summary %}
         <div class="finance-money-card-foot">
             {% if pending_line %}
-            <i class="bx bx-time-five"></i>
+            <i aria-hidden="true" class="bx bx-time-five"></i>
             <span class="finance-money-card-foot-label">Kutilmoqda</span>
             <span class="finance-money-card-foot-value money">{{ pending_line }}</span>
             {% else %}
-            <i class="bx bx-check-circle"></i>
+            <i aria-hidden="true" class="bx bx-check-circle"></i>
             <span class="finance-money-card-foot-label">Kutilayotgan summa yo'q</span>
             {% endif %}
         </div>

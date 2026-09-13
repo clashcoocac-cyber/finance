@@ -1,0 +1,47 @@
+{% load l10n %}
+{% comment %}
+Four currency amount inputs (2x2). Params: form (bound form or None), prefix (id prefix).
+Decimals allowed — amounts are DecimalField(decimal_places=2).
+{% endcomment %}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+        <label for="{{ prefix }}-amount_uzs" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
+        <div class="relative finance-amount-wrap">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-coin-stack"></i></span>
+            <input type="number" step="any" min="0" inputmode="decimal" id="{{ prefix }}-amount_uzs" name="amount_uzs" placeholder="0"
+                value="{{ form.amount_uzs.value|default_if_none:''|unlocalize }}"
+                class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+            <span class="finance-amount-suffix">so'm</span>
+        </div>
+    </div>
+    <div>
+        <label for="{{ prefix }}-amount_usd" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
+        <div class="relative finance-amount-wrap">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-coin-stack"></i></span>
+            <input type="number" step="any" min="0" inputmode="decimal" id="{{ prefix }}-amount_usd" name="amount_usd" placeholder="0"
+                value="{{ form.amount_usd.value|default_if_none:''|unlocalize }}"
+                class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+            <span class="finance-amount-suffix">$</span>
+        </div>
+    </div>
+    <div>
+        <label for="{{ prefix }}-amount_rub" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
+        <div class="relative finance-amount-wrap">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-coin-stack"></i></span>
+            <input type="number" step="any" min="0" inputmode="decimal" id="{{ prefix }}-amount_rub" name="amount_rub" placeholder="0"
+                value="{{ form.amount_rub.value|default_if_none:''|unlocalize }}"
+                class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+            <span class="finance-amount-suffix">₽</span>
+        </div>
+    </div>
+    <div>
+        <label for="{{ prefix }}-amount_eur" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
+        <div class="relative finance-amount-wrap">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);"><i aria-hidden="true" class="bx bx-coin-stack"></i></span>
+            <input type="number" step="any" min="0" inputmode="decimal" id="{{ prefix }}-amount_eur" name="amount_eur" placeholder="0"
+                value="{{ form.amount_eur.value|default_if_none:''|unlocalize }}"
+                class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
+            <span class="finance-amount-suffix">€</span>
+        </div>
+    </div>
+</div>

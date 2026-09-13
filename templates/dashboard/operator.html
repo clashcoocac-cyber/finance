@@ -9,49 +9,20 @@
 <div class="finance-page-heading">
     {% include "partials/_page_header.html" with title="Bosh sahifa" subtitle="Smena holati va so'nggi hisobotlar" icon="bx-home-circle" %}
     <div class="finance-page-heading-actions">
-        <input type="month" id="monthPicker" class="finance-month-picker form-control rounded-md" />
+        {% include "partials/_month_picker.html" %}
     </div>
 </div>
 
-<div style="margin-bottom: 1.5rem;"></div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const monthPicker = document.getElementById('monthPicker');
-
-        const fromParam = '{{ from }}';
-        const toParam = '{{ to }}';
-
-        if (fromParam && fromParam !== 'None') {
-            const [year, month, day] = fromParam.split('-');
-            monthPicker.value = `${year}-${month}`;
-        } else {
-            const today = new Date();
-            monthPicker.value = today.toISOString().slice(0, 7);
-        }
-
-        monthPicker.addEventListener('change', function() {
-            const [year, month] = this.value.split('-');
-            const fromStr = `${year}-${month}-01`;
-
-            const nextMonth = parseInt(month) === 12 ? 1 : parseInt(month) + 1;
-            const nextYear = parseInt(month) === 12 ? parseInt(year) + 1 : year;
-            const lastDay = new Date(nextYear, nextMonth - 1, 0).getDate();
-            const toStr = `${year}-${month.padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-
-            window.location.search = `from=${fromStr}&to=${toStr}`;
-        });
-    });
-</script>
 <div class="max-w-7xl mx-auto space-y-6">
         <div class="d-flex flex-wrap align-items-center gap-2">
             {% if request.session.shift %}
             <span class="badge bg-label-primary finance-count-badge">
-                <i class="bx bx-time-five"></i>{{ request.session.shift }}-smena
+                <i aria-hidden="true" class="bx bx-time-five"></i>{{ request.session.shift }}-smena
             </span>
             {% endif %}
             <span class="badge bg-label-secondary finance-count-badge">
-                <i class="bx bx-transfer-alt"></i>Bugun {{ today_transaction_count }} ta tranzaksiya
+                <i aria-hidden="true" class="bx bx-transfer-alt"></i>Bugun {{ today_transaction_count }} ta tranzaksiya
                 {% if unreported_count %}&middot; {{ unreported_count }} ta hisobotga kiritilmagan{% endif %}
             </span>
         </div>
@@ -67,7 +38,7 @@
         <div class="card rounded-lg" style="background: var(--color-surface);">
             <div class="card-header d-flex align-items-center gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                    <i class="bx bx-receipt text-lg"></i>
+                    <i aria-hidden="true" class="bx bx-receipt text-lg"></i>
                 </span>
                 <div>
                     <div class="text-lg font-bold" style="color: var(--color-text);">So'nggi hisobotlarim</div>
@@ -79,7 +50,7 @@
                 <ul class="list-unstyled mb-0 finance-report-list">
                     {% for report in reports %}
                     <li class="finance-report-row">
-                        <span class="finance-report-row-icon"><i class="bx bx-calendar"></i></span>
+                        <span class="finance-report-row-icon"><i aria-hidden="true" class="bx bx-calendar"></i></span>
                         <span class="finance-report-row-date">{{ report.date }}</span>
                         {% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}
                         <span class="finance-report-row-totals money">
@@ -94,7 +65,7 @@
                 {% else %}
                 <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                     <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="bx bx-receipt text-xl"></i>
+                        <i aria-hidden="true" class="bx bx-receipt text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Hozircha hisobotlar yo'q</p>
                 </div>

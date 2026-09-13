@@ -14,7 +14,7 @@
             <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4" style="border-bottom: 1px solid var(--color-border);">
                 <div class="flex items-center gap-3">
                     <span class="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);">
-                        <i class="bx bx-receipt text-lg"></i>
+                        <i aria-hidden="true" class="bx bx-receipt text-lg"></i>
                     </span>
                     <div>
                         <div class="text-lg font-bold" style="color: var(--color-text);">Kunlik chiqimlar</div>
@@ -22,29 +22,22 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <input value="{{ date }}" type="date" class="form-control px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" onchange="window.location.href = `?date=${this.value}`">
+                    <input value="{{ date }}" type="date" aria-label="Sana" class="form-control px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" onchange="window.location.href = `?date=${this.value}`">
                     <a href="{% url 'expenses_list' %}" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
-                        <i class="bx bx-calendar"></i>
+                        <i aria-hidden="true" class="bx bx-calendar"></i>
                         Bugun
                     </a>
                     <div x-data="{ open: {% if form.errors %}true{% else %}false{% endif %} }">
                         <button type="button" @click="open = true" class="finance-income-create btn btn-danger d-inline-flex align-items-center gap-2">
-                            <i class="bx bx-plus"></i>
+                            <i aria-hidden="true" class="bx bx-plus"></i>
                             Yangi chiqim
                         </button>
                         {% include "partials/_modal_open.html" with modal_title="Chiqim qo'shish" modal_subtitle="Chiqim ma'lumotlarini to'ldiring va tizimga kiriting" modal_tone="negative" modal_icon="plus" %}
-                            {% if form.errors %}
-                            <div class="django-errors rounded-md p-4 mb-6 fade-in border" style="background: var(--color-negative-bg); border-color: var(--color-negative);">
-                                <h3 class="text-sm font-medium mb-2" style="color: var(--color-negative);">Quyidagi xatolarni tuzating:</h3>
-                                <ul class="list-disc pl-5 space-y-1 text-sm" style="color: var(--color-negative);">
-                                    {% for field, errors in form.errors.items %}
-                                    <li>{{ field|capfirst }}: {{ errors|join:", " }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
+                            {% include "partials/_form_errors.html" with form=form %}
                             <form action="{% url 'expenses_list' %}?date={{ date }}" method="POST" class="space-y-4"
+                                @submit="submitting = true"
                                 x-data="{
+                                    submitting: false,
                                     expType: '{{ form.exp_type.value|default_if_none:'' }}',
                                     categoryValue: '{{ form.category.value|default_if_none:'' }}',
                                     categoryMode: '{{ form.category.value|default_if_none:'' }}' === '__new__' ? 'new' : 'select',
@@ -53,14 +46,14 @@
                                 x-init="categoryOptions = JSON.parse(document.getElementById('category-options-data').textContent)">
                                 {% csrf_token %}
                                 <div>
-                                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov maqsadi</label>
+                                    <label for="f1-exp_type" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">To'lov maqsadi</label>
                                     <div class="relative">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="bx bx-filter"></i>
+                                            <i aria-hidden="true" class="bx bx-filter"></i>
                                         </span>
-                                        <select required x-model="expType" name="exp_type"
+                                        <select id="f1-exp_type" required x-model="expType" name="exp_type"
                                             @change="categoryValue = ''; categoryMode = 'select'"
-                                            class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                                            class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                             <option value="">Maqsadni tanlang</option>
                                             <option value="expense">Chiqim</option>
                                             <option value="xarajat">Xarajat</option>
@@ -69,14 +62,14 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kategoriya</label>
+                                    <label for="f1-category" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Kategoriya</label>
                                     <div class="relative" x-show="categoryMode === 'select'">
                                         <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                            <i class="bx bx-list-ul"></i>
+                                            <i aria-hidden="true" class="bx bx-list-ul"></i>
                                         </span>
-                                        <select name="category" x-ref="categorySelect"
+                                        <select id="f1-category" name="category" x-ref="categorySelect"
                                             @change="categoryValue = $event.target.value; categoryMode = categoryValue === '__new__' ? 'new' : 'select'"
-                                            class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background-color: var(--color-surface); color: var(--color-text);">
+                                            class="form-select w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                             <option value="" :selected="categoryValue === ''">Kategoriya tanlang</option>
                                             <template x-for="opt in categoryOptions.filter(o => o.group === expType)" :key="opt.name">
                                                 <option :value="opt.name" x-text="opt.name" :selected="opt.name === categoryValue"></option>
@@ -87,75 +80,32 @@
                                     <div x-show="categoryMode === 'new'" class="flex gap-2">
                                         <div class="relative flex-1">
                                             <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="bx bx-list-ul"></i>
+                                                <i aria-hidden="true" class="bx bx-list-ul"></i>
                                             </span>
                                             <input type="text" name="new_category" value="{{ form.new_category.value|default_if_none:'' }}"
                                                 placeholder="Yangi kategoriya nomi" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                         </div>
                                         <button type="button" @click="categoryMode = 'select'; categoryValue = ''"
-                                            class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); color: var(--color-text);">
+                                            class="btn btn-outline-secondary px-3 py-2 border rounded-md text-sm whitespace-nowrap" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
                                             Ro'yxatdan tanlash
                                         </button>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Tavsif</label>
-                                    <textarea name="description" placeholder="Chiqim tavsifini kiriting..." rows="2"
+                                    <label for="f1-description" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Tavsif</label>
+                                    <textarea id="f1-description" name="description" placeholder="Chiqim tavsifini kiriting…" rows="2"
                                         class="form-control w-full px-4 py-2.5 rounded-md border text-sm resize-none" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">{{ form.description.value|default_if_none:'' }}</textarea>
                                 </div>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">So'm</label>
-                                        <div class="relative finance-amount-wrap">
-                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="bx bx-coin-stack"></i>
-                                            </span>
-                                            <input type="number" step="any" inputmode="decimal" name="amount_uzs" placeholder="So'm miqdori" value="{{ form.amount_uzs.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                                            <span class="finance-amount-suffix">so'm</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Dollar</label>
-                                        <div class="relative finance-amount-wrap">
-                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="bx bx-coin-stack"></i>
-                                            </span>
-                                            <input type="number" step="any" inputmode="decimal" name="amount_usd" placeholder="Dollar miqdori" value="{{ form.amount_usd.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                                            <span class="finance-amount-suffix">$</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Rubl</label>
-                                        <div class="relative finance-amount-wrap">
-                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="bx bx-coin-stack"></i>
-                                            </span>
-                                            <input type="number" step="any" inputmode="decimal" name="amount_rub" placeholder="Rubl miqdori" value="{{ form.amount_rub.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                                            <span class="finance-amount-suffix">₽</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Yevro</label>
-                                        <div class="relative finance-amount-wrap">
-                                            <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-4 h-4" style="color: var(--color-text-muted);">
-                                                <i class="bx bx-coin-stack"></i>
-                                            </span>
-                                            <input type="number" step="any" inputmode="decimal" name="amount_eur" placeholder="Yevro miqdori" value="{{ form.amount_eur.value|default_if_none:'' }}" class="form-control w-full pl-10 pr-4 py-2.5 rounded-md border text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
-                                            <span class="finance-amount-suffix">€</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                {% include "partials/_amount_fields.html" with form=form prefix="chiqim" %}
 
                                 <input type="hidden" name="payment_type" value="cash">
 
-                                <button type="submit" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
-                                    <i class="bx bx-plus"></i>
-                                    Chiqim qo'shish
+                                <button type="submit" :disabled="submitting" class="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2">
+                                    <span x-show="submitting" x-cloak class="spinner-border spinner-border-sm"></span>
+                                    <i aria-hidden="true" class="bx bx-plus" x-show="!submitting"></i>
+                                    <span x-text="submitting ? 'Saqlanmoqda…' : 'Chiqim qo\'shish'">Chiqim qo'shish</span>
                                 </button>
                             </form>
                         {% include "partials/_modal_close.html" %}
@@ -169,12 +119,12 @@
                     <table class="table table-hover align-middle mb-0 w-full finance-income-table">
                         <thead style="background: var(--color-surface-muted);">
                             <tr>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Sana</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Kategoriya</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Maqsad</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">To'lov turi</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Miqdor</th>
-                                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide" style="color: var(--color-text-muted);">Holat</th>
+                                <th>Sana</th>
+                                <th>Kategoriya</th>
+                                <th>Maqsad</th>
+                                <th>To'lov turi</th>
+                                <th class="finance-amount-col">Miqdor</th>
+                                <th>Holat</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -183,7 +133,7 @@
                         <td class="px-4 py-3 text-sm whitespace-nowrap" style="color: var(--color-text);"><div class="font-medium">{{ report.date|date:"d/m/Y" }}</div></td>
                         <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                             <div class="flex items-center gap-2">
-                                <span class="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);"><i class="bx bx-trending-down"></i></span>
+                                <span class="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);"><i aria-hidden="true" class="bx bx-trending-down"></i></span>
                                 <div class="font-semibold truncate" title="{{ report.category }}">{{ report.category }}</div>
                             </div>
                         </td>
@@ -194,7 +144,7 @@
                             {% for key, val in report.rub_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}
                             {% for key, val in report.eur_detail.items %}{% if val %}<span class="badge bg-label-secondary me-1">{% if key == "click1" %}Click ({{ clicks.0.1 }}){% elif key == "click2" %}Click ({{ clicks.1.1 }}){% elif key == "cash" %}Naqd{% elif key == "terminal" %}Terminal{% elif key == "bank" %}Bank{% else %}{{ key }}{% endif %}</span>{% endif %}{% endfor %}
                         </td>
-                        <td class="px-4 py-3 text-sm text-right whitespace-nowrap"><div class="finance-income-total money" style="color: var(--color-negative);">{% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}{% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}{% if report.total_rub %}<div>{{ report.total_rub|format_currency }} ₽</div>{% endif %}{% if report.total_eur %}<div>{{ report.total_eur|format_currency }} €</div>{% endif %}</div></td>
+                        <td class="px-4 py-3 text-sm finance-amount-col"><div class="finance-income-total money" style="color: var(--color-negative);">{% if report.total_uzs %}<div>{{ report.total_uzs|format_currency }} so'm</div>{% endif %}{% if report.total_usd %}<div>{{ report.total_usd|format_currency }} $</div>{% endif %}{% if report.total_rub %}<div>{{ report.total_rub|format_currency }} ₽</div>{% endif %}{% if report.total_eur %}<div>{{ report.total_eur|format_currency }} €</div>{% endif %}</div></td>
                         <td class="px-4 py-3 text-sm">{% include "partials/_status_badge.html" with status=report.is_closed|yesno:"confirmed,pending" %}</td>
                     </tr>
                     {% endfor %}
@@ -204,7 +154,7 @@
                 {% else %}
                 <div class="empty-state flex flex-col items-center justify-center py-10 text-center">
                     <span class="empty-state-icon w-12 h-12 rounded-md flex items-center justify-center mb-3" style="background: var(--color-surface-muted); color: var(--color-text-muted);">
-                        <i class="bx bx-inbox text-xl"></i>
+                        <i aria-hidden="true" class="bx bx-folder-open text-xl"></i>
                     </span>
                     <p class="text-sm" style="color: var(--color-text-muted);">Bu sanada chiqimlar yo'q</p>
                 </div>
@@ -213,15 +163,4 @@
         </div>
     </div>
 
-<script>
-document.querySelectorAll('input[type="number"]').forEach(function(input) {
-    input.addEventListener('input', function(e) {
-        const value = e.target.value;
-        if (value.includes('.')) {
-            alert("Iltimos, nuqta ishlatmang, faqat butun son kiriting.");
-            e.target.value = value.replace('.', '');
-        }
-    });
-});
-</script>
 {% endblock %}

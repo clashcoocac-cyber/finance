@@ -1,7 +1,19 @@
+from datetime import datetime
+
 from django.db.models import Sum
 from finance.models import Transaction, Stat, StatTypes
 
 CURRENCIES = ('uzs', 'usd', 'rub', 'eur')
+
+
+def date_param(value, default):
+    """`value` if it is a valid YYYY-MM-DD string, else `default`.
+    Query-string dates come from users; a bad one must fall back, not 500."""
+    try:
+        datetime.strptime((value or '').strip(), '%Y-%m-%d')
+    except ValueError:
+        return default
+    return value.strip()
 
 
 def preserve_filters(request, base_url):

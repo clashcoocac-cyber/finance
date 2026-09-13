@@ -5,15 +5,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#F8F7FA">
     <title>{% block title %}Moliyaviy Boshqaruv Tizimi{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Public+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'sneat/vendor/fonts/boxicons.css' %}">
     <link rel="stylesheet" href="{% static 'sneat/vendor/css/core.css' %}">
     <link rel="stylesheet" href="{% static 'sneat/vendor/css/theme-default.css' %}">
     <link rel="stylesheet" href="{% static 'sneat/assets/css/demo.css' %}">
-    <link rel="stylesheet" href="{% static 'sneat/finance.css' %}">
+    {# runserver serves static uncached-by-name; bust the browser cache on every load in DEBUG. Production hashes filenames (manifest storage). #}
+    <link rel="stylesheet" href="{% static 'sneat/finance.css' %}{% if debug %}?v={% now 'U' %}{% endif %}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" rel="stylesheet"
           integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -28,6 +30,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"
         integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6"
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.14.1/dist/cdn.min.js"
+        integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"
         integrity="sha384-l8f0VcPi/M1iHPv8egOnY/15TDwqgbOR1anMIJWvU6nLRgZVLTLSaNqi/TOoT5Fh"
         crossorigin="anonymous" defer></script>
@@ -59,23 +63,9 @@
 
             --shadow-card: 0 2px 6px 0 rgba(67, 89, 113, 0.12);
         }
-        @media (prefers-color-scheme: dark) {
-            :root:not([data-theme="light"]) {
-                --color-bg: #25293C;
-                --color-surface: #2F3349;
-                --color-surface-muted: #383C55;
-                --color-border: #434968;
-                --color-text: #E7E3FC;
-                --color-text-muted: #A7A3C0;
-
-                --color-sidebar-bg: #2F3349;
-                --color-sidebar-border: #434968;
-                --color-sidebar-text: #A7A3C0;
-                --color-sidebar-text-muted: #6B7290;
-
-                --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.32);
-            }
-        }
+        /* Light-only palette. Sneat's core.css and finance.css hardcode light
+           surfaces/text, so a token-level dark swap left dark text on dark
+           cards. Add dark mode by theming those files too, not here. */
         body {
             font-family: 'Public Sans', sans-serif;
             background: var(--color-bg);

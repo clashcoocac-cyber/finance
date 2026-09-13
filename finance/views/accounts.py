@@ -9,13 +9,13 @@ from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from django.contrib import messages
-from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom
+from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom, IncomeForm, ExpenseForm
 from finance.models import Counterparty, User
 from finance.models import DailyReport, Category
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, CLICKS
 from django.db.models import Sum, Q
-from finance.views.helpers import compute_money_stats
+from finance.views.helpers import compute_money_stats, date_param
 
 
 
@@ -29,8 +29,8 @@ class BossDashboardView(LoginRequiredMixin, BossRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         today = datetime.today()
         month_start = today.replace(day=1).strftime('%Y-%m-%d')
-        context['from'] = self.request.GET.get('from', None) or month_start
-        context['to'] = self.request.GET.get('to', None) or today.strftime('%Y-%m-%d')
+        context['from'] = date_param(self.request.GET.get('from'), month_start)
+        context['to'] = date_param(self.request.GET.get('to'), today.strftime('%Y-%m-%d'))
 
         date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
         date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
@@ -51,8 +51,8 @@ class ChiefCashierDashboardView(LoginRequiredMixin, CashierRequiredMixin, Templa
         context = super().get_context_data(**kwargs)
         today = datetime.today()
         month_start = today.replace(day=1).strftime('%Y-%m-%d')
-        context['from'] = self.request.GET.get('from', None) or month_start
-        context['to'] = self.request.GET.get('to', None) or today.strftime('%Y-%m-%d')
+        context['from'] = date_param(self.request.GET.get('from'), month_start)
+        context['to'] = date_param(self.request.GET.get('to'), today.strftime('%Y-%m-%d'))
 
         context['pending_reports_count'] = DailyReport.objects.filter(
             type='income', is_closed=False
@@ -130,31 +130,32 @@ class FinancePageView(LoginRequiredMixin, TemplateView):
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
 
+    FORMS = {'income': (IncomeForm, "Kirim muvaffaqiyatli qo'shildi."),
+             'expense': (ExpenseForm, "Chiqim muvaffaqiyatli qo'shildi.")}
+
     def post(self, request, *args, **kwargs):
-        from finance.forms import IncomeForm, ExpenseForm
         kind = request.POST.get('kind')
-        if kind == 'income':
-            form = IncomeForm(request.POST)
-            if form.is_valid():
-                form.save(operator=request.user)
-                messages.success(request, "Kirim muvaffaqiyatli qo'shildi.")
-                return redirect('finance_page')
-        elif kind == 'expense':
-            form = ExpenseForm(request.POST)
-            if form.is_valid():
-                form.save(operator=request.user)
-                messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
-                return redirect('finance_page')
+        if kind not in self.FORMS:
+            return redirect('finance_page')
+        form_class, success_msg = self.FORMS[kind]
+        form = form_class(request.POST)
+        if form.is_valid():
+            form.save(operator=request.user)
+            messages.success(request, success_msg)
+            return redirect('finance_page')
         messages.error(request, "Formani tekshiring.")
-        kwargs['failed_modal'] = kind or 'income'
+        # re-render with the failed modal open, its bound form (values +
+        # field errors) inside it
+        kwargs['failed_modal'] = kind
+        kwargs[f'{kind}_form'] = form
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         today = datetime.today()
         month_start = today.replace(day=1).strftime('%Y-%m-%d')
-        context['from'] = self.request.GET.get('from', None) or month_start
-        context['to'] = self.request.GET.get('to', None) or today.strftime('%Y-%m-%d')
+        context['from'] = date_param(self.request.GET.get('from'), month_start)
+        context['to'] = date_param(self.request.GET.get('to'), today.strftime('%Y-%m-%d'))
 
         date_from = datetime.strptime(context['from'], '%Y-%m-%d').date()
         date_to = datetime.strptime(context['to'], '%Y-%m-%d').date()
@@ -214,9 +215,9 @@ class FinancePageView(LoginRequiredMixin, TemplateView):
             {'name': c.name, 'group': c.group} for c in Category.objects.filter(is_active=True)
         ]
         context['clicks'] = CLICKS
-        # reopen the modal whose submission just failed, so the error message
-        # and the form are visible together
         context['failed_modal'] = kwargs.get('failed_modal')
+        context['income_form'] = kwargs.get('income_form')
+        context['expense_form'] = kwargs.get('expense_form')
         return context
 
 
@@ -224,10 +225,10 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
     template_name = 'dashboard/operator.html'
 
     def get_context_data(self, **kwargs):
-        report_date = self.request.GET.get('report_date', None) or datetime.today().strftime('%Y-%m-%d')
+        report_date = date_param(self.request.GET.get('report_date'), datetime.today().strftime('%Y-%m-%d'))
         context = super().get_context_data(**kwargs)
-        context['from'] = self.request.GET.get('from', None) or report_date
-        context['to'] = self.request.GET.get('to', None) or report_date
+        context['from'] = date_param(self.request.GET.get('from'), report_date)
+        context['to'] = date_param(self.request.GET.get('to'), report_date)
         context['q'] = self.request.GET.get('q', None)
         context['report_date'] = report_date
         context['is_expired'] = datetime.today().date() - datetime.strptime(report_date, '%Y-%m-%d').date() > timedelta(days=3)
