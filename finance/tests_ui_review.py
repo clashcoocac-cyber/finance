@@ -1,7 +1,8 @@
 """Regression checks for the UI review fixes: every page renders for its role,
 garbage date params fall back instead of 500, failed finance-page submits keep
 typed values, and lists paginate."""
-from datetime import date
+from datetime import date, datetime
+from django.utils import timezone
 
 from django.test import TestCase
 from django.urls import reverse
@@ -23,7 +24,7 @@ class RenderSmokeTests(TestCase):
         for i in range(3):
             tx = Transaction.objects.create(
                 type='income', amount_uzs=1000 + i, payment_type='cash', description='',
-                operator=self.users['operator'], counterparty='Ali', date=f'2026-09-0{i + 1} 10:00',
+                operator=self.users['operator'], counterparty='Ali', date=timezone.make_aware(datetime(2026, 9, i + 1, 10)),
             )
             rep = DailyReport.objects.create(
                 type='income', date=date(2026, 9, i + 1), operator=self.users['operator'],

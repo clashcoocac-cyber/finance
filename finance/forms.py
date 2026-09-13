@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils import timezone
 from django import forms
 from django.contrib.auth.forms import UserChangeForm
 from django.shortcuts import redirect
@@ -110,12 +111,11 @@ class TransactionFrom(forms.ModelForm):
         if date:
             try:
                 parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
-                now_time = datetime.now().time()
-                transaction.date = datetime.combine(parsed_date, now_time)
+                transaction.date = timezone.make_aware(datetime.combine(parsed_date, timezone.localtime().time()))
             except Exception:
-                transaction.date = datetime.now()
+                transaction.date = timezone.now()
         else:
-            transaction.date = datetime.now()
+            transaction.date = timezone.now()
 
         if commit:
             transaction.save()
@@ -192,9 +192,9 @@ class IncomeForm(forms.ModelForm):
             try:
                 parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
             except (ValueError, TypeError):
-                parsed_date = datetime.now().date()
+                parsed_date = timezone.localdate()
         else:
-            parsed_date = datetime.now().date()
+            parsed_date = timezone.localdate()
 
         # create the report first (store date as date object);
         # category = counterparty, purpose goes into desc ("Maqsad: X")
@@ -226,7 +226,7 @@ class IncomeForm(forms.ModelForm):
         transaction.type = 'income'
         transaction.click = self.cleaned_data.get('click') if payment_type == 'click' else None
         # combine parsed date with current time
-        transaction.date = datetime.combine(parsed_date, datetime.now().time())
+        transaction.date = timezone.make_aware(datetime.combine(parsed_date, timezone.localtime().time()))
         if commit:
             transaction.save()
 
@@ -282,9 +282,9 @@ class ExpenseForm(forms.Form):
             try:
                 parsed_date = datetime.strptime(date, '%Y-%m-%d').date()
             except (ValueError, TypeError):
-                parsed_date = datetime.now().date()
+                parsed_date = timezone.localdate()
         else:
-            parsed_date = datetime.now().date()
+            parsed_date = timezone.localdate()
 
         report = DailyReport.objects.create(
             operator=operator, type=exp_type, is_closed=False,
@@ -315,6 +315,6 @@ class ExpenseForm(forms.Form):
             operator=operator,
             report=report,
             counterparty=category,
-            date=datetime.combine(parsed_date, datetime.now().time()),
+            date=timezone.make_aware(datetime.combine(parsed_date, timezone.localtime().time())),
         )
         return transaction

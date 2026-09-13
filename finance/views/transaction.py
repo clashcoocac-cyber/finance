@@ -10,6 +10,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.utils import timezone
 from django.db.models import Sum, Q
 from finance.forms import ExpenseForm, TransactionFrom, IncomeForm
 from finance.models import User, Company, Category
@@ -74,7 +75,7 @@ class TransactionCreateView(LoginRequiredMixin, OperatorRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = TransactionFrom(request.POST)
-        report_date = date_param(request.GET.get('report_date'), datetime.today().date().strftime('%Y-%m-%d'))
+        report_date = date_param(request.GET.get('report_date'), timezone.localdate().strftime('%Y-%m-%d'))
 
         if form.is_valid():
             form.save(operator=request.user, date=report_date)
@@ -112,13 +113,13 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        report_date_str = date_param(request.GET.get('report_date'), datetime.today().date().strftime('%Y-%m-%d'))
+        report_date_str = date_param(request.GET.get('report_date'), timezone.localdate().strftime('%Y-%m-%d'))
         shift = request.session.get('shift', None)
 
         try:
             selected_date = datetime.strptime(report_date_str, '%Y-%m-%d').date()
         except (ValueError, TypeError):
-            selected_date = datetime.today().date()
+            selected_date = timezone.localdate()
 
         # Collect unreported transactions for this operator on the selected date only
         unreported = list(
@@ -208,7 +209,7 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = ExpenseForm(request.POST)
-        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
+        report_date = date_param(request.GET.get('date'), timezone.localdate().strftime('%Y-%m-%d'))
         if form.is_valid():
             form.save(operator=request.user, date=report_date)
             messages.success(request, "Chiqim muvaffaqiyatli qo'shildi.")
@@ -217,7 +218,7 @@ class ExpensesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
         return self._render(request, form=form)
 
     def _render(self, request, form=None):
-        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
+        report_date = date_param(request.GET.get('date'), timezone.localdate().strftime('%Y-%m-%d'))
         reports = DailyReport.objects.filter(type__in=['expense', 'xarajat'], date=report_date).order_by('-date')
         context = {
             'form': form or ExpenseForm(),
@@ -238,7 +239,7 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         form = IncomeForm(request.POST)
-        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
+        report_date = date_param(request.GET.get('date'), timezone.localdate().strftime('%Y-%m-%d'))
         if form.is_valid():
             form.save(operator=request.user, date=report_date)
             messages.success(request, "Kirim muvaffaqiyatli qo'shildi.")
@@ -247,7 +248,7 @@ class IncomesPageView(LoginRequiredMixin, CashierRequiredMixin, View):
         return self._render(request, form=form)
 
     def _render(self, request, form=None):
-        report_date = date_param(request.GET.get('date'), date.today().strftime('%Y-%m-%d'))
+        report_date = date_param(request.GET.get('date'), timezone.localdate().strftime('%Y-%m-%d'))
         reports = DailyReport.objects.filter(type='income', operator=request.user, date=report_date).order_by('-date')
         context = {
             'form': form or IncomeForm(),
@@ -263,15 +264,16 @@ class TransactionList(LoginRequiredMixin, BossRequiredMixin, View):
     template_name = 'transaction_page.html'
 
     def get(self, request, *args, **kwargs):
-        date_from = date_param(request.GET.get('from'), (date.today() - timedelta(days=7)).strftime('%Y-%m-%d'))
-        date_to = date_param(request.GET.get('to'), date.today().strftime('%Y-%m-%d'))
+        today = timezone.localdate()
+        date_from = date_param(request.GET.get('from'), (today - timedelta(days=7)).strftime('%Y-%m-%d'))
+        date_to = date_param(request.GET.get('to'), today.strftime('%Y-%m-%d'))
         search_query = request.GET.get('q', '').strip()
 
         transactions = Transaction.objects.all().order_by('-date')
         if date_from:
-            transactions = transactions.filter(date__gte=datetime.strptime(date_from, '%Y-%m-%d'))
+            transactions = transactions.filter(date__date__gte=date_from)
         if date_to:
-            transactions = transactions.filter(date__lte=datetime.strptime(date_to, '%Y-%m-%d') + timedelta(days=1))
+            transactions = transactions.filter(date__date__lte=date_to)
         if search_query:
             transactions = transactions.filter(
                 Q(operator__username__icontains=search_query) |

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
@@ -97,7 +98,7 @@ class OperatorReportsView(OperatorRequiredMixin, ReportListBase):
         report_date = date_param(self.request.GET.get('report_date'), context['to'])
         context['report_date'] = report_date
         context['is_expired'] = (
-            datetime.today().date() - datetime.strptime(report_date, '%Y-%m-%d').date()
+            timezone.localdate() - datetime.strptime(report_date, '%Y-%m-%d').date()
         ) > timedelta(days=3)
         # Transactions not yet rolled into a daily report — exactly what
         # "Kassani yopish" will sweep up for the selected date.

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
+from django.utils import timezone
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView
@@ -231,7 +232,7 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
         context['to'] = date_param(self.request.GET.get('to'), report_date)
         context['q'] = self.request.GET.get('q', None)
         context['report_date'] = report_date
-        context['is_expired'] = datetime.today().date() - datetime.strptime(report_date, '%Y-%m-%d').date() > timedelta(days=3)
+        context['is_expired'] = timezone.localdate() - datetime.strptime(report_date, '%Y-%m-%d').date() > timedelta(days=3)
 
         user = self.request.user
         context['reports'] = DailyReport.objects.filter(operator=user).order_by('-date')[:5]
