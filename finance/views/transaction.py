@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, date, timedelta
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView, ListView, DeleteView, CreateView, UpdateView
@@ -41,7 +41,7 @@ class OperatorTransactionsView(LoginRequiredMixin, OperatorRequiredMixin, View):
         )
         if q:
             my_transactions = my_transactions.filter(
-                Q(counterparty__icontains=q) | Q(description__icontains=q)
+                Q(counterparty__icontains=q) | Q(description__icontains=q) | Q(comment__icontains=q)
             )
         if counterparty:
             my_transactions = my_transactions.filter(counterparty__icontains=counterparty)
@@ -99,7 +99,7 @@ class BulkConfirmReportsView(LoginRequiredMixin, View):
         else:
             return HttpResponseForbidden()
 
-        report_ids = request.POST.getlist('report_ids')
+        report_ids = [i for i in request.POST.getlist('report_ids') if i.isdigit()]
         if report_ids:
             DailyReport.objects.filter(pk__in=report_ids, type__in=allowed_types).update(is_closed=True)
             messages.success(request, "Tanlangan hisobotlar tasdiqlandi.")
@@ -306,19 +306,22 @@ class ChangeStatView(LoginRequiredMixin, BossRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         stat_type = request.POST.get('stat_type')
-        total_uzs = int(request.POST.get('total_uzs', 0))
-        total_usd = int(request.POST.get('total_usd', 0))
-        total_rub = int(request.POST.get('total_rub', 0))
-        total_eur = int(request.POST.get('total_eur', 0))
+        if stat_type not in ('income', 'expense', 'diff'):
+            messages.error(request, "Noto'g'ri statistika turi.")
+            return redirect(self.success_url)
+        try:
+            totals = {
+                cur: Decimal((request.POST.get(f'total_{cur}') or '0').replace(' ', '').replace(',', '.'))
+                for cur in ('uzs', 'usd', 'rub', 'eur')
+            }
+        except InvalidOperation:
+            messages.error(request, "Summa noto'g'ri kiritilgan.")
+            return redirect(self.success_url)
 
         stat, _ = Stat.objects.get_or_create(type=stat_type)
-        raw = raw_confirmed_totals()
-        data = raw[stat_type]
-
-        stat.default_uzs = (data['total_uzs'] or 0) - total_uzs
-        stat.default_usd = (data['total_usd'] or 0) - total_usd
-        stat.default_rub = (data['total_rub'] or 0) - total_rub
-        stat.default_eur = (data['total_eur'] or 0) - total_eur
+        data = raw_confirmed_totals()[stat_type]
+        for cur, value in totals.items():
+            setattr(stat, f'default_{cur}', (data[f'total_{cur}'] or 0) - value)
         stat.save()
-
+        messages.success(request, "Statistika yangilandi.")
         return redirect(self.success_url)

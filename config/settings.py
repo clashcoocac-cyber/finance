@@ -119,3 +119,27 @@ AUTH_USER_MODEL = 'finance.User'
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
+
+# Production hardening (skipped under DEBUG so runserver keeps working).
+CSRF_TRUSTED_ORIGINS = env_config.CSRF_TRUSTED_ORIGINS
+if not DEBUG and env_config.HTTPS:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SESSION_COOKIE_HTTPONLY = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {'plain': {'format': '%(asctime)s %(levelname)s %(name)s %(message)s'}},
+    'handlers': {'console': {'class': 'logging.StreamHandler', 'formatter': 'plain'}},
+    'root': {'handlers': ['console'], 'level': 'INFO'},
+    'loggers': {
+        'django.request': {'handlers': ['console'], 'level': 'WARNING', 'propagate': False},
+    },
+}

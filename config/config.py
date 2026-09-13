@@ -15,6 +15,12 @@ class Settings(BaseSettings):
     DB_HOST: str = 'localhost'
     DB_PORT: str = ''
 
+    # Set to false only when the app is served over plain HTTP behind no TLS
+    # terminator (e.g. LAN-only deployment); secure cookies would then never
+    # be sent and login could not work.
+    HTTPS: bool = True
+    CSRF_TRUSTED_ORIGINS: list[str] = []
+
     model_config = SettingsConfigDict(
         env_file='.env',
         env_file_encoding='utf-8',

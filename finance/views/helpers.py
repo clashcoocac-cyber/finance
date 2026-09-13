@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from django.db.models import Sum
 from finance.models import Transaction, Stat, StatTypes
@@ -32,7 +33,7 @@ def _aggregate(qs):
         total_usd=Sum('amount_usd'), total_uzs=Sum('amount_uzs'),
         total_rub=Sum('amount_rub'), total_eur=Sum('amount_eur'),
     )
-    return {k: v or 0 for k, v in result.items()}
+    return {k: v if v is not None else Decimal('0') for k, v in result.items()}
 
 
 def _totals_for(is_closed, date_from=None, date_to=None):
@@ -77,7 +78,7 @@ def compute_money_stats(date_from=None, date_to=None):
 
     diff_stat, _ = Stat.objects.get_or_create(type=StatTypes.BALANCE)
     for cur in CURRENCIES:
-        setattr(diff_stat, f'total_{cur}', int(raw['diff'][f'total_{cur}']) - getattr(diff_stat, f'default_{cur}'))
+        setattr(diff_stat, f'total_{cur}', raw['diff'][f'total_{cur}'] - getattr(diff_stat, f'default_{cur}'))
     diff_stat.save()
 
     combined = {}

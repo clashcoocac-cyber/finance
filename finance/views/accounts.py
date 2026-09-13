@@ -9,7 +9,7 @@ from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from django.contrib import messages
-from finance.forms import UserRegisterForm, UserUpdateForm, TransactionFrom, IncomeForm, ExpenseForm
+from finance.forms import UserRegisterForm, UserUpdateForm, TransactionEditForm, IncomeForm, ExpenseForm
 from finance.models import Counterparty, User
 from finance.models import DailyReport, Category
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
@@ -326,14 +326,19 @@ class UserUpdateView(LoginRequiredMixin, BossRequiredMixin, View):
     success_url = reverse_lazy('users')
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
-        user = User.objects.filter(id=request.POST.get('user_id')).first()
+        user_id = request.POST.get('user_id') or ''
+        user = User.objects.filter(id=user_id).first() if user_id.isdigit() else None
+        if not user:
+            messages.error(request, "Foydalanuvchi topilmadi.")
+            return redirect(self.success_url)
         form = UserUpdateForm(request.POST, instance=user)
-
         if form.is_valid():
             form.save()
-            return redirect(self.success_url)
-
+            messages.success(request, "Foydalanuvchi yangilandi.")
+        else:
+            messages.error(request, "Formani tekshiring: " + "; ".join(
+                f"{field}: {err}" for field, errs in form.errors.items() for err in errs
+            ))
         return redirect(self.success_url)
     
 
@@ -344,8 +349,17 @@ class UserDeleteView(LoginRequiredMixin, BossRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         user = User.objects.filter(pk=kwargs['pk']).first()
-        if user and user.role != 'boss':
+        if not user or user.is_boss or user.pk == request.user.pk:
+            messages.error(request, "Bu foydalanuvchini o'chirib bo'lmaydi.")
+        elif Transaction.objects.filter(operator=user).exists() or DailyReport.objects.filter(operator=user).exists():
+            # transactions/reports cascade on delete — keep the history, just
+            # lock the account
+            user.is_active = False
+            user.save(update_fields=['is_active'])
+            messages.success(request, f"{user.username} faolsizlantirildi (tranzaksiyalari saqlanadi).")
+        else:
             user.delete()
+            messages.success(request, f"{user.username} o'chirildi.")
         return redirect(self.success_url)
 
 
@@ -369,7 +383,7 @@ class TransactionView(LoginRequiredMixin, BossRequiredMixin, View):
         if not transaction:
             return redirect('transaction_list')
 
-        form = TransactionFrom(instance=transaction)
+        form = TransactionEditForm(instance=transaction)
         context = {
             'form': form,
             'transaction': transaction,
@@ -383,19 +397,19 @@ class TransactionView(LoginRequiredMixin, BossRequiredMixin, View):
         if not transaction:
             return redirect('transaction_list')
 
-        data = request.POST.copy()
-        transaction = Transaction.objects.filter(pk=pk).first()
-        transaction.payment_type = data.get('payment_type')
-        transaction.click = data.get('click') or None
-        transaction.amount_usd = Decimal(data.get('amount_usd') or 0) or None
-        transaction.amount_uzs = Decimal(data.get('amount_uzs') or 0) or None
-        transaction.amount_rub = Decimal(data.get('amount_rub') or 0) or None
-        transaction.amount_eur = Decimal(data.get('amount_eur') or 0) or None
-        transaction.save()
+        form = TransactionEditForm(request.POST, instance=transaction)
+        if not form.is_valid():
+            messages.error(request, "Formani tekshiring.")
+            return render(request, self.template_name, {
+                'form': form, 'transaction': transaction,
+                'clicks': CLICKS, 'choices': Transaction.PAYMENT_TYPES,
+            })
+        form.save()
+        messages.success(request, "Tranzaksiya yangilandi.")
         return redirect('transaction_list')
 
 
-class TransactionDeleteView(BossRequiredMixin, View):
+class TransactionDeleteView(LoginRequiredMixin, BossRequiredMixin, View):
     success_url = reverse_lazy('transaction_list')
 
     def post(self, request, pk, *args, **kwargs):
@@ -404,44 +418,10 @@ class TransactionDeleteView(BossRequiredMixin, View):
             return redirect(self.success_url)
 
         report = transaction.report
-        if report:
-            # Safely subtract amounts from report totals and details
-            usd = transaction.amount_usd or Decimal('0')
-            uzs = transaction.amount_uzs or Decimal('0')
-            rub = transaction.amount_rub or Decimal('0')
-            eur = transaction.amount_eur or Decimal('0')
-
-            report.total_usd = (report.total_usd or Decimal('0')) - usd
-            report.total_uzs = (report.total_uzs or Decimal('0')) - uzs
-            report.total_rub = (report.total_rub or Decimal('0')) - rub
-            # note: model has total_uer field name typo in places; use what's on model
-            report.total_eur = (getattr(report, 'total_eur', Decimal('0')) or Decimal('0')) - eur
-
-            key = transaction.click if transaction.payment_type == 'click' else transaction.payment_type
-
-            def subtract_detail(field, amount):
-                detail = getattr(report, field) or {}
-                current = Decimal(detail.get(key, 0) or 0)
-                new = current - (amount or Decimal('0'))
-                if new <= 0:
-                    detail.pop(key, None)
-                else:
-                    # keep previous behaviour of storing ints for detail values
-                    detail[key] = int(new)
-                setattr(report, field, detail)
-
-            subtract_detail('usd_detail', usd)
-            subtract_detail('uzs_detail', uzs)
-            subtract_detail('rub_detail', rub)
-            subtract_detail('eur_detail', eur)
-
-            # If there are other transactions linked to this report, save adjustments;
-            # otherwise remove the empty report.
-            other_exists = Transaction.objects.filter(report=report).exclude(pk=transaction.pk).exists()
-            if other_exists:
-                report.save()
-            else:
-                report.delete()
-
+        # the post_delete signal recalculates the report's totals/details from
+        # the remaining transactions; a report left with none is removed
         transaction.delete()
+        if report and not Transaction.objects.filter(report=report).exists():
+            report.delete()
+        messages.success(request, "Tranzaksiya o'chirildi.")
         return redirect(self.success_url)

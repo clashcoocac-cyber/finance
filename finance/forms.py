@@ -23,7 +23,7 @@ class UserRegisterForm(forms.ModelForm):
         labels = {'username': 'Login', 'role': 'Rol', 'company_name': 'Kompaniya', 'password': 'Parol'}
 
     def save(self, commit = True):
-        company_name = self.cleaned_data.pop('company_name', '')
+        company_name = (self.cleaned_data.pop('company_name', '') or '').strip()
         password = self.cleaned_data.pop('password')
 
         user = super().save(commit=False)
@@ -52,16 +52,16 @@ class UserUpdateForm(UserChangeForm):
     def save(self, commit = True, **kwargs):
         user = super().save(commit=False)
 
-        print(self.cleaned_data)
-
         new_password = self.cleaned_data.get('new_password')
         if new_password:
             user.set_password(new_password)
 
-        company_name = self.cleaned_data.get('company_name')
-
-        company, _ = Company.objects.get_or_create(name=company_name)
-        user.company = company
+        company_name = (self.cleaned_data.get('company_name') or '').strip()
+        if company_name:
+            company, _ = Company.objects.get_or_create(name=company_name)
+            user.company = company
+        else:
+            user.company = None
 
         if commit:
             user.save()
@@ -121,6 +121,23 @@ class TransactionFrom(forms.ModelForm):
             transaction.save()
 
         return transaction
+
+class TransactionEditForm(forms.ModelForm):
+    """Boss edit of an existing transaction: amounts and payment channel only."""
+
+    class Meta:
+        model = Transaction
+        fields = ['amount_usd', 'amount_uzs', 'amount_rub', 'amount_eur', 'payment_type', 'click']
+        labels = AMOUNT_LABELS
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('payment_type') != 'click':
+            cleaned_data['click'] = None
+        elif not cleaned_data.get('click'):
+            self.add_error('click', "Click kartani tanlang.")
+        return cleaned_data
+
 
 class IncomeForm(forms.ModelForm):
     counterparty = forms.ChoiceField(choices=[], label="Manba (Kirim manbai)")

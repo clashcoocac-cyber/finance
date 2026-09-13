@@ -16,7 +16,10 @@ def format_currency(value):
 def get_item(dictionary, key):
     """Get item from dictionary by key."""
     if isinstance(dictionary, dict):
-        return dictionary.get(key, key)
+        try:
+            return dictionary.get(key, key)
+        except TypeError:  # unhashable key
+            return key
     return key
 
 _PENDING_CURRENCY_LABELS = (
