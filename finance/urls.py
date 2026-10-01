@@ -2,7 +2,7 @@ from django.urls import path
 from .views.accounts import (
     HomeView,
     BossDashboardView, ChiefCashierDashboardView, OperatorDashboardView, FinancePageView,
-    CustomLoginView, CustomLogoutView,
+    CustomLoginView, CustomLogoutView, CustomPasswordChangeView,
     UserListCreateView, UserUpdateView, UserDeleteView, TransactionView
 )
 from .views.accounts import TransactionDeleteView
@@ -27,6 +27,7 @@ urlpatterns = [
     path("finance/", FinancePageView.as_view(), name="finance_page"),
 
     # Profile
+    path("password/", CustomPasswordChangeView.as_view(), name="password_change"),
 
     # User management (boss)
     path("users/", UserListCreateView.as_view(), name="users"),

@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
@@ -290,6 +290,15 @@ class CustomLogoutView(LogoutView):
 
     def get(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'accounts/password_change.html'
+    success_url = reverse_lazy('password_change')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Parol muvaffaqiyatli o'zgartirildi.")
+        return super().form_valid(form)
+
 
 class UserListCreateView(LoginRequiredMixin, BossRequiredMixin, View):
     template_name = 'accounts/user_list.html'

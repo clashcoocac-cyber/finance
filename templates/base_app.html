@@ -42,6 +42,10 @@
                         <small class="finance-sidebar-role">{{ request.user.get_role_display }}</small>
                     </div>
                 </div>
+                <a href="{% url 'password_change' %}" class="finance-sidebar-link">
+                    <i aria-hidden="true" class="bx bx-lock-alt"></i>
+                    <span>Parolni o'zgartirish</span>
+                </a>
                 <a href="{% url 'logout' %}" class="finance-sidebar-logout">
                     <i aria-hidden="true" class="bx bx-log-out"></i>
                     <span>Chiqish</span>

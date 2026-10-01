@@ -716,3 +716,31 @@ class AccessMatrixTests(AccountsTestMixin, TestCase):
                 response = self.client.get(reverse(url_name))
                 self.assertEqual(response.status_code, 302, url_name)
                 self.assertTrue(response.url.startswith(reverse('login')), url_name)
+
+
+class PasswordChangeTests(AccountsTestMixin, TestCase):
+    url = '/password/'
+
+    def test_anon_redirected_to_login(self):
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, 302)
+        self.assertIn('/login/', resp['Location'])
+
+    def test_boss_changes_own_password_and_stays_logged_in(self):
+        self.client.login(username='vac_boss', password=PASSWORD)
+        resp = self.client.post(self.url, {
+            'old_password': PASSWORD, 'new_password1': 'new-pass-777', 'new_password2': 'new-pass-777',
+        })
+        self.assertRedirects(resp, self.url)
+        self.boss.refresh_from_db()
+        self.assertTrue(self.boss.check_password('new-pass-777'))
+        self.assertEqual(self.client.get(self.url).status_code, 200)
+
+    def test_wrong_old_password_rejected(self):
+        self.client.login(username='vac_boss', password=PASSWORD)
+        resp = self.client.post(self.url, {
+            'old_password': 'nope', 'new_password1': 'new-pass-777', 'new_password2': 'new-pass-777',
+        })
+        self.assertEqual(resp.status_code, 200)
+        self.boss.refresh_from_db()
+        self.assertTrue(self.boss.check_password(PASSWORD))
