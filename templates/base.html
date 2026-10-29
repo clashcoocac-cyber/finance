@@ -30,6 +30,32 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"
         integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6"
         crossorigin="anonymous"></script>
+    <script>
+        // Date pickers speak Uzbek and always show dd.mm.yyyy (the browser's own date input follows the browser's locale and can show day and month the other way round).
+        flatpickr.localize({
+            firstDayOfWeek: 1,
+            weekdays: {
+                shorthand: ['Yak', 'Dush', 'Sesh', 'Chor', 'Pay', 'Juma', 'Shan'],
+                longhand: ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'],
+            },
+            months: {
+                shorthand: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyun', 'Iyul', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'],
+                longhand: ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'],
+            },
+            rangeSeparator: ' - ',
+        });
+        // Single-date inputs: <input type="text" data-uz-date value="YYYY-MM-DD">. The form/handlers keep reading
+        // YYYY-MM-DD from the real input; the visible one shows dd.mm.yyyy.
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('input[data-uz-date]').forEach(function (input) {
+                const id = input.id, label = input.getAttribute('aria-label');
+                const picker = flatpickr(input, { dateFormat: 'Y-m-d', altInput: true, altFormat: 'd.m.Y', disableMobile: true });
+                if (id) { input.removeAttribute('id'); picker.altInput.id = id; }
+                if (label) picker.altInput.setAttribute('aria-label', label);
+                picker.altInput.style.cssText = input.style.cssText;
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.14.1/dist/cdn.min.js"
         integrity="sha384-bKXNU7o2Y3Uk/F2PB6U0bMyGZf6pLDnePM70U7sTE3cXUQ+JLgzrr/kwipEh0p23" crossorigin="anonymous" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"

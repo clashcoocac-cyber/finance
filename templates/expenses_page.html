@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <input value="{{ date }}" type="date" aria-label="Sana" class="form-control px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" onchange="window.location.href = `?date=${this.value}`">
+                    <input value="{{ date }}" type="text" data-uz-date aria-label="Sana" class="form-control px-3 py-2 border rounded-md text-sm" style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);" onchange="window.location.href = `?date=${this.value}`">
                     <a href="{% url 'expenses_list' %}" class="rounded-md px-4 py-2.5 text-sm font-medium inline-flex items-center gap-2" style="background: var(--color-surface-muted); color: var(--color-text);">
                         <i aria-hidden="true" class="bx bx-calendar"></i>
                         Bugun
@@ -130,7 +130,7 @@
                         <tbody>
                     {% for report in reports %}
                     <tr style="border-bottom: 1px solid var(--color-border);">
-                        <td class="px-4 py-3 text-sm whitespace-nowrap" style="color: var(--color-text);"><div class="font-medium">{{ report.date|date:"d/m/Y" }}</div></td>
+                        <td class="px-4 py-3 text-sm whitespace-nowrap" style="color: var(--color-text);"><div class="font-medium">{{ report.date|date:"d.m.Y" }}</div></td>
                         <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                             <div class="flex items-center gap-2">
                                 <span class="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style="background: var(--color-negative-bg); color: var(--color-negative);"><i aria-hidden="true" class="bx bx-trending-down"></i></span>

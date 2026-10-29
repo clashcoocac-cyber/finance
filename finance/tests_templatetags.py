@@ -33,18 +33,18 @@ class FormatCurrencyTests(TestCase):
         self.assertEqual(custom_filters.format_currency(Decimal("0.00")), "0")
 
     def test_million_space_separated(self):
-        self.assertEqual(custom_filters.format_currency(1000000), "1 000 000")
+        self.assertEqual(custom_filters.format_currency(1000000), "1\u00a0000\u00a0000")
 
     def test_thousand(self):
-        self.assertEqual(custom_filters.format_currency(1000), "1 000")
+        self.assertEqual(custom_filters.format_currency(1000), "1\u00a0000")
 
     def test_decimal_rounds_half_to_even_via_float(self):
         # value is cast through float, so .5 rounds to even neighbour
-        self.assertEqual(custom_filters.format_currency(Decimal("1234.5")), "1 234")
-        self.assertEqual(custom_filters.format_currency(Decimal("1235.5")), "1 236")
+        self.assertEqual(custom_filters.format_currency(Decimal("1234.5")), "1\u00a0234")
+        self.assertEqual(custom_filters.format_currency(Decimal("1235.5")), "1\u00a0236")
 
     def test_decimal_fraction_below_half_rounds_down(self):
-        self.assertEqual(custom_filters.format_currency(Decimal("1234.4")), "1 234")
+        self.assertEqual(custom_filters.format_currency(Decimal("1234.4")), "1\u00a0234")
 
     def test_float_fraction_rounds_to_nearest(self):
         self.assertEqual(custom_filters.format_currency(99.99), "100")
@@ -52,7 +52,7 @@ class FormatCurrencyTests(TestCase):
         self.assertEqual(custom_filters.format_currency(2.5), "2")
 
     def test_negative_amount(self):
-        self.assertEqual(custom_filters.format_currency(-5000), "-5 000")
+        self.assertEqual(custom_filters.format_currency(-5000), "-5\u00a0000")
 
     def test_negative_fractional_no_minus_zero_crash(self):
         # never raises; documents the float-artifact output
@@ -60,7 +60,7 @@ class FormatCurrencyTests(TestCase):
         self.assertEqual(custom_filters.format_currency(-0.6), "-1")
 
     def test_string_numeric_converts(self):
-        self.assertEqual(custom_filters.format_currency("12345"), "12 345")
+        self.assertEqual(custom_filters.format_currency("12345"), "12\u00a0345")
 
     def test_string_with_surrounding_spaces_converts(self):
         self.assertEqual(custom_filters.format_currency("  7  "), "7")
@@ -72,11 +72,11 @@ class FormatCurrencyTests(TestCase):
         # largest value storable in max_digits=15 / decimal_places=2
         self.assertEqual(
             custom_filters.format_currency(Decimal("9999999999999.99")),
-            "10 000 000 000 000",
+            "10\u00a0000\u00a0000\u00a0000\u00a0000",
         )
 
     def test_huge_float_no_crash(self):
-        self.assertEqual(custom_filters.format_currency(12345678901234.56), "12 345 678 901 235")
+        self.assertEqual(custom_filters.format_currency(12345678901234.56), "12\u00a0345\u00a0678\u00a0901\u00a0235")
 
 
 class FormatCurrencyFaultToleranceTests(TestCase):
@@ -160,7 +160,7 @@ class PendingSummaryTests(TestCase):
 
     def test_mixed_dict_exact_string(self):
         amounts = {"total_uzs": 60000, "total_usd": 0, "total_rub": 0, "total_eur": 5}
-        self.assertEqual(custom_filters.pending_summary(amounts), "60 000 so'm, 5 €")
+        self.assertEqual(custom_filters.pending_summary(amounts), "60\u00a0000 so'm, 5 €")
 
     def test_currency_order_uzs_usd_rub_eur(self):
         amounts = {"total_eur": 1, "total_rub": 2, "total_usd": 3, "total_uzs": 4}
@@ -309,7 +309,7 @@ class FilterRegistrationTests(TestCase):
     def test_format_currency_registered(self):
         self.assertEqual(
             self.render("{% load custom_filters %}{{ x|format_currency }}", 1000000),
-            "1 000 000",
+            "1\u00a0000\u00a0000",
         )
 
     def test_get_item_registered(self):
@@ -333,7 +333,7 @@ class FilterRegistrationTests(TestCase):
                 "{% load custom_filters %}{{ x|pending_summary }}",
                 {"total_uzs": 60000, "total_usd": 0, "total_rub": 0, "total_eur": 5},
             ),
-            "60 000 so&#x27;m, 5 €",
+            "60\u00a0000 so&#x27;m, 5 €",
         )
 
     def test_maqsad_registered(self):
@@ -424,11 +424,11 @@ class FiltersWithPersistedModelsTests(TestCase):
             total_usd=Decimal("0.00"),
             total_eur=Decimal("5.00"),
         )
-        self.assertEqual(custom_filters.pending_summary(report), "60 000 so'm, 5 €")
+        self.assertEqual(custom_filters.pending_summary(report), "60\u00a0000 so'm, 5 €")
 
     def test_format_currency_on_persisted_decimal_field(self):
         report = self.make_report(total_uzs=Decimal("1234.50"))
-        self.assertEqual(custom_filters.format_currency(report.total_uzs), "1 234")
+        self.assertEqual(custom_filters.format_currency(report.total_uzs), "1\u00a0234")
 
     def test_maqsad_on_persisted_report(self):
         report = self.make_report(desc="Maqsad: tushum — keltirilgan")
@@ -446,5 +446,5 @@ class FiltersWithPersistedModelsTests(TestCase):
         report = self.make_report(total_uzs=Decimal("9999999999999.99"))
         self.assertEqual(
             custom_filters.format_currency(report.total_uzs),
-            "10 000 000 000 000",
+            "10\u00a0000\u00a0000\u00a0000\u00a0000",
         )

@@ -68,7 +68,7 @@
                                     <input type="checkbox" name="report_ids" value="{{ report.pk }}" x-model="selected" aria-label="{{ report.date|date:'d.m.Y' }} hisobotini belgilash">
                                     {% endif %}
                                 </td>
-                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.date|date:"d/m/Y" }}</td>
+                                <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ report.date|date:"d.m.Y" }}</td>
                                 <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                                     {% if report.type == 'income' %}
                                         <div>{{ report.operator.username }}</div>
@@ -79,7 +79,7 @@
                                 </td>
                                 <td class="px-4 py-3 text-sm" style="color: var(--color-text);">
                                     {% if report.type == 'income' %}
-                                        {{ report.operator.company.name }}
+                                        {{ report.operator.company.name|default:"-" }}
                                     {% else %}
                                         {{ report.category }}
                                     {% endif %}

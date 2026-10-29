@@ -49,7 +49,7 @@
                                 </span>
                             </td>
                             <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ user.company.name|default:"-" }}</td>
-                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ user.created|date:"d/m/Y" }}</td>
+                            <td class="px-4 py-3 text-sm" style="color: var(--color-text);">{{ user.created|date:"d.m.Y" }}</td>
                             <td class="px-4 py-3 text-sm">
                                 {% if not user.is_boss %}
                                 <div class="relative" x-data="{ menuOpen: false, menuPos: {top: 0, left: 0} }">

@@ -1295,8 +1295,9 @@ body {
 
 .finance-money-cell {
   display: flex;
+  flex-wrap: wrap;            /* if the number and its unit do not fit side by side, the unit drops below */
   align-items: baseline;
-  gap: 0.3125rem;
+  column-gap: 0.3125rem;
   min-width: 0;
   padding: 0.625rem 0.75rem;
   border-radius: 0.5rem;
@@ -1317,9 +1318,7 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
   color: #384551;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;        /* never split an amount; never clip digits with an ellipsis */
 }
 
 .finance-money-unit {
@@ -1355,7 +1354,7 @@ body {
   padding-top: 0.75rem;
   border-top: 1px solid #ebeaee;
   font-size: 0.8125rem;
-  color: #a5a3ae;
+  color: #6f6b7d;             /* 5.2:1 on white (was 2.5:1) */
 }
 
 .finance-money-card-foot > .bx {
@@ -1365,7 +1364,7 @@ body {
 
 .finance-money-card-foot-value {
   font-weight: 600;
-  color: #cc7700;
+  color: #a35a00;             /* 5.2:1 on white (was 3.4:1) */
   font-variant-numeric: tabular-nums;
 }
 
@@ -1398,3 +1397,4 @@ body {
 .finance-amount-cell > span + span {
   margin-left: 0.75rem;
 }
+
