@@ -11,12 +11,14 @@ from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.utils import timezone
+from django.db import transaction as db_transaction
 from django.db.models import Sum, Q
 from finance.forms import ExpenseForm, TransactionFrom, IncomeForm
 from finance.models import User, Company, Category
 from finance.models import DailyReport, CLICKS
 from finance.mixins import BossRequiredMixin, CashierRequiredMixin, OperatorRequiredMixin
 from finance.models import Transaction, Stat
+from finance.models import _recalc_report as recalc_report
 from finance.views.helpers import preserve_filters, raw_confirmed_totals, date_param
 
 
@@ -121,81 +123,43 @@ class CloseCashRegister(LoginRequiredMixin, OperatorRequiredMixin, View):
         except (ValueError, TypeError):
             selected_date = timezone.localdate()
 
-        # Collect unreported transactions for this operator on the selected date only
-        unreported = list(
-            Transaction.objects.filter(
-                operator=user, 
-                report__isnull=True,
-                date__date=selected_date
-            ).order_by('-date')
-        )
+        with db_transaction.atomic():
+            # Collect unreported transactions for this operator on the selected date only
+            unreported = list(
+                Transaction.objects.filter(
+                    operator=user,
+                    report__isnull=True,
+                    date__date=selected_date
+                ).order_by('-date')
+            )
 
-        if not unreported:
-            return redirect(self.success_url + f'?report_date={report_date_str}')
+            if not unreported:
+                return redirect(self.success_url + f'?report_date={report_date_str}')
 
-        # One report per operator per day, full stop — "Kassani yopish" bundles
-        # every transaction from the day into a single report, regardless of
-        # which shift was active in the session when each close happened
-        # (operator_shift used to be part of this lookup, which silently
-        # created a second report whenever the session's shift value changed
-        # or was missing between closes).
-        report, created = DailyReport.objects.get_or_create(
-            operator=user,
-            date=selected_date,
-            defaults={'is_closed': False, 'type': 'income', 'operator_shift': shift},
-        )
+            # One report per operator per day, full stop - "Kassani yopish" bundles
+            # every transaction from the day into a single report, regardless of
+            # which shift was active in the session when each close happened.
+            report, created = DailyReport.objects.get_or_create(
+                operator=user,
+                date=selected_date,
+                defaults={'is_closed': False, 'type': 'income', 'operator_shift': shift},
+            )
 
-        # If a report already existed and was closed, reopen it so boss can confirm
-        if report.is_closed:
+            comment_tran = next((tx for tx in unreported if tx.comment), None)
+
+            # assign transactions to this report
+            Transaction.objects.filter(pk__in=[t.pk for t in unreported]).update(report=report)
+
+            # Totals and per-payment-type details are recomputed from the report's
+            # transactions (not added on top of the stored numbers): exact to the
+            # cent, and pressing the button twice can never count anything twice.
+            recalc_report(report.pk)
+            report.refresh_from_db()
+            if comment_tran:
+                report.comment = comment_tran.comment
+            # A report that was already closed is reopened so the boss can confirm it again.
             report.is_closed = False
-
-        # Start from existing details if present
-        result = {
-            'usd': defaultdict(lambda: Decimal('0')),
-            'uzs': defaultdict(lambda: Decimal('0')),
-            'rub': defaultdict(lambda: Decimal('0')),
-            'eur': defaultdict(lambda: Decimal('0')),
-        }
-
-        # seed from existing report details
-        for k, v in (report.usd_detail or {}).items():
-            result['usd'][k] += Decimal(v or 0)
-        for k, v in (report.uzs_detail or {}).items():
-            result['uzs'][k] += Decimal(v or 0)
-        for k, v in (report.rub_detail or {}).items():
-            result['rub'][k] += Decimal(v or 0)
-        for k, v in (report.eur_detail or {}).items():
-            result['eur'][k] += Decimal(v or 0)
-
-        comment_tran = None
-        for tx in unreported:
-            if not comment_tran and tx.comment:
-                comment_tran = tx
-
-            key = tx.click if tx.payment_type == 'click' else tx.payment_type
-            result['usd'][key] += Decimal(tx.amount_usd or 0)
-            result['uzs'][key] += Decimal(tx.amount_uzs or 0)
-            result['rub'][key] += Decimal(tx.amount_rub or 0)
-            result['eur'][key] += Decimal(tx.amount_eur or 0)
-
-        # assign transactions to this report
-        Transaction.objects.filter(pk__in=[t.pk for t in unreported]).update(report=report)
-
-        if comment_tran:
-            report.comment = comment_tran.comment
-
-        report.total_usd = sum(result['usd'].values())
-        report.total_uzs = sum(result['uzs'].values())
-        report.total_rub = sum(result['rub'].values())
-        # set EUR total
-        report.total_eur = sum(result['eur'].values())
-
-        report.usd_detail = {k: int(v) for k, v in result['usd'].items()}
-        report.uzs_detail = {k: int(v) for k, v in result['uzs'].items()}
-        report.rub_detail = {k: int(v) for k, v in result['rub'].items()}
-        report.eur_detail = {k: int(v) for k, v in result['eur'].items()}
-        report.is_closed = False
-        report.save()
+            report.save(update_fields=['comment', 'is_closed'])
 
         return redirect(self.success_url + f'?report_date={report_date_str}')
 

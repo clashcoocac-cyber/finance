@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta
 from decimal import Decimal
 from django.utils import timezone
@@ -10,6 +11,7 @@ from django.db.models.functions import Lower
 from django.urls import reverse_lazy
 from django.db.models import Sum
 from django.contrib import messages
+from django.core.cache import cache
 from finance.forms import UserRegisterForm, UserUpdateForm, TransactionEditForm, IncomeForm, ExpenseForm
 from finance.models import Counterparty, User
 from finance.models import DailyReport, Category
@@ -274,14 +276,53 @@ class OperatorDashboardView(LoginRequiredMixin, OperatorRequiredMixin, TemplateV
 
 # --- AUTH (LOGIN / LOGOUT / REGISTER) ---
 
+MAX_FAILED_LOGINS = 5          # per username from one address
+MAX_FAILED_LOGINS_PER_IP = 30   # per address, across usernames
+LOCKOUT_SECONDS = 15 * 60
+
+
+def _client_ip(request):
+    """nginx sets X-Real-IP; the socket peer is nginx itself."""
+    return request.META.get('HTTP_X_REAL_IP') or request.META.get('REMOTE_ADDR', '')
+
+
+def _count_failure(key):
+    cache.add(key, 0, LOCKOUT_SECONDS)
+    try:
+        cache.incr(key)
+    except ValueError:  # expired between add() and incr()
+        cache.set(key, 1, LOCKOUT_SECONDS)
+
+
 class CustomLoginView(LoginView):
+    """Sign-in with a brake on password guessing."""
     template_name = 'accounts/login.html'
 
+    def _throttle_keys(self):
+        ip = _client_ip(self.request)
+        username = (self.request.POST.get('username') or '').strip().lower()[:150]
+        digest = hashlib.sha256(username.encode()).hexdigest()[:32]
+        return f'login-fail:{ip}:{digest}', f'login-fail-ip:{ip}'
+
     def post(self, request, *args, **kwargs):
+        user_key, ip_key = self._throttle_keys()
+        if cache.get(user_key, 0) >= MAX_FAILED_LOGINS or cache.get(ip_key, 0) >= MAX_FAILED_LOGINS_PER_IP:
+            form = self.get_form()
+            form.add_error(None, "Juda ko'p noto'g'ri urinish. 15 daqiqadan keyin qayta urinib ko'ring.")
+            return self.render_to_response(self.get_context_data(form=form), status=429)
         shift = request.POST.get('shift', None)
         if shift:
             request.session['shift'] = shift
         return super().post(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        for key in self._throttle_keys():
+            _count_failure(key)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        cache.delete(self._throttle_keys()[0])
+        return super().form_valid(form)
 
 
 class CustomLogoutView(LogoutView):

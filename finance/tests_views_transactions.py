@@ -366,13 +366,16 @@ class CloseCashRegisterTests(TestCase):
         self.assertEqual(rep.uzs_detail, {'click1': 100, 'click2': 200, 'terminal': 300, 'bank': 400})
 
     def test_merges_with_preexisting_report_details(self):
+        # Closing again later the same day adds the new transactions to the day's report;
+        # totals are recomputed from all of the report's transactions.
         d = today()
-        rep = DailyReport.objects.create(operator=self.operator, type='income', date=d, category='c',
-                                         uzs_detail={'cash': 5})
+        make_tx(self.operator, date=dt_on(d, 9), amount_uzs=Decimal('5'))
+        self.close(d.strftime('%Y-%m-%d'))
         make_tx(self.operator, date=dt_on(d, 10), amount_uzs=Decimal('7'))
         self.close(d.strftime('%Y-%m-%d'))
-        rep.refresh_from_db()
+        rep = DailyReport.objects.get(operator=self.operator, date=d)
         self.assertEqual(rep.uzs_detail, {'cash': 12})
+        self.assertEqual(rep.total_uzs, Decimal('12'))
 
     def test_comment_copied_from_first_tx_with_one(self):
         d = today()

@@ -1,4 +1,5 @@
 import sys
+import tempfile
 from pathlib import Path
 from config.config import env_config
 
@@ -139,6 +140,14 @@ SESSION_COOKIE_HTTPONLY = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
+# Shared by all gunicorn workers; used for the sign-in attempt limiter.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': str(Path(tempfile.gettempdir()) / 'sfb-cache'),
+    }
+}
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -153,6 +162,7 @@ LOGGING = {
 
 # Tests: fast password hasher + in-memory SQLite (PBKDF2 and Postgres dominate test time)
 if 'test' in sys.argv:
+    CACHES = {'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}}
     LOGGING['loggers']['django.request'] = {'handlers': [], 'propagate': False}  # expected 403/405 in tests
     PASSWORD_HASHERS = ['django.contrib.auth.hashers.MD5PasswordHasher']
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}
